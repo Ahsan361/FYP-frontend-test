@@ -3,7 +3,8 @@ import { createTheme } from '@mui/material/styles';
 // Professional color palette for cultural heritage
 const colors = {
   primary: {
-    main: '#1B4332', // Deep forest green - represents heritage and tradition
+    main: '#1B4332',
+    lightmain: "#616161",// Deep forest green - represents heritage and tradition
     light: '#2D5A3D',
     dark: '#0F2920',
     contrastText: '#FFFFFF'
@@ -33,6 +34,7 @@ export const lightTheme = createTheme({
   palette: {
     mode: 'light',
     primary: colors.primary,
+    lightmain: colors.primary.lightmain,
     secondary: colors.secondary,
     background: {
       default: '#FAFAFA',
@@ -115,7 +117,8 @@ export const darkTheme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#4ADE80', // Lighter green for dark mode
+      main: '#4ADE80',
+      lightmain: "#4ade808a", // Bright green - represents growth and renewal
       light: '#6EE7B7',
       dark: '#22C55E',
       contrastText: '#000000'

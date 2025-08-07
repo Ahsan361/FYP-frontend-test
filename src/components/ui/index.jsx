@@ -6,4 +6,6 @@ export { default as Modal } from './Modal';
 export { default as Loading } from './Loading';
 export { default as Alert } from './Alert';
 export { default as ThemeToggle } from './ThemeToggle';
-export {default as Navbar} from './navbar';
+export {default as Navbar} from '../Navbar/Navbar';
+export {default as SlideNavButton} from './slideButton';
+
