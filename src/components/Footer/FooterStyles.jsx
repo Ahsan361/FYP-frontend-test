@@ -8,7 +8,7 @@ const StyledFooter = styled(Box)(({ theme }) => ({
     ? theme.palette.common.white 
     : theme.palette.text.primary,
   marginTop: 'auto',
-  padding: theme.spacing(6, 0, 2),
+  padding: theme.spacing(4, 6, 6),
   position: 'relative',
   
   '&::before': {

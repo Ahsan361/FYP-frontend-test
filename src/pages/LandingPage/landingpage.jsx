@@ -10,11 +10,12 @@ import Footer from '../../components/Footer/Footer';
 import { lightTheme, darkTheme } from '../../styles/theme';
 
 import Hero from './heroSection';
-import ArtifactsSection from './ArtifactsSection';
+import ExhibitionsEventsSection from './ExhibitionsEventsSection';
 import CollectionSection from './CollectionSection';
 import QuickActionsSection from './QuickActionsSection';
 import NewsletterSection from './NewsletterSection';
 import StatisticsSection from './StatisticsSection';
+import VisitMuseumSection from './VisitMuseumSection';
 
 function EnhancedLandingPage() {
   const darkMode = useSelector((state) => state.theme.darkMode);
@@ -57,16 +58,15 @@ function EnhancedLandingPage() {
       <StatisticsSection/>
 
       {/* {ArtifactsSection} */}
-      <ArtifactsSection/>
+      <ExhibitionsEventsSection/>
       {/* Collections Section */}
       <CollectionSection/>
-
+      {/* {Visit Museum Section} */}
+      <VisitMuseumSection />
       {/* Quick Actions Section */}
       <QuickActionsSection/>
-
       {/* Newsletter/CTA Section */}
       <NewsletterSection/>
-
       {/* Footer */}
       <Footer />
     </ThemeProvider>

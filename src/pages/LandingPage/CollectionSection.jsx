@@ -36,93 +36,88 @@ function CollectionSection(){
           title: 'Folk Traditions',
           count: 2240,
           icon: <People />,
-          image: 'https://images.unsplash.com/photo-1551650681-ca71a83d1dc6?w=300&h=200&fit=crop',
+          image: 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=300&h=200&fit=crop',
           description: 'Traditional crafts, textiles, and cultural items'
         }
     ];
 
     return(
-    <Paper 
-        sx={{ 
-        py: { xs: 4, md: 8 }, 
-        backgroundColor: theme.palette.mode === 'light' ? theme.palette.background.default : theme.palette.background.paper 
-        }} 
-        elevation={0}
-      >
-        <Container maxWidth="lg">
-          <Slide direction="up" in={true} timeout={800}>
-            <Box sx={{ mb: 6, textAlign: 'center' }}>
-              <Typography variant="h2" sx={{ fontWeight: 700, mb: 2 }}>
-                Explore Collections
-              </Typography>
-              <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
-                Browse through our carefully curated collections spanning thousands of years 
-                of cultural heritage
-              </Typography>
-            </Box>
-          </Slide>
+      <Container maxWidth={false}  sx={{ px:{xs: 2, md: 8}, py: { xs: 4, md: 8 } }}>
+        <Slide direction="up" in={true} timeout={800}>
+          <Box sx={{ mb: 6, textAlign: 'center' }}>
+            <Typography variant="h2" sx={{ fontWeight: 700, mb: 2 }}>
+              Explore Collections
+            </Typography>
+            <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
+              Browse through our carefully curated collections spanning thousands of years 
+              of cultural heritage
+            </Typography>
+          </Box>
+        </Slide>
 
-          <Grid container spacing={4}>
-            {collections.map((collection, index) => (
-              <Grid key={index} size={{ xs: 12, sm: 6, md: 3 }}>
-                <Grow in={true} timeout={1000 + index * 200}>
-                  <Card
-                    image={collection.image}
-                    imageHeight={200}
-                    sx={{ 
-                      height: '100%', 
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
-                        transform: 'translateY(-8px)',
-                      }
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <Box
-                        sx={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: '50%',
-                          backgroundColor: 'primary.main',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: 'white',
-                          mr: 2
-                        }}
-                      >
-                        {collection.icon}
-                      </Box>
-                      <Box>
-                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                          {collection.title}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {collection.count} items
-                        </Typography>
-                      </Box>
-                    </Box>
-                    
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                      {collection.description}
-                    </Typography>
-
-                    <Button 
-                      variant="outlined" 
-                      size="small" 
-                      fullWidth 
-                      endIcon={<ArrowForward />}
+        <Grid container spacing={4}>
+          {collections.map((collection, index) => (
+            <Grid key={index} size={{ xs: 12, sm: 6, md: 3 }}>
+              <Grow in={true} timeout={1000 + index * 200}>
+                <Card
+                  image={collection.image}
+                  imageHeight={250}
+                  sx={{ 
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    position: 'relative',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                    }
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Box
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: '50%',
+                        backgroundColor: 'primary.main',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'white',
+                        mr: 2
+                      }}
                     >
-                      View Collection
-                    </Button>
-                  </Card>
-                </Grow>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Paper>
+                      {collection.icon}
+                    </Box>
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                        {collection.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {collection.count} items
+                      </Typography>
+                    </Box>
+                  </Box>
+                  
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                    {collection.description}
+                  </Typography>
+
+                  <Button 
+                    variant="outlined" 
+                    size="small" 
+                    fullWidth 
+                    endIcon={<ArrowForward />}
+                  >
+                    View Collection
+                  </Button>
+                </Card>
+              </Grow>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
     )
 }
 
