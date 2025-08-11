@@ -64,6 +64,11 @@ export const NavButton = styled(Button)(({ theme }) => ({
   '&:hover::after': {
     width: '100%',
   },
+  '&.MuiButton-root': {
+    '& .MuiTouchRipple-root': {
+      display: 'none'
+    }
+  }
 }));
 export const StyledListItem = styled(
   (props) => <ListItem {...props} />,

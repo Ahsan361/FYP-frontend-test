@@ -1,4 +1,3 @@
-import React , {forwardRef } from 'react';
 import {
   Box,
   Container,
@@ -24,10 +23,8 @@ import {
 import FooterLink from './FooterLink';
 import StyledFooter from './FooterStyles';
 import SocialIconButton from './FooterIconButtons';
-import AnimatedIconButton from '../ui/AnimatedIconButton';
 
-
-const Footer = ( {
+const Footer = ({
   title = 'MIRAS',
   subtitle = 'Cultural Heritage Archive',
   description = 'Preserving and digitizing Pakistan\'s rich cultural heritage for future generations.',
@@ -69,195 +66,208 @@ const Footer = ( {
   showLanguageSelector = true,
   customContent,
   ...props
-}) =>{
+}) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
     <StyledFooter component="footer" {...props}>
-      <Container maxWidth="lg">
-        <Grid container spacing={4}>
-          {/* Brand Section */}
-          <Grid size={{xs:12, md:3}}>
-            <Box sx={{ mb: 2 }}>
-              <Typography 
-                variant="h5" 
-                component="div" 
-                sx={{ 
-                  fontWeight: 700,
-                  color: 'primary.main',
-                  mb: 0.5
-                }}
-              >
-                {title}
-              </Typography>
-              <Typography 
-                variant="subtitle2" 
-                sx={{ 
-                  color: theme.palette.mode === 'light' 
-                    ? 'grey.400' 
-                    : 'text.secondary',
-                  mb: 2
-                }}
-              >
-                {subtitle}
-              </Typography>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  color: theme.palette.mode === 'light' 
-                    ? 'grey.300' 
-                    : 'text.secondary',
-                  lineHeight: 1.6,
-                  mb: 2
-                }}
-              >
-                {description}
-              </Typography>
-              
-              {/* Social Links */}
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', mt: 2 }}>
-                {socialLinks.map((social, index) => (
-                  <SocialIconButton
-                    key={index}
-                    href={social.href}
-                    aria-label={social.label}
-                    size="small"
-                  >
-                    {social.icon}
-                  </SocialIconButton>
-                ))}
-              </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: isMobile ? 'column' : 'row',
+            justifyContent: 'space-between',
+            gap: 4,
+          }}
+        >
+          {/* Box 1: Logo and Social Links (Left) */}
+          <Box sx={{ flex: isMobile ? '1 1 100%' : '0 0 30%', maxWidth: isMobile ? '100%' : '650px' }}>
+            <Typography 
+              variant="h3" 
+              component="div" 
+              sx={{ 
+                fontWeight: 700,
+                color: 'primary.main',
+                mb: 1.5,
+                letterSpacing: '-0.02em'
+              }}
+            >
+              {title}
+            </Typography>
+            <Typography 
+              variant="subtitle1" 
+              sx={{ 
+                color: theme.palette.mode === 'light' ? 'grey.300' : 'text.secondary',
+                mb: 2,
+                fontWeight: 500
+              }}
+            >
+              {subtitle}
+            </Typography>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: theme.palette.mode === 'light' ? 'grey.400' : 'text.secondary',
+                lineHeight: 1.7,
+                mb: 3
+              }}
+            >
+              {description}
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+              {socialLinks.map((social, index) => (
+                <SocialIconButton
+                  key={index}
+                  href={social.href}
+                  aria-label={social.label}
+                  size="small"
+                  sx={{
+                    bgcolor: theme.palette.mode === 'light' ? 'grey.800' : theme.palette.background,
+                    '&:hover': { bgcolor: 'primary.main' }
+                  }}
+                >
+                  {social.icon}
+                </SocialIconButton>
+              ))}
             </Box>
-          </Grid>
+          </Box>
 
-          {/* Quick Links */}
-          <Grid size={{xs:12 ,sm:6, md:2}}>
-            <Typography 
-              variant="h6" 
-              sx={{ 
-                fontWeight: 600,
-                mb: 2,
-                color: theme.palette.mode === 'light' 
-                  ? 'common.white' 
-                  : 'text.primary'
-              }}
-            >
-              Quick Links
-            </Typography>
-            <Stack spacing={1}>
-              {quickLinks.map((link, index) => (
-                <FooterLink 
-                  key={index} 
-                  href={link.href}
-                  underline="none"
+          {/* Box 2: Quick Links, Resources, Contact, Legal (Right) */}
+          <Box sx={{ flex: isMobile ? '1 1 100%' : '0 0 65%' }}>
+            <Grid container spacing={{ xs: 3, md: 4 }} justifyContent="flex-end">
+              {/* Quick Links */}
+              <Grid size={{ xs: 6, md: 3 }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    fontWeight: 600,
+                    mb: 2.5,
+                    color: theme.palette.mode === 'light' ? 'common.white' : 'text.primary'
+                  }}
                 >
-                  {link.label}
-                </FooterLink>
-              ))}
-            </Stack>
-          </Grid>
+                  Quick Links
+                </Typography>
+                <Stack spacing={1.5}>
+                  {quickLinks.map((link, index) => (
+                    <FooterLink 
+                      key={index} 
+                      href={link.href}
+                      underline="none"
+                      sx={{
+                        color: theme.palette.mode === 'light' ? 'grey.300' : 'text.secondary',
+                        '&:hover': { color: 'primary.main' }
+                      }}
+                    >
+                      {link.label}
+                    </FooterLink>
+                  ))}
+                </Stack>
+              </Grid>
 
-          {/* Resources */}
-          <Grid size={{xs:12, sm:6, md:2}}>
-            <Typography 
-              variant="h6" 
-              sx={{ 
-                fontWeight: 600,
-                mb: 2,
-                color: theme.palette.mode === 'light' 
-                  ? 'common.white' 
-                  : 'text.primary'
-              }}
-            >
-              Resources
-            </Typography>
-            <Stack spacing={1}>
-              {resources.map((resource, index) => (
-                <FooterLink 
-                  key={index} 
-                  href={resource.href}
-                  underline="none"
+              {/* Resources */}
+              <Grid size={{ xs: 6, md: 3 }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    fontWeight: 600,
+                    mb: 2.5,
+                    color: theme.palette.mode === 'light' ? 'common.white' : 'text.primary'
+                  }}
                 >
-                  {resource.label}
-                </FooterLink>
-              ))}
-            </Stack>
-          </Grid>
+                  Resources
+                </Typography>
+                <Stack spacing={1.5}>
+                  {resources.map((resource, index) => (
+                    <FooterLink 
+                      key={index} 
+                      href={resource.href}
+                      underline="none"
+                      sx={{
+                        color: theme.palette.mode === 'light' ? 'grey.300' : 'text.secondary',
+                        '&:hover': { color: 'primary.main' }
+                      }}
+                    >
+                      {resource.label}
+                    </FooterLink>
+                  ))}
+                </Stack>
+              </Grid>
 
-          {/* Contact Information */}
-          <Grid size ={{xs:12, sm:6, md:3}}>
-            <Typography 
-              variant="h6" 
-              sx={{ 
-                fontWeight: 600,
-                mb: 2,
-                color: theme.palette.mode === 'light' 
-                  ? 'common.white' 
-                  : 'text.primary'
-              }}
-            >
-              Contact Us
-            </Typography>
-            <Stack spacing={2}>
-              <FooterLink>
-                <Box display="flex" alignItems="center" gap={1}>
-                  <LocationOn />
-                  <Typography variant="body2">
-                    {contact.address}
-                  </Typography>
-                </Box>
-              </FooterLink>
-              <FooterLink>
-                <Box display="flex" alignItems="center" gap={1}>
-                  <Phone />
-                  <Typography variant="body2">
-                    {contact.phone}
-                  </Typography>
-                 </Box>
-              </FooterLink>
-              <FooterLink>
-                <Box display="flex" alignItems="center" gap={1.5}>
-                  <Email />
-                  <Typography variant="body2">
-                    {contact.email}
-                  </Typography>
-                </Box>
-              </FooterLink>
-            </Stack>
-          </Grid>
-
-          {/* Legal Links */}
-          <Grid size = {{xs:12, sm:6, md:2}}>
-            <Typography 
-              variant="h6" 
-              sx={{ 
-                fontWeight: 600,
-                mb: 2,
-                color: theme.palette.mode === 'light' 
-                  ? 'common.white' 
-                  : 'text.primary'
-              }}
-            >
-              Legal
-            </Typography>
-            <Stack spacing={1}>
-              {legal.map((item, index) => (
-                <FooterLink 
-                  key={index} 
-                  href={item.href}
-                  underline="none"
+              {/* Contact Information */}
+              <Grid size={{ xs: 6, md: 3 }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    fontWeight: 600,
+                    mb: 2.5,
+                    color: theme.palette.mode === 'light' ? 'common.white' : 'text.primary'
+                  }}
                 >
-                  {item.label}
-                </FooterLink>
-              ))}
-            </Stack>
-          </Grid>
-        </Grid>
+                  Contact Us
+                </Typography>
+                <Stack spacing={2}>
+                  <FooterLink>
+                    <Box display="flex" alignItems="center" gap={1.5}>
+                      <LocationOn sx={{ color: 'primary.main' }} />
+                      <Typography variant="body2" sx={{ color: theme.palette.mode === 'light' ? 'grey.300' : 'text.secondary' }}>
+                        {contact.address}
+                      </Typography>
+                    </Box>
+                  </FooterLink>
+                  <FooterLink>
+                    <Box display="flex" alignItems="center" gap={1.5}>
+                      <Phone sx={{ color: 'primary.main' }} />
+                      <Typography variant="body2" sx={{ color: theme.palette.mode === 'light' ? 'grey.300' : 'text.secondary' }}>
+                        {contact.phone}
+                      </Typography>
+                    </Box>
+                  </FooterLink>
+                  <FooterLink>
+                    <Box display="flex" alignItems="center" gap={1.5}>
+                      <Email sx={{ color: 'primary.main' }} />
+                      <Typography variant="body2" sx={{ color: theme.palette.mode === 'light' ? 'grey.300' : 'text.secondary' }}>
+                        {contact.email}
+                      </Typography>
+                    </Box>
+                  </FooterLink>
+                </Stack>
+              </Grid>
+
+              {/* Legal Links */}
+              <Grid size={{ xs: 6, md: 3 }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    fontWeight: 600,
+                    mb: 2.5,
+                    color: theme.palette.mode === 'light' ? 'common.white' : 'text.primary'
+                  }}
+                >
+                  Legal
+                </Typography>
+                <Stack spacing={1.5}>
+                  {legal.map((item, index) => (
+                    <FooterLink 
+                      key={index} 
+                      href={item.href}
+                      underline="none"
+                      sx={{
+                        color: theme.palette.mode === 'light' ? 'grey.300' : 'text.secondary',
+                        '&:hover': { color: 'primary.main' }
+                      }}
+                    >
+                      {item.label}
+                    </FooterLink>
+                  ))}
+                </Stack>
+              </Grid>
+            </Grid>
+          </Box>
+        </Box>
 
         {/* Custom Content */}
         {customContent && (
-          <Box sx={{ mt: 4, mb: 2 }}>
+          <Box sx={{ mt: 5, mb: 3 }}>
             {customContent}
           </Box>
         )}
@@ -265,10 +275,9 @@ const Footer = ( {
         {/* Divider */}
         <Divider 
           sx={{ 
-            my: 3,
-            borderColor: theme.palette.mode === 'light' 
-              ? 'grey.700' 
-              : 'divider'
+            my: 4,
+            borderColor: theme.palette.mode === 'light' ? 'grey.700' : 'divider',
+            borderWidth: '1px'
           }} 
         />
 
@@ -285,30 +294,26 @@ const Footer = ( {
           <Typography 
             variant="body2" 
             sx={{ 
-              color: theme.palette.mode === 'light' 
-                ? 'grey.400' 
-                : 'text.secondary'
+              color: theme.palette.mode === 'light' ? 'grey.400' : 'text.secondary',
+              fontSize: '0.875rem'
             }}
           >
             © {new Date().getFullYear()} {title}. All rights reserved. | 
             Powered by Digital Heritage Initiative
           </Typography>
 
-          {/* Language Selector & Additional Info */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>           
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Typography 
               variant="body2" 
               sx={{ 
-                color: theme.palette.mode === 'light' 
-                  ? 'grey.400' 
-                  : 'text.secondary'
+                color: theme.palette.mode === 'light' ? 'grey.400' : 'text.secondary',
+                fontSize: '0.875rem'
               }}
             >
               Made with ❤️ for Pakistan's Heritage
             </Typography>
           </Box>
         </Box>
-      </Container>
     </StyledFooter>
   );
 };

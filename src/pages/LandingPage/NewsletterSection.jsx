@@ -11,8 +11,9 @@ function NewsletterSection(){
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     return(
-    <Paper 
+        <Container maxWidth={false}  
         sx={{ 
+          px:{xs: 2, md: 8},
           py: { xs: 4, md: 6 },
           background: theme.palette.mode === 'light' 
               ? `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${theme.palette.divider} 100%)`
@@ -20,9 +21,7 @@ function NewsletterSection(){
           color: theme.palette.primary.contrastText,
           textAlign: 'center'
         }} 
-        elevation={0}
-      >
-        <Container maxWidth="md">
+        >
           <Fade in={true} timeout={1200}>
             <Box>
               <Typography variant="h3" color="text.secondary" sx={{ fontWeight: 700, mb: 2 }}>
@@ -62,7 +61,6 @@ function NewsletterSection(){
             </Box>
           </Fade>
         </Container>
-      </Paper>
     )
 }
 
