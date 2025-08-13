@@ -1,13 +1,8 @@
 import { CssBaseline, ThemeProvider, Typography, Box, Grid } from "@mui/material";
-import { lightTheme, darkTheme } from '../../styles/theme';
 import { useSelector } from "react-redux";
-
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import HeadphonesIcon from '@mui/icons-material/Headphones';
-import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
+import { lightTheme, darkTheme } from '../../styles/theme';
 
-import Button from "./Button"
 function MembershipContactSection(){
     const darkMode = useSelector((state) => state.theme.darkMode);
     const theme = darkMode ? darkTheme : lightTheme;
@@ -27,6 +22,7 @@ function MembershipContactSection(){
                         pr: { xs: 2, sm: 8, md: 20 },
                         color: theme.palette.mode === "dark" ? theme.palette.text.primary : "#101010",
                         gap: { xs: 2, sm: 4 },
+                        textAlign: { xs: "center", sm: "left" },
                     }}
                 >
                     {/* Free entry */}
@@ -34,7 +30,6 @@ function MembershipContactSection(){
                         sx={{
                             fontSize: { xs: "1.5rem", sm: "2rem", md: "3rem" },
                             lineHeight: 1.2,
-                            textAlign: { xs: "center", sm: "left" },
                         }}
                     >
                         Contact the Membership Office
@@ -48,7 +43,7 @@ function MembershipContactSection(){
                         </Typography>
                     </Box>
                     <Box>
-                        <Typography variant="subtitle1" fontWeight="bold" sx={{ display: "flex", alignItems: "center", gap: 1, fontSize: { xs: "0.9rem", sm: "1rem", md: "1.5rem" } }}>
+                        <Typography variant="subtitle1" fontWeight="bold" sx={{ gap: 1, fontSize: { xs: "0.9rem", sm: "1rem", md: "1.5rem" } }}>
                             <AccessTimeIcon fontSize="small" /> Opening times
                         </Typography>
                         <Typography variant="body1" sx={{ fontSize: { xs: "0.9rem", sm: "1rem", md: "1.5rem" }, lineHeight: 1.5 }}>
