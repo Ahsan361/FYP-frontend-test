@@ -10,7 +10,7 @@ import MemberDetailSection from "./MemberDetailSection"
 import AdvertisementSection from "../../../components/ui/AdvertismentCard";
 import MembershipBenefitSection from "./MembershipBenifitSection";
 import FacilitiesSection from "./FacilitiesSection";
-import MembershipContactSection from "./MembershipContactSection";
+import MembershipContactSection from "../../../components/ui/MembershipContactSection";
 import QuoteTile from "../../../components/ui/QuoteTile";
 
 function BecomeMemberPage(){
