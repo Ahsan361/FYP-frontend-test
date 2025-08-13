@@ -6,7 +6,9 @@ import SpecialTourPage from "./pages/VisitPage/SpecialToursPage/SpecialTourPage"
 import ObjectTrailPage from "./pages/VisitPage/ObjectTrail/ObjectTrailPage"
 import MuseumMapPage from "./pages/VisitPage/MuseumMap/MuseumMapPage"
 import GalleryPage from "./pages/CollectionPage/Galleries/GalleriesPage";
-import OnlineGalleryPage from "./pages/CollectionPage/OnlineGalleries/OnlineGalleriesPage"
+import OnlineGalleryPage from "./pages/CollectionPage/OnlineGalleries/OnlineGalleriesPage";
+import SearchSection from "./pages/CollectionPage/OnlineGalleries/SearchSection/SearchSection";
+
 function App(){
   return (
     <div>
