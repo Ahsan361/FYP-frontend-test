@@ -35,6 +35,15 @@ export const LogoContainer = styled(Box)(({ theme }) => ({
 }));
 
 export const NavButton = styled(Button)(({ theme }) => ({
+  // fontSize: "0.9rem",
+
+  // [theme.breakpoints.up('sm')]: {
+  //   fontSize: "1rem",
+  // },
+  // [theme.breakpoints.up('md')]: {
+  //   fontSize: "1.5rem",
+  // },
+  
   margin: theme.spacing(0, 1),
   color: theme.palette.text.primary,
   fontWeight: 600,

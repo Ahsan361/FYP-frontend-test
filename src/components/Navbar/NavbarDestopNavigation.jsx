@@ -1,4 +1,4 @@
-import { Box, useTheme } from "@mui/material";
+import { Box, useTheme, Typography } from "@mui/material";
 import { Menu as MenuIcon, Close as CloseIcon, KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 
 import DropdownMenu from "../Dropdown/dropdown";
@@ -43,7 +43,9 @@ const DesktopNavigation = ({ navItems, openDropdown, setOpenDropdown, anchorEl, 
               }
             }}
           >
-            {item.label}
+            <Typography sx={{fontSize: {xs:"0.9rem", sm:"1rem", md:"1.5rem"} }}>
+              {item.label}
+            </Typography>
           </NavButton>
         );
       })}

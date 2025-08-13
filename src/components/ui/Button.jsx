@@ -2,41 +2,42 @@ import React from 'react';
 import { Button as MuiButton, CircularProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-const StyledButton = styled(MuiButton)(({ theme, variant }) => ({
+const StyledButton = styled(MuiButton, {
+  shouldForwardProp: (prop) => prop !== "noBackground", 
+})(({ theme, variant, noBackground }) => ({
   position: 'relative',
   overflow: 'hidden',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   transform: 'translateY(0)',
-  boxShadow: variant === 'contained' 
-    ? '0 4px 12px rgba(0, 0, 0, 0.15)' 
+  boxShadow: variant === 'contained' && !noBackground
+    ? '0 4px 12px rgba(0, 0, 0, 0.15)'
     : 'none',
-  
+  backgroundColor: noBackground ? 'transparent' : undefined,
+
   '&:hover': {
-    transform: 'translateY(-2px)',
-    boxShadow: variant === 'contained' 
-      ? '0 8px 25px rgba(0, 0, 0, 0.25)' 
-      : '0 2px 8px rgba(0, 0, 0, 0.1)',
+    transform: noBackground ? 'none' : 'translateY(-2px)',
+    backgroundColor: noBackground ? 'transparent' : undefined,
+    boxShadow: variant === 'contained' && !noBackground
+      ? '0 8px 25px rgba(0, 0, 0, 0.25)'
+      : 'none',
   },
 
-  '&:active': {
-    transform: 'translateY(0)',
-    transition: 'transform 0.1s',
-  },
+  '&::before': noBackground
+    ? { display: 'none' }
+    : {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: '-100%',
+        width: '100%',
+        height: '100%',
+        background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent)',
+        transition: 'left 0.5s',
+      },
 
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: '-100%',
-    width: '100%',
-    height: '100%',
-    background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent)',
-    transition: 'left 0.5s',
-  },
-
-  '&:hover::before': {
-    left: '100%',
-  },
+  '&:hover::before': noBackground
+    ? {}
+    : { left: '100%' },
 
   '&.Mui-disabled': {
     transform: 'none',
@@ -47,11 +48,14 @@ const StyledButton = styled(MuiButton)(({ theme, variant }) => ({
   },
 }));
 
+
+
 const Button = ({ 
   children, 
   loading = false, 
   variant = 'contained', 
-  size = 'medium',
+  noBackground = false,
+  size = 'large',
   fullWidth = false,
   startIcon,
   endIcon,
@@ -62,6 +66,7 @@ const Button = ({
   return (
     <StyledButton
       variant={variant}
+      noBackground={noBackground}
       size={size}
       fullWidth={fullWidth}
       startIcon={!loading ? startIcon : null}
@@ -81,5 +86,6 @@ const Button = ({
     </StyledButton>
   );
 };
+
 
 export default Button;

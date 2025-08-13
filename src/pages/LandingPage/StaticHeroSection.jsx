@@ -4,7 +4,7 @@ import {Box, Typography, useTheme, useMediaQuery,} from "@mui/material";
 import {Search} from "@mui/icons-material";
 import { Button, SlideNavButton } from '../../components/ui';
 
-const Hero = () => {
+const StaticHeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -216,4 +216,4 @@ const Hero = () => {
   );
 };
 
-export default Hero;
+export default StaticHeroSection;
