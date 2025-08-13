@@ -9,7 +9,7 @@ import GalleryPage from "./pages/CollectionPage/Galleries/GalleriesPage";
 import OnlineGalleryPage from "./pages/CollectionPage/OnlineGalleries/OnlineGalleriesPage";
 import SearchSection from "./pages/CollectionPage/OnlineGalleries/SearchSection/SearchSection";
 import BecomeMemberPage from "./pages/MembershipPage/BecomeMember/BecomeMemberPage"
-
+import ExistingMemberPage from "./pages/MembershipPage/ExistingMembers/ExistingMemberPage"
 function App(){
   return (
     <div>
@@ -22,7 +22,8 @@ function App(){
       {/* <MuseumMapPage/> */}
       {/* <GalleryPage /> */}
       {/* <OnlineGalleryPage/> */}
-      <BecomeMemberPage/>
+      {/* <BecomeMemberPage/> */}
+      <ExistingMemberPage/>
     </div>
   );
 }
