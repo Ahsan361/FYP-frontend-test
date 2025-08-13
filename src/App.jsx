@@ -8,6 +8,7 @@ import MuseumMapPage from "./pages/VisitPage/MuseumMap/MuseumMapPage"
 import GalleryPage from "./pages/CollectionPage/Galleries/GalleriesPage";
 import OnlineGalleryPage from "./pages/CollectionPage/OnlineGalleries/OnlineGalleriesPage";
 import SearchSection from "./pages/CollectionPage/OnlineGalleries/SearchSection/SearchSection";
+import BecomeMemberPage from "./pages/MembershipPage/BecomeMember/BecomeMemberPage"
 
 function App(){
   return (
@@ -20,7 +21,8 @@ function App(){
       {/* <ObjectTrailPage /> */}
       {/* <MuseumMapPage/> */}
       {/* <GalleryPage /> */}
-      <OnlineGalleryPage/>
+      {/* <OnlineGalleryPage/> */}
+      <BecomeMemberPage/>
     </div>
   );
 }
