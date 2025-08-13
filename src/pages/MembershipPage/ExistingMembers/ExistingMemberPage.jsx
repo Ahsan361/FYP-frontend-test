@@ -9,8 +9,7 @@ import HeroSection from "../../../components/ui/HeroSection";
 import ExistingMemberDetailSection from "./ExistingMemberDetailSection"
 import AdvertisementSection from "../../../components/ui/AdvertismentCard";
 import FacilitiesSection from "./FacilitiesSection";
-import MembershipContactSection from "./MembershipContactSection";
-import QuoteTile from "../../../components/ui/QuoteTile";
+import MembershipContactSection from "../../../components/ui/MembershipContactSection";
 
 function ExistingMemberPage(){
     const darkMode = useSelector((state) => state.theme.darkMode);

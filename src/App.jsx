@@ -22,8 +22,8 @@ function App(){
       {/* <MuseumMapPage/> */}
       {/* <GalleryPage /> */}
       {/* <OnlineGalleryPage/> */}
-      {/* <BecomeMemberPage/> */}
-      <ExistingMemberPage/>
+      <BecomeMemberPage/>
+      {/* <ExistingMemberPage/> */}
     </div>
   );
 }
