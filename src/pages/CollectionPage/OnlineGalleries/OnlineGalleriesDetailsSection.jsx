@@ -23,8 +23,8 @@ function OnlineGalleriesDetailsSection(){
                         display:"flex",
                         flexDirection: "column", 
                         justifyContent:"left",
-                        p:{xs:2, sm:4, md:8},
-                        pr:{xs:2, sm:8, md:20},
+                        p:{xs:4, sm:4, md:8},
+                        pr:{xs:4, sm:8, md:20},
                         color:theme.palette.mode === "dark"? theme.palette.text.primary:"#101010",
                         gap:{xs:2, sm:4},
 
