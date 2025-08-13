@@ -10,6 +10,7 @@ import OnlineGalleryPage from "./pages/CollectionPage/OnlineGalleries/OnlineGall
 import SearchSection from "./pages/CollectionPage/OnlineGalleries/SearchSection/SearchSection";
 import BecomeMemberPage from "./pages/MembershipPage/BecomeMember/BecomeMemberPage"
 import ExistingMemberPage from "./pages/MembershipPage/ExistingMembers/ExistingMemberPage"
+import MembersVisitPage from "./pages/MembershipPage/MembersVisit/MembersVisitPage"
 function App(){
   return (
     <div>
@@ -22,8 +23,9 @@ function App(){
       {/* <MuseumMapPage/> */}
       {/* <GalleryPage /> */}
       {/* <OnlineGalleryPage/> */}
-      <BecomeMemberPage/>
+      {/* <BecomeMemberPage/> */}
       {/* <ExistingMemberPage/> */}
+      <MembersVisitPage/>
     </div>
   );
 }
