@@ -9,7 +9,9 @@ import HeroSection from "../../../components/ui/HeroSection";
 import AdvertisementSection from "../../../components/ui/AdvertismentCard";
 import OnlineFacilitiesSection from "./OnlineFacilitiesSection";
 import CollectionThemeSection from "./CollectionThemeSection";
-import Filler from "./Filler"
+import Filler from "./Filler";
+import OnlineGalleriesDetailsSection from "./OnlineGalleriesDetailsSection";
+
 function OnlineGalleryPage(){
     const darkMode = useSelector((state) => state.theme.darkMode);
     const theme = darkMode ? darkTheme : lightTheme;
@@ -23,6 +25,7 @@ function OnlineGalleryPage(){
             imageUrl="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
             showButton={false}
         />
+        <OnlineGalleriesDetailsSection/>
         <CollectionThemeSection/>
         <Filler/>
         <AdvertisementSection 
