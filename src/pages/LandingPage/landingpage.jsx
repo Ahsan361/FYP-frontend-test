@@ -9,7 +9,7 @@ import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
 import { lightTheme, darkTheme } from '../../styles/theme';
 
-import Hero from './heroSection';
+import StaticHeroSection from './StaticHeroSection';
 import ExhibitionsEventsSection from './ExhibitionsEventsSection';
 import CollectionSection from './CollectionSection';
 import QuickActionsSection from './QuickActionsSection';
@@ -52,7 +52,7 @@ function EnhancedLandingPage() {
       <Navbar />
 
       {/* Hero Section */}
-      <Hero />
+      <StaticHeroSection />
 
       {/* Statistics Section */}
       <StatisticsSection/>
