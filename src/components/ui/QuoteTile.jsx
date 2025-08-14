@@ -38,6 +38,7 @@ function QuoteTile({ quote, author, title, showTitle = false }) {
             variant="body1"
             sx={{
               fontSize: { xs: "0.9rem", sm: "1rem", md: "1.5rem" },
+              paddingLeft:{xs:"1rem"},
               lineHeight: 1.5,
               mb: 2,
             }}
@@ -48,6 +49,7 @@ function QuoteTile({ quote, author, title, showTitle = false }) {
             variant="body1"
             sx={{
               fontSize: { xs: "0.9rem", sm: "1rem", md: "1rem" },
+              paddingLeft:{xs:"1rem"},
               lineHeight: 1.5,
             }}
           >
