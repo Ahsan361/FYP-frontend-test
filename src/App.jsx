@@ -11,6 +11,8 @@ import SearchSection from "./pages/CollectionPage/OnlineGalleries/SearchSection/
 import BecomeMemberPage from "./pages/MembershipPage/BecomeMember/BecomeMemberPage"
 import ExistingMemberPage from "./pages/MembershipPage/ExistingMembers/ExistingMemberPage"
 import MembersVisitPage from "./pages/MembershipPage/MembersVisit/MembersVisitPage"
+import YoungFriendsPage from "./pages/MembershipPage/YoungFriends/YoungFriendsPage"
+
 function App(){
   return (
     <div>
@@ -25,7 +27,8 @@ function App(){
       {/* <OnlineGalleryPage/> */}
       {/* <BecomeMemberPage/> */}
       {/* <ExistingMemberPage/> */}
-      <MembersVisitPage/>
+      {/* <MembersVisitPage/> */}
+      <YoungFriendsPage />
     </div>
   );
 }
