@@ -13,6 +13,7 @@ import ExistingMemberPage from "./pages/MembershipPage/ExistingMembers/ExistingM
 import MembersVisitPage from "./pages/MembershipPage/MembersVisit/MembersVisitPage"
 import YoungFriendsPage from "./pages/MembershipPage/YoungFriends/YoungFriendsPage"
 import DonatePage from "./pages/SupportUs/Donate/DonatePage";
+import CorporateSupport from "./pages/SupportUs/CorporateSupport/CorporateSupportPage";
 
 function App(){
   return (
@@ -30,7 +31,8 @@ function App(){
       {/* <ExistingMemberPage/> */}
       {/* <MembersVisitPage/> */}
       {/* <YoungFriendsPage /> */}
-      <DonatePage />
+      {/* <DonatePage /> */}
+      <CorporateSupport />
     </div>
   );
 }
