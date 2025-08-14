@@ -1,4 +1,4 @@
-import { Paper, Typography, Box, Container, Stack, Fade, useMediaQuery } from '@mui/material';
+import { Typography, Box, Container, Stack, Fade, useMediaQuery } from '@mui/material';
 import { lightTheme, darkTheme } from '../../styles/theme';
 import { useSelector } from 'react-redux';
 

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { ThemeProvider } from '@emotion/react';
-import { CssBaseline, Box, useMediaQuery } from '@mui/material';
+import { CssBaseline, Box} from '@mui/material';
 
 // Custom Components
-import { Button, Loading } from '../../components/ui';
+import { Loading } from '../../components/ui';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
 import { lightTheme, darkTheme } from '../../styles/theme';

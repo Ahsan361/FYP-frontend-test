@@ -1,31 +1,11 @@
 import React from 'react';
-import { 
-  Typography, 
-  Grid, 
-  Box, 
-  Container, 
-  Grow, 
-  Slide, 
-  useMediaQuery,
-  Paper
-} from '@mui/material';
-import { 
-  EventSeat,
-  Map,
-  Museum,
-  FamilyRestroom,
-  ArrowForward
-} from '@mui/icons-material';
-import { lightTheme, darkTheme } from '../../styles/theme';
-import { useSelector } from 'react-redux';
+import { Typography, Grid, Box, Container, Grow, Slide } from '@mui/material';
+import { EventSeat, Map, Museum, FamilyRestroom, ArrowForward} from '@mui/icons-material';
 
 // Custom components
 import { Card, Button } from '../../components/ui';
 
 function VisitMuseumSection() {
-  const darkMode = useSelector((state) => state.theme.darkMode);
-  const theme = darkMode ? darkTheme : lightTheme;
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const visitInfo = [
     {

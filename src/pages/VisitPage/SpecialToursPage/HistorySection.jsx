@@ -1,8 +1,9 @@
 import { CssBaseline, ThemeProvider, Typography, Box, Grid } from "@mui/material";
-import { lightTheme, darkTheme } from '../../../styles/theme';
 import { useSelector } from "react-redux";
+
 //my custom
 import Button from "../../../components/ui/Button";
+import { lightTheme, darkTheme } from '../../../styles/theme';
 
 function HistorySection() {
     const darkMode = useSelector((state) => state.theme.darkMode);

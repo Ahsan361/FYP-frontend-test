@@ -1,19 +1,6 @@
 import React from 'react';
-import { 
-  Typography, 
-  Grid, 
-  Box, 
-  Container, 
-  Grow, 
-  Slide, 
-  useMediaQuery,
-  Paper,
-  Link
-} from '@mui/material';
-import { 
-  Event,
-  ArrowForward
-} from '@mui/icons-material';
+import { Typography, Grid, Box, Container, Grow, Slide, useMediaQuery } from '@mui/material';
+import { Event,ArrowForward } from '@mui/icons-material';
 import { lightTheme, darkTheme } from '../../styles/theme';
 import { useSelector } from 'react-redux';
 
@@ -23,7 +10,6 @@ import { Card, Button, Badge } from '../../components/ui';
 function ExhibitionsEventsSection() {
   const darkMode = useSelector((state) => state.theme.darkMode);
   const theme = darkMode ? darkTheme : lightTheme;
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const exhibitions = [
     {

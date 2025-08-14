@@ -1,7 +1,6 @@
 import { CssBaseline, ThemeProvider, Typography, Box, Grid } from "@mui/material";
 import { lightTheme, darkTheme } from '../../../styles/theme';
 import { useSelector } from "react-redux";
-import ListCard from "../../../components/ui/ListCard";
 
 function RefreshmentSection() {
     const darkMode = useSelector((state) => state.theme.darkMode);

@@ -1,10 +1,10 @@
 import { Typography, Grid, Box, Container, Stack, Slide, useMediaQuery } from '@mui/material';
-import { School, PlayArrow, InfoOutlined } from '@mui/icons-material';
+import { School, PlayArrow } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 import { lightTheme, darkTheme } from '../../styles/theme';
 
 // Custom Components
-import { Button, Alert } from '../../components/ui';
+import { Button } from '../../components/ui';
 
 function QuickActionsSection(){
     const darkMode = useSelector((state) => state.theme.darkMode);

@@ -24,7 +24,7 @@ function App(){
       {/* <PlanVisitPage /> */}
       {/* <FamilyVisitPage/> */}
       {/* <GroupVisitPage/> */}
-      {/* <SpecialTourPage/> */}
+      <SpecialTourPage/>
       {/* <ObjectTrailPage /> */}
       {/* <MuseumMapPage/> */}
       {/* <GalleryPage /> */}
@@ -35,8 +35,8 @@ function App(){
       {/* <YoungFriendsPage /> */}
       {/* <DonatePage /> */}
       {/* <CorporateSupport /> */}
-      {/* <PatronPage /> */}
-      <VolunteerPage />
+      <PatronPage />
+      {/* <VolunteerPage /> */}
     </div>
   );
 }

@@ -6,12 +6,14 @@ import { useSelector } from "react-redux";
 import { Navbar } from "../../../components/ui";
 import Footer from '../../../components/Footer/Footer'
 import HeroSection from "../../../components/ui/HeroSection";
-import MembersVisitDetailSection from "./MembersVisitDetailSection"
 import AdvertisementSection from "../../../components/ui/AdvertismentCard";
-import FacilitiesSection from "./FacilitiesSection";
 import MembershipContactSection from "../../../components/ui/MembershipContactSection";
+
+//section components
 import GuidingSection from "./GuidingSection"
+import MembersVisitDetailSection from "./MembersVisitDetailSection"
 import ExhibitionsDetailSection from "./ExhibitionsDetailSection";
+import FacilitiesSection from "./FacilitiesSection";
 
 function MembersVisitPage(){
     const darkMode = useSelector((state) => state.theme.darkMode);

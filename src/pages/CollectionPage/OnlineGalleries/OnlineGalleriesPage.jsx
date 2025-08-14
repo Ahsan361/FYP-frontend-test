@@ -1,12 +1,13 @@
-import { CssBaseline, ThemeProvider, Typography, Box, Grid, Divider } from "@mui/material";
+import { CssBaseline, ThemeProvider } from "@mui/material";
 import { lightTheme, darkTheme } from '../../../styles/theme';
 import { useSelector } from "react-redux";
 
-//my custom
+//my custom components
 import { Navbar } from "../../../components/ui";
 import Footer from '../../../components/Footer/Footer'
-import HeroSection from "../../../components/ui/HeroSection";
 import AdvertisementSection from "../../../components/ui/AdvertismentCard";
+
+//section components
 import OnlineFacilitiesSection from "./OnlineFacilitiesSection";
 import CollectionThemeSection from "./CollectionThemeSection";
 import Filler from "./Filler";

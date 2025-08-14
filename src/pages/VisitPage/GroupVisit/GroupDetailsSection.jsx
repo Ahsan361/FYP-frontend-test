@@ -1,12 +1,10 @@
 import { CssBaseline, ThemeProvider, Typography, Box, Grid } from "@mui/material";
-import { lightTheme, darkTheme } from '../../../styles/theme';
 import { useSelector } from "react-redux";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 //my custom
-import { Navbar } from "../../../components/ui";
 import Button from "../../../components/ui/Button";
-
+import { lightTheme, darkTheme } from '../../../styles/theme';
 
 function GroupDetailsSection() {
     const darkMode = useSelector((state) => state.theme.darkMode);
@@ -14,7 +12,6 @@ function GroupDetailsSection() {
     return(
         <ThemeProvider theme= {theme}>
         <CssBaseline/>
-        <Navbar />
         <Grid container >
             {/* {Left Column} */}
             <Grid size={{sm:14, md:8}}>

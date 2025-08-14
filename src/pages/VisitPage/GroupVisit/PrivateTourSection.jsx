@@ -1,4 +1,4 @@
-import { CssBaseline, ThemeProvider, Typography, Box, Grid } from "@mui/material";
+import { CssBaseline, ThemeProvider, Typography, Box } from "@mui/material";
 import { lightTheme, darkTheme } from '../../../styles/theme';
 import { useSelector } from "react-redux";
 import ListCard from "../../../components/ui/ListCard";

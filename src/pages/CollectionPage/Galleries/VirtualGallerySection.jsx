@@ -1,12 +1,14 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
+
+//my custom components
 import Tiles from "../../../components/ui/Tiles"
 
 function VirtualGallerySection() {
   const artifactData = [
     {
       floor: "Virtual galleries",
-      image: "room4.jpg", // replace with your actual image path
+      image: "room4.jpg", 
       artifactName: "Oceania",
       artifactDetail:
         "Red mask made from fibre glass, polyester resin, ply and balsar wood and bamboo",
@@ -14,7 +16,7 @@ function VirtualGallerySection() {
     },
     {
       floor: "Virtual galleries",
-      image: "room4.jpg", // replace with your actual image path
+      image: "room4.jpg", 
       artifactName: "Prints and drawings",
       artifactDetail: "Drawing of boats sailing on rough seas",
       buttonText: "Explore the Prints and drawings collection",

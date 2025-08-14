@@ -11,12 +11,10 @@ const SEARCH_FIELDS = [
   { value: "museum_number", label: "Museum number" },
 ];
 
-function SearchBar({ onSearch }) {
+function SearchBar() {
   const theme = useTheme();
   const [searchField, setSearchField] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-
-  const handleSearch = () => onSearch?.({ field: searchField, query: searchQuery });
 
   const fieldStyles = {
     '& .MuiOutlinedInput-root': {

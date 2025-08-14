@@ -1,4 +1,4 @@
-import { CssBaseline, ThemeProvider, Typography, Box, Grid, Divider } from "@mui/material";
+import { CssBaseline, ThemeProvider, Divider } from "@mui/material";
 import { lightTheme, darkTheme } from '../../../styles/theme';
 import { useSelector } from "react-redux";
 
@@ -6,12 +6,15 @@ import { useSelector } from "react-redux";
 import { Navbar } from "../../../components/ui";
 import Footer from '../../../components/Footer/Footer'
 import HeroSection from "../../../components/ui/HeroSection";
+import AdvertisementSection from "../../../components/ui/AdvertismentCard";
+
+//section components
 import DetailsSection from "./DetailsSection";
 import ExplorationSection from "./ExplorationSection";
-import AdvertisementSection from "../../../components/ui/AdvertismentCard";
 import FacilitiesSection from "./facilitiesSection";
 import FamilyEventsSection from "./FamilyEventsSection";
-import ExtraActivitesSection from "./ExtraActivitiesSection";
+import ExtraActivitiesSection from "./ExtraActivitiesSection";
+
 
 function FamilyVisitPage(){
     const darkMode = useSelector((state) => state.theme.darkMode);
@@ -43,7 +46,7 @@ function FamilyVisitPage(){
             my: 2,
             }}
         />
-        <ExtraActivitesSection/>
+        <ExtraActivitiesSection/>
         <Footer />
     </ThemeProvider>
     )
