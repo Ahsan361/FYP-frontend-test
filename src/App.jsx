@@ -12,6 +12,7 @@ import BecomeMemberPage from "./pages/MembershipPage/BecomeMember/BecomeMemberPa
 import ExistingMemberPage from "./pages/MembershipPage/ExistingMembers/ExistingMemberPage"
 import MembersVisitPage from "./pages/MembershipPage/MembersVisit/MembersVisitPage"
 import YoungFriendsPage from "./pages/MembershipPage/YoungFriends/YoungFriendsPage"
+import DonatePage from "./pages/SupportUs/Donate/DonatePage";
 
 function App(){
   return (
@@ -28,7 +29,8 @@ function App(){
       {/* <BecomeMemberPage/> */}
       {/* <ExistingMemberPage/> */}
       {/* <MembersVisitPage/> */}
-      <YoungFriendsPage />
+      {/* <YoungFriendsPage /> */}
+      <DonatePage />
     </div>
   );
 }
