@@ -1,8 +1,9 @@
 import { CssBaseline, ThemeProvider, Typography, Grid } from "@mui/material";
 import { lightTheme, darkTheme } from "../../styles/theme";
 import { useSelector } from "react-redux";
+import PropTypes from "prop-types";
 
-function QuoteTile({ quote, author }) {
+function QuoteTile({ quote, author, title, showTitle = false }) {
   const darkMode = useSelector((state) => state.theme.darkMode);
   const theme = darkMode ? darkTheme : lightTheme;
 
@@ -20,6 +21,19 @@ function QuoteTile({ quote, author }) {
             color: "white",
           }}
         >
+          {showTitle && (
+            <Typography
+              variant="h1"
+              sx={{
+                fontSize: { xs: "1.5rem", sm: "2rem", md: "2.5rem" },
+                mb: 3,
+                fontWeight: 700,
+              }}
+            >
+              {title}
+            </Typography>
+          )}
+
           <Typography
             variant="body1"
             sx={{
