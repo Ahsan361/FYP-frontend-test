@@ -15,6 +15,7 @@ import YoungFriendsPage from "./pages/MembershipPage/YoungFriends/YoungFriendsPa
 import DonatePage from "./pages/SupportUs/Donate/DonatePage";
 import CorporateSupport from "./pages/SupportUs/CorporateSupport/CorporateSupportPage";
 import PatronPage from "./pages/SupportUs/Patron/PatronPage";
+import VolunteerPage from "./pages/SupportUs/Volunteer/VolunteerPage";
 
 function App(){
   return (
@@ -34,7 +35,8 @@ function App(){
       {/* <YoungFriendsPage /> */}
       {/* <DonatePage /> */}
       {/* <CorporateSupport /> */}
-      <PatronPage />
+      {/* <PatronPage /> */}
+      <VolunteerPage />
     </div>
   );
 }
