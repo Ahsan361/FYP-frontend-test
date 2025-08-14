@@ -1,14 +1,16 @@
 import { CssBaseline, ThemeProvider } from "@mui/material";
-import { lightTheme, darkTheme } from '../../../styles/theme';
 import { useSelector } from "react-redux";
 
 //my custom
 import { Navbar } from "../../../components/ui";
 import Footer from '../../../components/Footer/Footer'
 import HeroSection from "../../../components/ui/HeroSection";
+import { lightTheme, darkTheme } from '../../../styles/theme';
+import AdvertisementSection from "../../../components/ui/AdvertismentCard";
+
+//section components
 import AdditionalFacilitiesSection from "./AdditionalFacilitiesSection";
 import MuseumDetailsSection from "./MuseumDetailsSection"
-import AdvertisementSection from "../../../components/ui/AdvertismentCard";
 
 function MuseumMapPage() {
     const darkMode = useSelector((state) => state.theme.darkMode);

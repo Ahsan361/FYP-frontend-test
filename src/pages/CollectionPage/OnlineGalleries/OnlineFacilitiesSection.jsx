@@ -1,16 +1,10 @@
 import React from 'react';
-import { useMediaQuery} from '@mui/material';
-import { EventSeat, Map, Museum, FamilyRestroom } from '@mui/icons-material';
-import { useSelector } from 'react-redux';
+import { EventSeat, Map, Museum } from '@mui/icons-material';
 
 // Custom components
-import { lightTheme, darkTheme } from '../../../styles/theme';
 import ExplorationGrid from '../../../components/ui/ExplorationGrid';
 
 function OnlineFacilitiesSection() {
-  const darkMode = useSelector((state) => state.theme.darkMode);
-  const theme = darkMode ? darkTheme : lightTheme;
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const visitInfo = [
     {

@@ -1,9 +1,11 @@
 import { CssBaseline, ThemeProvider, Typography, Box, Grid, Divider } from "@mui/material";
-import { lightTheme, darkTheme } from '../../../styles/theme';
 import { useSelector } from "react-redux";
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import HeadphonesIcon from '@mui/icons-material/Headphones';
+
+//my custom components
+import { lightTheme, darkTheme } from '../../../styles/theme';
 
 function TourDetailSection() {
     const darkMode = useSelector((state) => state.theme.darkMode);

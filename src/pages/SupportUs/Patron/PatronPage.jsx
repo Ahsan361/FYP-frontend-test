@@ -1,4 +1,4 @@
-import { CssBaseline, ThemeProvider, Typography, Box, Grid, Divider } from "@mui/material";
+import { CssBaseline, ThemeProvider, Divider } from "@mui/material";
 import { lightTheme, darkTheme } from '../../../styles/theme';
 import { useSelector } from "react-redux";
 
@@ -6,9 +6,8 @@ import { useSelector } from "react-redux";
 import { Navbar } from "../../../components/ui";
 import Footer from '../../../components/Footer/Footer'
 import HeroSection from "../../../components/ui/HeroSection";
-import AdvertisementSection from "../../../components/ui/AdvertismentCard";
-import QuoteTile from "../../../components/ui/QuoteTile";
 
+//section components 
 import PatronDetailSection from "./PatronDetailSection"
 import PatronCirclesSection from "./PatronCirclesSection";
 import SpecialGroupSection from "./SpecialGroupSection";
@@ -16,6 +15,7 @@ import SpecialGroupSection from "./SpecialGroupSection";
 function PatronPage(){
     const darkMode = useSelector((state) => state.theme.darkMode);
     const theme = darkMode ? darkTheme : lightTheme;
+
     return(
         <ThemeProvider theme= {theme}>
         <CssBaseline/>

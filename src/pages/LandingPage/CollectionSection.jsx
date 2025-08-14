@@ -1,15 +1,10 @@
-import { Paper, Typography, Grid, Box, Container, Grow, Slide } from '@mui/material';
-import { lightTheme, darkTheme } from '../../styles/theme';
-import { useSelector } from 'react-redux';
+import { Typography, Grid, Box, Container, Grow, Slide } from '@mui/material';
 import { Museum, History, Public, People, ArrowForward } from '@mui/icons-material';
 
 //custom components
 import { Card, Button } from '../../components/ui';
 
 function CollectionSection(){
-    const darkMode = useSelector((state) => state.theme.darkMode);
-    const theme = darkMode ? darkTheme : lightTheme;
-
     const collections = [
         {
           title: 'Ancient Civilizations',

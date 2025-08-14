@@ -1,4 +1,4 @@
-import { CssBaseline, ThemeProvider, Typography, Box, Grid, Divider } from "@mui/material";
+import { CssBaseline, ThemeProvider, Divider } from "@mui/material";
 import { lightTheme, darkTheme } from '../../../styles/theme';
 import { useSelector } from "react-redux";
 
@@ -38,7 +38,7 @@ function DonatePage(){
             quote="❛The chief reason why I want to and do support the British Museum is simply that I love visiting, finding a new room I have not yet explored. I can spend a whole day there. The visiting collections are brilliant and a fantastic opportunity to see artefacts here in London which I had never even dreamed I would see.❜"
             author="Anonymous"
         />
-            <QuoteTile
+        <QuoteTile
             quote="❛I support the Museum as I value greatly its collections, ethos of operating, and free access to anyone wishing to visit, either in person or online. I particularly enjoy the art works and exhibitions and have spent many inspiring hours in the galleries.❜"
             author="David, Member since 2008"
         />

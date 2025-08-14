@@ -1,7 +1,7 @@
 import React from "react";
-import { Link } from "@mui/material";
+
+//my custom components
 import ListCard from "../../../components/ui/ListCard"
-import { Schedule } from "@mui/icons-material";
 
 function ScheduleSection() {
   const ticketItems = [

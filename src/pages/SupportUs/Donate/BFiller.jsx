@@ -1,10 +1,8 @@
 import { CssBaseline, ThemeProvider, Typography, Box, Grid, Stack } from "@mui/material";
-import { lightTheme, darkTheme } from '../../../styles/theme';
 import { useSelector } from "react-redux";
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 //my custom components
-import Button from "../../../components/ui/Button";
+import { lightTheme, darkTheme } from '../../../styles/theme';
 
 function BFiller() {
     const darkMode = useSelector((state) => state.theme.darkMode);

@@ -18,7 +18,7 @@ function ObjectTrailPage() {
         <CssBaseline/>
         <Navbar />
         <HeroSection
-            heading="Out of hours tours"
+            heading="Object trails"
             description="📍 This photo showcases the stunning landscape of the Rocky Mountains at sunrise. Perfect for nature lovers and adventure seekers."
             imageUrl="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
             showButton={false}

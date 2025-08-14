@@ -1,4 +1,4 @@
-import { CssBaseline, ThemeProvider, Typography, Box, Grid, Divider } from "@mui/material";
+import { CssBaseline, ThemeProvider, Divider } from "@mui/material";
 import { lightTheme, darkTheme } from '../../../styles/theme';
 import { useSelector } from "react-redux";
 

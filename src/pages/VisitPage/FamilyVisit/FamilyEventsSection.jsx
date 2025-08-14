@@ -1,31 +1,8 @@
 import React from 'react';
-import { 
-  Typography, 
-  Grid, 
-  Box, 
-  Container, 
-  Grow, 
-  Slide, 
-  useMediaQuery,
-  Paper
-} from '@mui/material';
-import { 
-  EventSeat,
-  Map,
-  Museum,
-  FamilyRestroom,
-  ArrowForward
-} from '@mui/icons-material';
-import { useSelector } from 'react-redux';
-
 // Custom components
-import { lightTheme, darkTheme } from '../../../styles/theme';
 import ExplorationGrid from '../../../components/ui/ExplorationGrid';
 
 function FamilyEventsSection() {
-  const darkMode = useSelector((state) => state.theme.darkMode);
-  const theme = darkMode ? darkTheme : lightTheme;
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const visitInfo = [
     { 

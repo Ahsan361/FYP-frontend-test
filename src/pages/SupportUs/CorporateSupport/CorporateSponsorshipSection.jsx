@@ -1,9 +1,9 @@
 import { CssBaseline, ThemeProvider, Typography, Box, Grid, Stack } from "@mui/material";
-import { lightTheme, darkTheme } from '../../../styles/theme';
 import { useSelector } from "react-redux";
-import { Padding, PaddingOutlined } from "@mui/icons-material";
 
 //my custom components
+import { lightTheme, darkTheme } from '../../../styles/theme';
+
 function CorporateSponsorshipSection() {
     const darkMode = useSelector((state) => state.theme.darkMode);
     const theme = darkMode ? darkTheme : lightTheme;
@@ -69,9 +69,3 @@ function CorporateSponsorshipSection() {
 }
 
 export default CorporateSponsorshipSection;
-
-
-
-
-
-
