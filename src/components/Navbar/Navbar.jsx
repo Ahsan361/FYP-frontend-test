@@ -33,11 +33,11 @@ const Navbar = () => {
   }, []);
 
   const navItems = [
-    { label: "Visit", icon: <Home />, path: "/Visit", dropdown: ["Plan your visit", "Family Visit", "Group Visit", "Object Trail", "Out of hour tours", "Museum Map"], active: true },
+    { label: "Visit", icon: <Home />, path: "/PlanVisitPage", dropdown: ["Plan your visit", "Family Visit", "Group Visit", "Object Trail", "Out of hour tours", "Museum Map"], active: true },
     { label: "Exibition and Events", icon: <Search />, path: "/explore" },
-    { label: "Collections", icon: <ViewCarouselIcon />, path: "/collections", badge: "12", dropdown: ["Contemporary Art", "Classical Paintings", "Modern Sculptures", "Photography", "Digital Art", "Installations"] },
-    { label: "Membership", icon: <Info />, path: "/about", dropdown: ["Individual Membership", "Family Plans", "Student Discounts", "Corporate Benefits", "Membership Renewal", "Exclusive Events", "Member Perks", "Annual Pass", "VIP Access"] },
-    { label: "Support Us", icon: <ContactMail />, path: "/contact", dropdown: ["Make a Donation", "Volunteer Programs", "Corporate Sponsorship", "Legacy Giving", "Art Acquisition Fund"] },
+    { label: "Collections", icon: <ViewCarouselIcon />, path: "/collections", badge: "12", dropdown: ["Galleries", "Online Collections"] },
+    { label: "Membership", icon: <Info />, path: "/about", dropdown: ["BecomeMember","Existing Members", "Members Visit", "Young Friends"] },
+    { label: "Support Us", icon: <ContactMail />, path: "/contact", dropdown: ["Corporate Support", "Donate", "Existing Patron", "Patron","Volunteer"] },
   ];
 
   const handleMobileMenuToggle = () => setMobileMenuOpen(!mobileMenuOpen);

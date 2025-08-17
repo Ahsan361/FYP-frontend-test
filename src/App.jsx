@@ -1,4 +1,4 @@
-import LandingPage from "./pages/LandingPage/landingpage";
+// import LandingPage from "./pages/LandingPage/landingpage";
 import FamilyVisitPage from "./pages/VisitPage/FamilyVisit/FamilyVisitPage";
 import GroupVisitPage from "./pages/VisitPage/GroupVisit/GroupVisitPage";
 import PlanVisitPage from "./pages/VisitPage/PlanVisitPage/planVisitPage";
@@ -16,6 +16,7 @@ import DonatePage from "./pages/SupportUs/Donate/DonatePage";
 import CorporateSupport from "./pages/SupportUs/CorporateSupport/CorporateSupportPage";
 import PatronPage from "./pages/SupportUs/Patron/PatronPage";
 import VolunteerPage from "./pages/SupportUs/Volunteer/VolunteerPage";
+import ExistingPatronPage from "./pages/SupportUs/ExistingPatron/ExistingPatron";
 
 function App(){
   return (
@@ -24,7 +25,7 @@ function App(){
       {/* <PlanVisitPage /> */}
       {/* <FamilyVisitPage/> */}
       {/* <GroupVisitPage/> */}
-      <SpecialTourPage/>
+      {/* <SpecialTourPage/> */}
       {/* <ObjectTrailPage /> */}
       {/* <MuseumMapPage/> */}
       {/* <GalleryPage /> */}
@@ -35,8 +36,9 @@ function App(){
       {/* <YoungFriendsPage /> */}
       {/* <DonatePage /> */}
       {/* <CorporateSupport /> */}
-      <PatronPage />
+      {/* <PatronPage /> */}
       {/* <VolunteerPage /> */}
+      <ExistingPatronPage/>
     </div>
   );
 }
