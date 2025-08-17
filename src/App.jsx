@@ -1,45 +1,18 @@
-// import LandingPage from "./pages/LandingPage/landingpage";
-import FamilyVisitPage from "./pages/VisitPage/FamilyVisit/FamilyVisitPage";
-import GroupVisitPage from "./pages/VisitPage/GroupVisit/GroupVisitPage";
-import PlanVisitPage from "./pages/VisitPage/PlanVisitPage/planVisitPage";
-import SpecialTourPage from "./pages/VisitPage/SpecialToursPage/SpecialTourPage";
-import ObjectTrailPage from "./pages/VisitPage/ObjectTrail/ObjectTrailPage"
-import MuseumMapPage from "./pages/VisitPage/MuseumMap/MuseumMapPage"
-import GalleryPage from "./pages/CollectionPage/Galleries/GalleriesPage";
-import OnlineGalleryPage from "./pages/CollectionPage/OnlineGalleries/OnlineGalleriesPage";
-import SearchSection from "./pages/CollectionPage/OnlineGalleries/SearchSection/SearchSection";
-import BecomeMemberPage from "./pages/MembershipPage/BecomeMember/BecomeMemberPage"
-import ExistingMemberPage from "./pages/MembershipPage/ExistingMembers/ExistingMemberPage"
-import MembersVisitPage from "./pages/MembershipPage/MembersVisit/MembersVisitPage"
-import YoungFriendsPage from "./pages/MembershipPage/YoungFriends/YoungFriendsPage"
-import DonatePage from "./pages/SupportUs/Donate/DonatePage";
-import CorporateSupport from "./pages/SupportUs/CorporateSupport/CorporateSupportPage";
-import PatronPage from "./pages/SupportUs/Patron/PatronPage";
-import VolunteerPage from "./pages/SupportUs/Volunteer/VolunteerPage";
-import ExistingPatronPage from "./pages/SupportUs/ExistingPatron/ExistingPatron";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import routesConfig from "./routes/routesConfig";
+import Navbar from "./components/Navbar/Navbar";
 
-function App(){
+
+function App() {
   return (
-    <div>
-      {/* <LandingPage/> */}
-      {/* <PlanVisitPage /> */}
-      {/* <FamilyVisitPage/> */}
-      {/* <GroupVisitPage/> */}
-      {/* <SpecialTourPage/> */}
-      {/* <ObjectTrailPage /> */}
-      {/* <MuseumMapPage/> */}
-      {/* <GalleryPage /> */}
-      {/* <OnlineGalleryPage/> */}
-      {/* <BecomeMemberPage/> */}
-      {/* <ExistingMemberPage/> */}
-      {/* <MembersVisitPage/> */}
-      {/* <YoungFriendsPage /> */}
-      {/* <DonatePage /> */}
-      {/* <CorporateSupport /> */}
-      {/* <PatronPage /> */}
-      {/* <VolunteerPage /> */}
-      <ExistingPatronPage/>
-    </div>
+    <BrowserRouter>
+      <Navbar />
+      <Routes>
+        {routesConfig.map((route, index) => (
+          <Route key={index} path={route.path} element={route.element} />
+        ))}
+      </Routes>
+    </BrowserRouter>
   );
 }
 

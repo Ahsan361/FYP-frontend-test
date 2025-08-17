@@ -1,11 +1,13 @@
 import { Box, useTheme, Typography } from "@mui/material";
 import { Menu as MenuIcon, Close as CloseIcon, KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 import DropdownMenu from "../Dropdown/dropdown";
 import { NavButton } from "./StyledComponents";
 
 const DesktopNavigation = ({ navItems, openDropdown, setOpenDropdown, anchorEl, setAnchorEl, buttonRefs }) => {
   const theme = useTheme();
+  const navigate = useNavigate();
 
   return (
     <Box
@@ -31,17 +33,20 @@ const DesktopNavigation = ({ navItems, openDropdown, setOpenDropdown, anchorEl, 
               hasDropdown ? (isOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />) : null
             }
             onClick={(e) => {
-              e.stopPropagation();
-              if (hasDropdown) {
-                if (isOpen) {
-                  setOpenDropdown(null);
-                  setAnchorEl(null);
-                } else {
-                  setOpenDropdown(index);
-                  setAnchorEl(buttonRefs.current[index]);
-                }
-              }
-            }}
+          e.stopPropagation();
+          if (hasDropdown) {
+            if (isOpen) {
+              setOpenDropdown(null);
+              setAnchorEl(null);
+            } else {
+              setOpenDropdown(index);
+              setAnchorEl(buttonRefs.current[index]);
+            }
+          } else if (item.path) {
+            navigate(item.path); // ✅ navigate to route
+          }
+          }}
+
           >
             <Typography sx={{fontSize: {xs:"0.9rem", sm:"1rem", md:"1.5rem"} }}>
               {item.label}

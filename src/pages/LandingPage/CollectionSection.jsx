@@ -56,7 +56,6 @@ function CollectionSection(){
               <Grow in={true} timeout={1000 + index * 200}>
                 <Card
                   image={collection.image}
-                  imageHeight={250}
                   sx={{ 
                     height: '100%',
                     display: 'flex',

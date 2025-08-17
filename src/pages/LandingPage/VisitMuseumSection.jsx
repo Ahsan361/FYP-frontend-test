@@ -62,7 +62,6 @@ function VisitMuseumSection() {
               <Grow in={true} timeout={1000 + index * 200}>
                 <Card
                   image={info.image}
-                  imageHeight={200}
                   sx={{ 
                     height: '100%',
                     display: 'flex',

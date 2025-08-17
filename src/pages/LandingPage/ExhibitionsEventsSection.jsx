@@ -84,7 +84,6 @@ function ExhibitionsEventsSection() {
             <Grow in={true} timeout={1200 + index * 100}>
               <Card
                 image={exhibition.image}
-                imageHeight={250}
                 sx={{ 
                   height: '100%',
                   display: 'flex',
