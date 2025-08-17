@@ -13,9 +13,6 @@ import RightActions from "./NavbarRightActions";
 import MobileMenu from "./NavbarMobileMenu";
 import NavbarWithProvider from "./NavbarWithProvider";
 
-//import routes here 
-import routes from "../../routes/routes";
-
 
 const Navbar = () => {
   const theme = useTheme();

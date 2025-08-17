@@ -93,7 +93,7 @@ function DropdownMenu({ anchorEl, open, onClose, dropdownItems = [] }) {
                 }}
               >
                 <Typography
-                  variant="h4"
+                  variant="h6"
                   sx={{
                     fontWeight: 500,
                     flex: 1,
