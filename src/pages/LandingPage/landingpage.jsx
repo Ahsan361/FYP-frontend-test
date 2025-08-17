@@ -17,7 +17,7 @@ import NewsletterSection from './NewsletterSection';
 import StatisticsSection from './StatisticsSection';
 import VisitMuseumSection from './VisitMuseumSection';
 
-function EnhancedLandingPage() {
+function LandingPage() {
   const darkMode = useSelector((state) => state.theme.darkMode);
   const theme = darkMode ? darkTheme : lightTheme;
   const [loading, setLoading] = useState(true);
@@ -73,4 +73,4 @@ function EnhancedLandingPage() {
   );
 }
 
-export default EnhancedLandingPage;
+export default LandingPage;

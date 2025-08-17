@@ -20,12 +20,15 @@ import {
   ExpandLess, 
   ArrowForwardIos 
 } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+
 
 //custom components
 import Button from "../ui/Button";
 
 function MobileMenu({ mobileMenuOpen, handleMobileMenuToggle, navItems, user }) {
   const theme = useTheme();
+  const navigate = useNavigate(); // ✅ put it here
   const [expandedItems, setExpandedItems] = useState({});
 
   // Reset expanded items when menu closes
@@ -105,7 +108,14 @@ function MobileMenu({ mobileMenuOpen, handleMobileMenuToggle, navItems, user }) 
                   {/* Main Navigation Item */}
                   <StyledListItem
                     button={true}
-                    onClick={() => (hasDropdown ? handleItemToggle(index) : null)}
+                    onClick={() => {
+                    if (hasDropdown) {
+                      handleItemToggle(index);
+                    } else if (item.path) {
+                      navigate(item.path); // ✅ navigate
+                      handleMobileMenuToggle(); // ✅ close drawer after navigation
+                    }
+                  }}
                     sx={{
                       mb: 0.5,
                       borderRadius: 2,
@@ -180,6 +190,12 @@ function MobileMenu({ mobileMenuOpen, handleMobileMenuToggle, navItems, user }) 
                           <StyledListItem
                             key={subIndex}
                             button={true}
+                            onClick={() => {
+                              if (subItem.path) {
+                                navigate(subItem.path); // ✅ navigate to sub-route
+                                handleMobileMenuToggle(); // ✅ close drawer
+                              }
+                            }}
                             sx={{
                               py: 1,
                               px: 2,
@@ -200,7 +216,7 @@ function MobileMenu({ mobileMenuOpen, handleMobileMenuToggle, navItems, user }) 
 
                             {/* Sub-item Text */}
                             <ListItemText
-                              primary={subItem}
+                              primary={subItem.label}
                               slotProps={{
                                 primary: {
                                   sx: {

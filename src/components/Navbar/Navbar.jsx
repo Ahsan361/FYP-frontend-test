@@ -13,6 +13,10 @@ import RightActions from "./NavbarRightActions";
 import MobileMenu from "./NavbarMobileMenu";
 import NavbarWithProvider from "./NavbarWithProvider";
 
+//import routes here 
+import routes from "../../routes/routes";
+
+
 const Navbar = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
@@ -32,13 +36,60 @@ const Navbar = () => {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  const navItems = [
-    { label: "Visit", icon: <Home />, path: "/PlanVisitPage", dropdown: ["Plan your visit", "Family Visit", "Group Visit", "Object Trail", "Out of hour tours", "Museum Map"], active: true },
-    { label: "Exibition and Events", icon: <Search />, path: "/explore" },
-    { label: "Collections", icon: <ViewCarouselIcon />, path: "/collections", badge: "12", dropdown: ["Galleries", "Online Collections"] },
-    { label: "Membership", icon: <Info />, path: "/about", dropdown: ["BecomeMember","Existing Members", "Members Visit", "Young Friends"] },
-    { label: "Support Us", icon: <ContactMail />, path: "/contact", dropdown: ["Corporate Support", "Donate", "Existing Patron", "Patron","Volunteer"] },
-  ];
+    const navItems = [
+  {
+    label: "Visit",
+    icon: <Home />,
+    path: "/PlanVisitPage",
+    active: true,
+    dropdown: [
+      { label: "Plan your visit", path: "/PlanVisitPage" },
+      { label: "Family Visit", path: "/PlanVisitPage/family" },
+      { label: "Group Visit", path: "/PlanVisitPage/group" },
+      { label: "Object Trail", path: "/PlanVisitPage/object-trail" },
+      { label: "Out of hour tours", path: "/PlanVisitPage/tours" },
+      { label: "Museum Map", path: "/PlanVisitPage/map" },
+    ],
+  },
+  {
+    label: "Exhibition and Events",
+    icon: <Search />,
+    path: "/explore",
+  },
+  {
+    label: "Collections",
+    icon: <ViewCarouselIcon />,
+    path: "/collections",
+    badge: "12",
+    dropdown: [
+      { label: "Galleries", path: "/collections/galleries" },
+      { label: "Online Collections", path: "/collections/online" },
+    ],
+  },
+  {
+    label: "Membership",
+    icon: <Info />,
+    path: "/about",
+    dropdown: [
+      { label: "Become Member", path: "/membership/become-member" },
+      { label: "Existing Members", path: "/membership/existing" },
+      { label: "Members Visit", path: "/membership/visit" },
+      { label: "Young Friends", path: "/membership/young-friends" },
+    ],
+  },
+  {
+    label: "Support Us",
+    icon: <ContactMail />,
+    path: "/contact",
+    dropdown: [
+      { label: "Corporate Support", path: "/support/corporate" },
+      { label: "Donate", path: "/support/donate" },
+      { label: "Existing Patron", path: "/support/existing-patron" },
+      { label: "Patron", path: "/support/patron" },
+      { label: "Volunteer", path: "/support/volunteer" },
+    ],
+  },
+];
 
   const handleMobileMenuToggle = () => setMobileMenuOpen(!mobileMenuOpen);
   const handleNotificationMenuClose = () => setNotificationMenuAnchor(null);
