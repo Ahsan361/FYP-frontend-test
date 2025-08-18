@@ -20,6 +20,7 @@ import CorporateSupport from "../pages/SupportUs/CorporateSupport/CorporateSuppo
 import PatronPage from "../pages/SupportUs/Patron/PatronPage";
 import VolunteerPage from "../pages/SupportUs/Volunteer/VolunteerPage";
 import ExistingPatronPage from "../pages/SupportUs/ExistingPatron/ExistingPatron";
+import EventsAndExibitionsPage from "../pages/EventsAndExibitions/EventsAndExibitionsPage";
 
 // map paths to components
 const routesConfig = [
@@ -52,7 +53,7 @@ const routesConfig = [
   { path: routes.support.volunteer, element: <VolunteerPage /> },
 
   //exibition and event  page 
-  { path: routes.explore, element: <LandingPage /> },
+  { path: routes.explore, element: <EventsAndExibitionsPage /> },//to be replaced with our original page here 
 ];
 
 export default routesConfig;

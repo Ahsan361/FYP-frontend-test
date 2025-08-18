@@ -6,6 +6,7 @@ import { lightTheme, darkTheme } from "../../../styles/theme";
 function SocialConnectionSection(){
     const darkMode = useSelector((state) => state.theme.darkMode);
     const theme = darkMode ? darkTheme : lightTheme;
+    
     return(
     <Box
         sx={{

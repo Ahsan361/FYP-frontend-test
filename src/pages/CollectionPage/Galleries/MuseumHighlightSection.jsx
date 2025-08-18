@@ -5,7 +5,6 @@ import {  EventSeat, Map, Museum, FamilyRestroom } from '@mui/icons-material';
 import ExplorationGrid from '../../../components/ui/ExplorationGrid';
 
 function MuseumHighlightSection() {
-
   const visitInfo = [
     {
       id: 1,

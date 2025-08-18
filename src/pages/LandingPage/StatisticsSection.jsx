@@ -1,13 +1,5 @@
 
-import {
-  Paper,
-  Typography,
-  Grid,
-  Box,
-  Container,
-  Fade,
-  Grow,
-} from '@mui/material';
+import { Paper, Typography, Grid, Box, Container, Fade, Grow } from '@mui/material';
 import { Museum, History, Visibility, School } from '@mui/icons-material';
 import { lightTheme, darkTheme } from '../../styles/theme';
 import { useSelector } from 'react-redux';

@@ -2,13 +2,14 @@ import { CssBaseline, ThemeProvider, Typography, Box, Grid, Divider } from "@mui
 import { useSelector } from "react-redux";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
-//my custom
+//my custom components
 import Button from "../../../components/ui/Button";
 import { lightTheme, darkTheme } from '../../../styles/theme';
 
 function PatronDetailSection(){
     const darkMode = useSelector((state) => state.theme.darkMode);
     const theme = darkMode ? darkTheme : lightTheme;
+    
     return(
         <ThemeProvider theme= {theme}>
         <CssBaseline/>

@@ -1,11 +1,13 @@
 import { CssBaseline, ThemeProvider, Divider } from "@mui/material";
-import { lightTheme, darkTheme } from '../../../styles/theme';
 import { useSelector } from "react-redux";
 
 //my custom
 import { Navbar } from "../../../components/ui";
+import { lightTheme, darkTheme } from '../../../styles/theme';
 import Footer from '../../../components/Footer/Footer'
 import HeroSection from "../../../components/ui/HeroSection";
+
+//section components
 import ObjectDetailsSection from "./ObjectDetailsSection";
 import TrailSection from "./TrailSection";
 import AdditionalFacilitiesSection from "./AdditionalFacilitiesSection";

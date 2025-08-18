@@ -1,10 +1,11 @@
 import { CssBaseline, ThemeProvider, Typography, Box, Grid } from "@mui/material";
-import { lightTheme, darkTheme } from '../../../styles/theme';
 import { useSelector } from "react-redux";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+
 //my custom
 import Button from "../../../components/ui/Button";
+import { lightTheme, darkTheme } from '../../../styles/theme';
 
 function MembersVisitDetailSection(){
     const darkMode = useSelector((state) => state.theme.darkMode);

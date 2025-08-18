@@ -6,10 +6,12 @@ import { useSelector } from "react-redux";
 import { Navbar } from "../../../components/ui";
 import Footer from '../../../components/Footer/Footer'
 import HeroSection from "../../../components/ui/HeroSection";
+import AdvertisementSection from "../../../components/ui/AdvertismentCard";
+
+//section components
 import PlanDetailsSection from "./PlanDetailsSection";
 import ExplorationSection from "./ExplorationSection";
 import TicketInfoSection from "./TicketInformationSection";
-import AdvertisementSection from "../../../components/ui/AdvertismentCard";
 import GallerySection from "./GallerySection";
 import ScheduleSection from "./ScheduleSection";
 import ExhibitionsEventsSection from "../../LandingPage/ExhibitionsEventsSection";

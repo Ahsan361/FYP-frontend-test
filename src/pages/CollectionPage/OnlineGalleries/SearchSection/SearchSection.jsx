@@ -3,7 +3,6 @@ import { Box } from "@mui/material";
 import SearchIntroSection from "./SearchIntroSection";
 import SearchBar from "./Searchbar";
 import WarningSection from "./WarningSection";
-import SocialConnectionSection from "../SocialConnectionSection";
 
 function SearchSection() {
   return (
