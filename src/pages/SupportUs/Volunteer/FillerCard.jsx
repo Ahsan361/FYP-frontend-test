@@ -12,7 +12,7 @@ function FillerCard() {
             {/* {Left Column} */}
             <Grid size={{xs:12, sm: 12, md:8}}>
                     <img 
-                        src="filler.png" 
+                        src="/filler.png" 
                         alt="Loading Image" 
                         style={{
                         width: "100%",

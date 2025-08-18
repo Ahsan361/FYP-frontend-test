@@ -23,7 +23,7 @@ function RefreshmentSection() {
                     </Typography> 
                     
                     <img
-                        src="room4.jpg"
+                        src="/room4.jpg"
                         alt="Private Tour"
                         style={{ width: "100%", p: 4 }}
                     />

@@ -1,4 +1,4 @@
-import { Box, useTheme, Typography } from "@mui/material";
+import { Box, useTheme, Typography, useMediaQuery } from "@mui/material";
 import { Menu as MenuIcon, Close as CloseIcon, KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
@@ -8,6 +8,7 @@ import { NavButton } from "./StyledComponents";
 const DesktopNavigation = ({ navItems, openDropdown, setOpenDropdown, anchorEl, setAnchorEl, buttonRefs }) => {
   const theme = useTheme();
   const navigate = useNavigate();
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up("md")); 
 
   return (
     <Box
@@ -48,7 +49,7 @@ const DesktopNavigation = ({ navItems, openDropdown, setOpenDropdown, anchorEl, 
           }}
 
           >
-            <Typography sx={{fontSize: {xs:"0.9rem", sm:"0.75rem", md:"1rem"} }}>
+            <Typography variant="h5"  sx={{fontSize:{ md: "1.35rem"}  }}>
               {item.label}
             </Typography>
           </NavButton>

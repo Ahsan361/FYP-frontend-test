@@ -83,7 +83,7 @@ const Footer = ({
           {/* Box 1: Logo and Social Links (Left) */}
           <Box sx={{ flex: isMobile ? '1 1 100%' : '0 0 30%', maxWidth: isMobile ? '100%' : '650px' }}>
             <Typography 
-              variant="h3" 
+              variant="h2" 
               component="div" 
               sx={{ 
                 fontWeight: 700,
@@ -95,11 +95,12 @@ const Footer = ({
               {title}
             </Typography>
             <Typography 
-              variant="subtitle1" 
+              variant="subtitle1"
               sx={{ 
                 color: theme.palette.mode === 'light' ? 'grey.300' : 'text.secondary',
                 mb: 2,
-                fontWeight: 500
+                fontWeight: 500,
+                fontSize: {xs: "1rem", md:"1.4rem" }
               }}
             >
               {subtitle}
@@ -109,7 +110,8 @@ const Footer = ({
               sx={{ 
                 color: theme.palette.mode === 'light' ? 'grey.400' : 'text.secondary',
                 lineHeight: 1.7,
-                mb: 3
+                mb: 3,
+                fontSize: {xs: "0.9rem", md:"1.1rem" }
               }}
             >
               {description}
@@ -120,7 +122,7 @@ const Footer = ({
                   key={index}
                   href={social.href}
                   aria-label={social.label}
-                  size="small"
+                  size="medium"
                   sx={{
                     bgcolor: theme.palette.mode === 'light' ? 'grey.800' : theme.palette.background,
                     '&:hover': { bgcolor: 'primary.main' }
@@ -142,7 +144,8 @@ const Footer = ({
                   sx={{ 
                     fontWeight: 600,
                     mb: 2.5,
-                    color: theme.palette.mode === 'light' ? 'common.white' : 'text.primary'
+                    color: theme.palette.mode === 'light' ? 'common.white' : 'text.primary',
+                    fontSize: {xs: "0.9rem", md:"1.4rem" }
                   }}
                 >
                   Quick Links
@@ -155,7 +158,8 @@ const Footer = ({
                       underline="none"
                       sx={{
                         color: theme.palette.mode === 'light' ? 'grey.300' : 'text.secondary',
-                        '&:hover': { color: 'primary.main' }
+                        '&:hover': { color: 'primary.main' },
+                        fontSize: {xs: "0.9rem", md:"1.1rem" }
                       }}
                     >
                       {link.label}
@@ -171,7 +175,8 @@ const Footer = ({
                   sx={{ 
                     fontWeight: 600,
                     mb: 2.5,
-                    color: theme.palette.mode === 'light' ? 'common.white' : 'text.primary'
+                    color: theme.palette.mode === 'light' ? 'common.white' : 'text.primary',
+                    fontSize: {xs: "0.9rem", md:"1.4rem" }
                   }}
                 >
                   Resources
@@ -184,7 +189,8 @@ const Footer = ({
                       underline="none"
                       sx={{
                         color: theme.palette.mode === 'light' ? 'grey.300' : 'text.secondary',
-                        '&:hover': { color: 'primary.main' }
+                        '&:hover': { color: 'primary.main' },
+                        fontSize: {xs: "0.9rem", md:"1.1rem" }
                       }}
                     >
                       {resource.label}
@@ -200,7 +206,8 @@ const Footer = ({
                   sx={{ 
                     fontWeight: 600,
                     mb: 2.5,
-                    color: theme.palette.mode === 'light' ? 'common.white' : 'text.primary'
+                    color: theme.palette.mode === 'light' ? 'common.white' : 'text.primary',
+                    fontSize: {xs: "0.9rem", md:"1.4rem" }
                   }}
                 >
                   Contact Us
@@ -209,7 +216,7 @@ const Footer = ({
                   <FooterLink>
                     <Box display="flex" alignItems="center" gap={1.5}>
                       <LocationOn sx={{ color: 'primary.main' }} />
-                      <Typography variant="body2" sx={{ color: theme.palette.mode === 'light' ? 'grey.300' : 'text.secondary' }}>
+                      <Typography variant="body2" sx={{ color: theme.palette.mode === 'light' ? 'grey.300' : 'text.secondary' , fontSize: {xs: "0.9rem", md:"1.1rem" } }}>
                         {contact.address}
                       </Typography>
                     </Box>
@@ -217,7 +224,7 @@ const Footer = ({
                   <FooterLink>
                     <Box display="flex" alignItems="center" gap={1.5}>
                       <Phone sx={{ color: 'primary.main' }} />
-                      <Typography variant="body2" sx={{ color: theme.palette.mode === 'light' ? 'grey.300' : 'text.secondary' }}>
+                      <Typography variant="body2" sx={{ color: theme.palette.mode === 'light' ? 'grey.300' : 'text.secondary', fontSize: {xs: "0.9rem", md:"1.1rem" } }}>
                         {contact.phone}
                       </Typography>
                     </Box>
@@ -225,7 +232,7 @@ const Footer = ({
                   <FooterLink>
                     <Box display="flex" alignItems="center" gap={1.5}>
                       <Email sx={{ color: 'primary.main' }} />
-                      <Typography variant="body2" sx={{ color: theme.palette.mode === 'light' ? 'grey.300' : 'text.secondary' }}>
+                      <Typography variant="body2" sx={{ color: theme.palette.mode === 'light' ? 'grey.300' : 'text.secondary', fontSize: {xs: "0.9rem", md:"1.1rem" } }}>
                         {contact.email}
                       </Typography>
                     </Box>
@@ -240,7 +247,8 @@ const Footer = ({
                   sx={{ 
                     fontWeight: 600,
                     mb: 2.5,
-                    color: theme.palette.mode === 'light' ? 'common.white' : 'text.primary'
+                    color: theme.palette.mode === 'light' ? 'common.white' : 'text.primary',
+                    fontSize: {xs: "0.9rem", md:"1.4rem" }
                   }}
                 >
                   Legal
@@ -253,7 +261,8 @@ const Footer = ({
                       underline="none"
                       sx={{
                         color: theme.palette.mode === 'light' ? 'grey.300' : 'text.secondary',
-                        '&:hover': { color: 'primary.main' }
+                        '&:hover': { color: 'primary.main' },
+                        fontSize: {xs: "0.9rem", md:"1.1rem" }
                       }}
                     >
                       {item.label}

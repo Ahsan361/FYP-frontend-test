@@ -43,7 +43,7 @@ function CorporatePartnershipSection() {
         <Grid size={{sm:12, md:4}} sx={{pl:{xs:4, md:8}, pr:{xs:4, md:8}}}>
             <Box sx={{ flex: 0.8, textAlign: "center" }}>
                 <img
-                src="room2.png"
+                src="/room2.png"
                 alt="Private Tour"
                 style={{ width: "100%" }}
                 />

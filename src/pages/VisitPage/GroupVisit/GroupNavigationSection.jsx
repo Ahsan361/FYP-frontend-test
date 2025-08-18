@@ -39,7 +39,7 @@ function GroupNavigationSection() {
                     Getting here for groups
                 </Typography>
                     <img 
-                        src="museumMap.png" 
+                        src="/museumMap.png" 
                         alt="museum map here" 
                         style={{
                         width: "70%",

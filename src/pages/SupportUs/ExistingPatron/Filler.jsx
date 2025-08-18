@@ -2,8 +2,6 @@ import { CssBaseline, ThemeProvider, Typography, Box, Grid, Stack } from "@mui/m
 import { lightTheme, darkTheme } from '../../../styles/theme';
 import { useSelector } from "react-redux";
 
-import ExistingPatronTiles from "./ExistingPatronTiles";
-
 function Filler() {
     const darkMode = useSelector((state) => state.theme.darkMode);
     const theme = darkMode ? darkTheme : lightTheme;
@@ -35,7 +33,7 @@ function Filler() {
         <Grid size={{sm:12, md:4}} sx={{pl:{xs:4, md:8}, pr:{xs:4, md:8}}}>
             <Box sx={{ flex: 0.8, textAlign: "center" }}>
                 <img
-                src="room4.jpg"
+                src="/room4.jpg"
                 alt="Private Tour"
                 style={{ width: "100%" }}
                 />
@@ -44,7 +42,6 @@ function Filler() {
                 </Typography>
             </Box>
         </Grid>
-        <ExistingPatronTiles/>
     </Grid>
 
     </ThemeProvider>

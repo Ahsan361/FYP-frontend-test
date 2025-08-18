@@ -9,7 +9,6 @@ import Button from "../../../components/ui/Button";
 function MagzineSection() {
     const darkMode = useSelector((state) => state.theme.darkMode);
     const theme = darkMode ? darkTheme : lightTheme;
-   
 
     return(
         <ThemeProvider theme= {theme}>
@@ -36,7 +35,7 @@ function MagzineSection() {
         <Grid size={{sm:12, md:6}} sx={{pl:{xs:4, md:8}, pr:{xs:4, md:8}}}>
             <Box sx={{ flex: 0.8, textAlign: "center" }}>
                 <img
-                src="room4.jpg"
+                src="/room2.png"
                 alt="Private Tour"
                 style={{ width: "70%" }}
                 />
