@@ -91,7 +91,7 @@ function CountryIntroductionSection() {
                 >
                     <Box sx={{ flex: 0.8, textAlign: "center" }}>
                     <img
-                    src="room4.jpg"
+                    src="/room4.jpg"
                     alt="Private Tour"
                     style={{ width: "100%" }}
                     />

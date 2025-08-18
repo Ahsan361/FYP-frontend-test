@@ -1,12 +1,9 @@
 import { CssBaseline, ThemeProvider, Typography, Box, Grid, Divider } from "@mui/material";
-import { lightTheme, darkTheme } from '../../../styles/theme';
 import { useSelector } from "react-redux";
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import HeadphonesIcon from '@mui/icons-material/Headphones';
+
 //my custom
 import Button from "../../../components/ui/Button";
-
+import { lightTheme, darkTheme } from '../../../styles/theme';
 
 function MuseumIntroductionSection() {
     const darkMode = useSelector((state) => state.theme.darkMode);
@@ -103,7 +100,7 @@ function MuseumIntroductionSection() {
                 >
                     <Box sx={{ flex: 0.8, textAlign: "center" }}>
                     <img
-                    src="room4.jpg"
+                    src="/room4.jpg"
                     alt="Private Tour"
                     style={{ width: "100%" }}
                     />

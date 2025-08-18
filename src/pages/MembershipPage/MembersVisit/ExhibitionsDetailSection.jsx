@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 function ExhibitionsDetailSection() {
     const darkMode = useSelector((state) => state.theme.darkMode);
     const theme = darkMode ? darkTheme : lightTheme;
-   
 
     return(
         <ThemeProvider theme= {theme}>
@@ -39,7 +38,7 @@ function ExhibitionsDetailSection() {
         <Grid size={{sm:12, md:6}} sx={{pl:{xs:4, md:8}, pr:{xs:4, md:8}}}>
             <Box sx={{ flex: 0.8, textAlign: "center" }}>
                 <img
-                src="room4.jpg"
+                src="/room4.jpg"
                 alt="Private Tour"
                 style={{ width: "70%" }}
                 />

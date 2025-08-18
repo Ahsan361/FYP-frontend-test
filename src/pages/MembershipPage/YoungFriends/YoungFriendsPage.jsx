@@ -8,7 +8,7 @@ import Footer from '../../../components/Footer/Footer'
 import HeroSection from "../../../components/ui/HeroSection";
 import MembershipContactSection from "../../../components/ui/MembershipContactSection";
 import QuoteTile from "../../../components/ui/QuoteTile";
-
+import CarouselSlider from "../../../components/ui/CarouselSlider";
 //sections components
 import YoungFriendsDeitailSection from "./YoungFriendsDeitailSection";
 import FamilyEventsSection from "./FamilyEventsSection";
@@ -50,6 +50,7 @@ function YoungFriendsPage(){
             }} 
         />
         {/* CarouselSlider here  */}
+        <CarouselSlider/>
         <VediosSection/>
         {/* {Childern Accounts} */}
         <MembershipContactSection/>

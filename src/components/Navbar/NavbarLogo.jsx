@@ -17,8 +17,8 @@ const NavbarLogo = () => {
     <LogoContainer onClick={handleLogoClick} >
       <Box
         sx={{
-          width: isMobile ? "2rem" : isLargeScreen ? "3.5rem" : "2.5rem", // Responsive logo size
-          height: isMobile ? "2rem" : isLargeScreen ? "3.5rem" : "2.5rem",
+          width: isMobile ? "2rem" : isLargeScreen ? "2.5rem" : "2.5rem", // Responsive logo size
+          height: isMobile ? "2rem" : isLargeScreen ? "2.5rem" : "2.5rem",
           borderRadius: "0.1rem",
           background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
           display: "flex",
@@ -32,7 +32,7 @@ const NavbarLogo = () => {
           variant={isMobile ? "body1" : "h6"} // Smaller variant on mobile
           sx={{
             color: "white",
-            fontSize: isMobile ? "1.9rem" : isLargeScreen ? "3.4rem" : "2.2rem", // Responsive font size
+            fontSize: isMobile ? "1.5rem" : isLargeScreen ? "2.4rem" : ".2rem", // Responsive font size
             fontWeight: 700,
           }}
         >

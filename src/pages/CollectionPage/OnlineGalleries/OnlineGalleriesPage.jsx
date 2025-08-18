@@ -14,6 +14,7 @@ import Filler from "./Filler";
 import OnlineGalleriesDetailsSection from "./OnlineGalleriesDetailsSection";
 import SearchSection from "./SearchSection/SearchSection";
 import SocialConnectionSection from "./SocialConnectionSection";
+import CarouselSlider from "../../../components/ui/CarouselSlider";
 
 function OnlineGalleryPage(){
     const darkMode = useSelector((state) => state.theme.darkMode);
@@ -25,7 +26,7 @@ function OnlineGalleryPage(){
         <SearchSection/>
         <SocialConnectionSection/>
         <OnlineGalleriesDetailsSection/>
-        {/* <CarouselSlider is yet to be implemnted here/> */}
+        <CarouselSlider/>
         <CollectionThemeSection/>
         <Filler/>
         <AdvertisementSection 
