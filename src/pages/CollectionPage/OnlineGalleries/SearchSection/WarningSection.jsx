@@ -1,8 +1,6 @@
 import { Grid, Typography, Box } from "@mui/material";
-import { useSelector } from "react-redux";
 
 function WarningSection() {
-  const darkMode = useSelector((state) => state.theme.darkMode);
 
   return (
     <Grid

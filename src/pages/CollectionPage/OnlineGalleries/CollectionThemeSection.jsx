@@ -1,5 +1,4 @@
 import React from 'react';
-import {  useMediaQuery,} from '@mui/material';
 import {  EventSeat, Map, Museum, FamilyRestroom } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 

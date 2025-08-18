@@ -32,7 +32,7 @@ function AFiller() {
         <Grid size={{sm:12, md:4}} sx={{pl:{xs:4, md:8}, pr:{xs:4, md:8}}}>
             <Box sx={{ flex: 0.8, textAlign: "center" }}>
                 <img
-                src="room4.jpg"
+                src="/room4.jpg"
                 alt="Private Tour"
                 style={{ width: "100%" }}
                 />

@@ -1,7 +1,6 @@
 import React from 'react';
 import { EventSeat,Map, Museum, FamilyRestroom } from '@mui/icons-material';
 
-
 // Custom components
 import ExplorationGrid from '../../../components/ui/ExplorationGrid';
 

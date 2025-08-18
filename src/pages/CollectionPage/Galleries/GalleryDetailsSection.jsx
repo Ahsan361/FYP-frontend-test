@@ -2,9 +2,6 @@ import { CssBaseline, ThemeProvider, Typography, Box, Grid } from "@mui/material
 import { lightTheme, darkTheme } from '../../../styles/theme';
 import { useSelector } from "react-redux";
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import HeadphonesIcon from '@mui/icons-material/Headphones';
-import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
 
 //my custom
 import Button from "../../../components/ui/Button";
