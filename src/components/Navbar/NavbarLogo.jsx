@@ -1,13 +1,13 @@
 import { LogoContainer } from "./StyledComponents";
 import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import routes from "../../routes/routes"; // Import routes
+import { useNavigate } from "react-router-dom";
+import routes from "../../routes/routes"; 
 
 const NavbarLogo = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Detect mobile screens
-  const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg")); // Detect large screens
-  const navigate = useNavigate(); // Initialize navigate
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); 
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"));
+  const navigate = useNavigate();
 
   const handleLogoClick = () => {
     navigate(routes.home); // Navigate to landing page ("/")

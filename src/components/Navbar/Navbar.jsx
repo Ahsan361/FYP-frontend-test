@@ -11,8 +11,6 @@ import NavbarLogo from "./NavbarLogo";
 import DesktopNavigation from "./NavbarDestopNavigation";
 import RightActions from "./NavbarRightActions";
 import MobileMenu from "./NavbarMobileMenu";
-import NavbarWithProvider from "./NavbarWithProvider";
-
 
 const Navbar = () => {
   const theme = useTheme();
@@ -21,7 +19,7 @@ const Navbar = () => {
   const [notificationMenuAnchor, setNotificationMenuAnchor] = useState(null);
   const [openDropdown, setOpenDropdown] = useState(null); 
   const [anchorEl, setAnchorEl] = useState(null);
-  const user = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const buttonRefs = useRef([]);
 
   useEffect(() => {
@@ -34,7 +32,7 @@ const Navbar = () => {
   }, []);
 
     const navItems = [
-  {
+    {
     label: "Visit",
     icon: <Home />,
     path: "/PlanVisitPage",
@@ -108,6 +106,7 @@ const Navbar = () => {
         </Box>
         <RightActions 
           user={user} 
+          setUser={setUser} 
           isMobile={isMobile}
           handleMobileMenuToggle={handleMobileMenuToggle}
         />

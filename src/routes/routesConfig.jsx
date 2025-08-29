@@ -21,10 +21,16 @@ import PatronPage from "../pages/SupportUs/Patron/PatronPage";
 import VolunteerPage from "../pages/SupportUs/Volunteer/VolunteerPage";
 import ExistingPatronPage from "../pages/SupportUs/ExistingPatron/ExistingPatron";
 import EventsAndExibitionsPage from "../pages/EventsAndExibitions/EventsAndExibitionsPage";
+import Login from "../pages/Authentication/LoginPage";
+import Register from "../pages/Authentication/RegistrationPage";
+import AdminPanel from "../pages/AdminPanel/AdminPanel";
 
 // map paths to components
 const routesConfig = [
   { path: routes.home, element: <LandingPage /> },
+  { path: routes.login, element: <Login /> },
+  { path: routes.register, element: <Register /> },
+  { path: routes.admin , element: <AdminPanel /> },
 
   // Visit
   { path: routes.visit.base, element: <PlanVisitPage /> },
