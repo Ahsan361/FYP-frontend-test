@@ -2,6 +2,9 @@
 // central route definitions here 
 const routes = {
   home: "/",
+  login: "/login", 
+  register: "/register",
+  admin: "/adminDashboard",
 
   // Visit pages
   visit: {

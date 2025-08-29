@@ -1,23 +1,40 @@
-import { Box, IconButton, Avatar, Typography, Stack, useTheme, useMediaQuery } from "@mui/material";
+import { 
+  Box, 
+  IconButton, 
+  Avatar, 
+  Typography, 
+  Stack, 
+  useTheme, 
+  useMediaQuery, 
+  Tooltip 
+} from "@mui/material";
 import { Menu as MenuIcon, Close as CloseIcon, Login, Logout } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 // Custom components
 import ThemeToggle from "../ui/ThemeToggle";
 import Button from "../ui/Button";
 
-function RightActions({ user, isMobile, handleMobileMenuToggle, mobileMenuOpen }) {
+function RightActions({ user, setUser, isMobile, handleMobileMenuToggle, mobileMenuOpen }) {
   const theme = useTheme();
-  // Use MUI's useMediaQuery to detect screen size
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm")); // Below 600px
-  const isMediumScreen = useMediaQuery(theme.breakpoints.between("sm", "md")); // 600px - 900px
+  const navigate = useNavigate();
+
+  // Responsive checks
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.between("sm", "md"));
+
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // remove JWT
+    setUser(null); // update state in parent
+    navigate("/login"); // redirect to login
+  };
 
   return (
     <Stack
       direction="row"
-      spacing={{ xs: 0.5, sm: 1, md: 1.5 }} // Responsive spacing
+      spacing={{ xs: 0.5, sm: 1, md: 1.5 }}
       alignItems="center"
       sx={{
-        // Ensure touch-friendly sizes on mobile
         "& .MuiIconButton-root": {
           width: { xs: 40, sm: 44 },
           height: { xs: 40, sm: 44 },
@@ -25,56 +42,36 @@ function RightActions({ user, isMobile, handleMobileMenuToggle, mobileMenuOpen }
       }}
     >
       <ThemeToggle />
+
       {user ? (
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: { xs: 0.5, sm: 1 }, // Smaller gap on mobile
-          }}
-        >
-          {/* Hide user name on small screens to save space */}
-          {!isSmallScreen && (
-            <Typography
-              variant={isMediumScreen ? "caption" : "body2"} // Smaller text on medium screens
-              sx={{
-                fontWeight: 600,
-                color: theme.palette.text.primary,
-              }}
-            >
-              {user.name}
-            </Typography>
-          )}
-          <IconButton
-            aria-label="User profile"
-            sx={{
-              p: 0, // Reduce padding for avatar
-            }}
-          >
-            <Avatar
-              src={user.avatar}
-              sx={{
-                width: { xs: 32, sm: 36, md: 40 }, // Responsive avatar size
-                height: { xs: 32, sm: 36, md: 40 },
-              }}
-            >
-              {user.name.charAt(0)}
-            </Avatar>
-          </IconButton>
+        // ✅ Logged-in state
+        <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 0.5, sm: 1 } }}>
+          <Tooltip title="Profile">
+            <IconButton aria-label="User profile" sx={{ p: 0 }}>
+              <Avatar src={user.avatar}>
+                {user.username?.charAt(0).toUpperCase()}
+              </Avatar>
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Logout">
+            <IconButton onClick={handleLogout} aria-label="Logout">
+              <Logout />
+            </IconButton>
+          </Tooltip>
         </Box>
       ) : (
+        // ✅ Logged-out state → Sign In button
         <Button
           variant="contained"
           startIcon={<Login />}
-          size={isSmallScreen ? "small" : "medium"} // Smaller button on mobile
-          sx={{
-            px: { xs: 1, sm: 2 }, // Adjust padding
-            fontSize: { xs: "0.75rem", sm: "0.875rem" }, // Responsive font size
-          }}
+          size={isSmallScreen ? "small" : "medium"}
+          onClick={() => navigate("/login")}
         >
-          {isSmallScreen ? "Sign In" : "Sign In"} {/* Optional: Change text if needed */}
+          Sign In
         </Button>
       )}
+
+      {/* Mobile menu toggle */}
       {isMobile && (
         <IconButton
           onClick={handleMobileMenuToggle}
