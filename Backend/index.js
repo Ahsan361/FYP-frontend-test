@@ -1,0 +1,67 @@
+import express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
+import connectDB from "./config/db.js";
+import artifactRoutes from "./routes/artifactRoutes.js";
+import artifactMediaRoutes from "./routes/artifactMediaRoutes.js";
+import blockchainRoutes from "./routes/blockchainRoutes.js";
+import ownershipRoutes from "./routes/ownershipRoutes.js";
+import marketplaceRoutes from "./routes/marketplaceRoutes.js";
+import auctionBidRoutes from "./routes/auctionBidRoutes.js";
+import exhibitionRoutes from "./routes/exhibitionRoutes.js";
+import exhibitionArtifactRoutes from "./routes/exhibitionArtifactRoutes.js";
+import eventRoutes from "./routes/eventRoutes.js";
+import { optionalAuth, readOnlyUnlessAdmin } from "./middleware/rbac.js";
+import authRoutes from "./routes/authRoutes.js";
+import aiProcessingRoutes from "./routes/aiProcessingRoutes.js";
+
+dotenv.config();
+connectDB();
+
+const app = express();
+app.use(express.json());
+
+app.use(cors({
+  origin: "http://localhost:5173",  // frontend URL
+  credentials: true,                 // if you’re sending cookies or auth headers
+}));
+
+// For every model where users can view but only admins can write:
+const readonlyBases = [
+  "/api/artifacts",
+  "/api/artifact-media",
+  "/api/blockchain",
+  "/api/ownerships",
+  "/api/listings",
+  "/api/bids",
+  "/api/exhibitions",
+  "/api/exhibition-artifacts",
+  "/api/events",
+  // add other CRUD modules here...
+];
+
+// Attach: parse token if present, then block writes for non-admins
+readonlyBases.forEach(base => {
+  app.use(base, optionalAuth, readOnlyUnlessAdmin);
+});
+
+// Mount your routers after the guard:
+app.use("/api/artifacts", artifactRoutes);
+app.use("/api/artifact-media", artifactMediaRoutes);
+app.use("/api/blockchain", blockchainRoutes);
+app.use("/api/ownerships", ownershipRoutes);
+app.use("/api/listings", marketplaceRoutes);
+app.use("/api/bids", auctionBidRoutes);
+app.use("/api/exhibitions", exhibitionRoutes);
+app.use("/api/exhibition-artifacts", exhibitionArtifactRoutes);
+app.use("/api/events", eventRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/ai-processing", aiProcessingRoutes);
+
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
