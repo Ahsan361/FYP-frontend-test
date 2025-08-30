@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { Box, Button, TextField, Typography, Paper, Fade } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "../../components/contexts/UserContext";
+import { UserContext } from "../../contexts/UserContext";
 
 function Login({ onLogin }) {
   const navigate = useNavigate();
@@ -158,6 +158,19 @@ function Login({ onLogin }) {
             variant="body2"
             sx={{ mt: 3, textAlign: "center", color: "text.secondary" }}
           >
+            Want to Login as guest?{" "}
+            <Button
+              variant="text"
+              onClick={() => navigate("/")}
+              sx={{ color: "primary.main", textTransform: "none" }}
+            >
+              Guest Account
+            </Button>
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{ mt: 3, textAlign: "center", color: "text.secondary" }}
+          >
             Don’t have an account?{" "}
             <Button
               variant="text"
@@ -166,7 +179,7 @@ function Login({ onLogin }) {
             >
               Register
             </Button>
-          </Typography>
+          </Typography>          
         </Paper>
       </Fade>
     </Box>

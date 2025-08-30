@@ -1,4 +1,4 @@
-import { useEventsFilter } from "../contexts/EventsFilterContext";
+import { useEventsFilter } from "../../contexts/EventsFilterContext";
 import {
   Box,
   FormControl,

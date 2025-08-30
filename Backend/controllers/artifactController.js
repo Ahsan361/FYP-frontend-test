@@ -6,6 +6,7 @@ export const createArtifact = async (req, res) => {
     const artifact = await Artifact.create({ ...req.body, contributor_id: req.user._id });
     res.status(201).json(artifact);
   } catch (error) {
+    console.log("❌ Error in createArtifact:", error);
     res.status(500).json({ message: "Error creating artifact", error: error.message });
   }
 };
@@ -50,5 +51,20 @@ export const deleteArtifact = async (req, res) => {
     res.json({ message: "Artifact deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error deleting artifact" });
+  }
+};
+
+//get artifacts stats
+export const getArtifactStats = async (req, res) => {
+  try {
+    const total = await Artifact.countDocuments();
+    const published = await Artifact.countDocuments({ status: "published" });
+    const drafts = await Artifact.countDocuments({ status: "draft" });
+    const underReview = total - (published + drafts);
+
+    res.json({ total, published, drafts, underReview });
+  } catch (err) {
+    console.log("❌ Error in getArtifactStats:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };

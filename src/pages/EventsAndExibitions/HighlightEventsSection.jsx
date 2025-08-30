@@ -1,5 +1,5 @@
 import ExplorationGrid from "../../components/ui/ExplorationGrid";
-import { useEventsFilter } from "../../components/contexts/EventsFilterContext";
+import { useEventsFilter } from "../../contexts/EventsFilterContext";
 
 function HighlightEventsSection() {
   const { filters } = useEventsFilter();

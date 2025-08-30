@@ -116,6 +116,19 @@ function Register({ onRegister }) {
               Register
             </Button>
           </form>
+          <Typography
+            variant="body2"
+            sx={{ mt: 3, textAlign: "center", color: "text.secondary" }}
+          >
+            Already have an account?{" "}
+            <Button
+            variant="text"
+            onClick={() => navigate("/login")}
+            sx={{ color: "primary.main", textTransform: "none" }}
+            >
+            Login
+            </Button>
+          </Typography>
         </Paper>
       </Fade>
     </Box>

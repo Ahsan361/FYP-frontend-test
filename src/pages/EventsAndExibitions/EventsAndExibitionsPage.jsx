@@ -2,7 +2,7 @@ import { CssBaseline, ThemeProvider, Divider } from "@mui/material";
 import { useSelector } from "react-redux";
 
 //context
-import { EventsFilterProvider } from "../../components/contexts/EventsFilterContext";
+import { EventsFilterProvider } from "../../contexts/EventsFilterContext";
 
 //my custom
 import { Navbar } from "../../components/ui";
