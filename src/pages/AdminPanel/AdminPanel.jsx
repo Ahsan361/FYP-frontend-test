@@ -18,7 +18,9 @@ import {
   Menu,
   MenuItem,
   Divider,
+  ListItemButton,
 } from '@mui/material';
+
 import {
   Home,
   Archive,
@@ -29,6 +31,13 @@ import {
   Bell,
   Search,
   User,
+  Gavel,
+  Calendar,
+  Image,
+  Blocks,
+  ClipboardList,
+  ShoppingCart,
+  GalleryHorizontal,
 } from 'lucide-react';
 
 // Import theme
@@ -36,7 +45,7 @@ import { lightTheme, darkTheme } from '../../styles/theme';
 
 //import context
 import { useContext } from "react";
-import { UserContext } from "../../components/contexts/UserContext";
+import { UserContext } from "../../contexts/UserContext";
 
 // Import components
 import { ThemeToggle } from '../../components/ui';
@@ -59,13 +68,13 @@ const menuItems = [
   { text: 'Dashboard', icon: Home, key: 'home' },
   { text: 'Artifacts', icon: Archive, key: 'artifacts' },
   { text: 'Users', icon: Users, key: 'users' },
-  { text: 'Auctions', icon: Users, key: 'auctions' },
-  { text: 'Events', icon: Users, key: 'events' },
-  { text: 'Exhibitions', icon: Users, key: 'exhibitions' },  
-  { text: 'Blockchain', icon: Users, key: 'blockchain' },
-  { text: 'Event Registration ', icon: Users, key: 'bookings' },
-  { text: 'Market Place', icon: Users, key: 'marketplace' },
-  { text: 'Artifact Media', icon: Users, key: 'artifactMedia' },
+  { text: 'Auctions', icon: Gavel, key: 'auctions' },
+  { text: 'Events', icon: Calendar, key: 'events' },
+  { text: 'Exhibitions', icon: Image, key: 'exhibitions' },  
+  { text: 'Blockchain', icon: Blocks, key: 'blockchain' },
+  { text: 'Event Registration', icon: ClipboardList, key: 'bookings' },
+  { text: 'Market Place', icon: ShoppingCart, key: 'marketplace' },
+  { text: 'Artifact Media', icon: GalleryHorizontal, key: 'artifactMedia' },
 ];
 
 function AdminPanel() {
@@ -145,52 +154,52 @@ function AdminPanel() {
       <Box sx={{ flexGrow: 1, overflowY: 'auto', overflowX: "hidden", pt: 2 }}>
         <List>
           {menuItems.map((item) => (
-            <ListItem
-              key={item.key}
-              button
-              onClick={() => setActiveSection(item.key)}
-              sx={{
-                mx: 1,
-                borderRadius: 2,
-                mb: 0.5,
-                backgroundColor:
-                  activeSection === item.key
-                    ? theme.palette.mode === 'dark'
-                      ? theme.palette.primary.main + '40'
-                      : theme.palette.primary.main + '15'
-                    : 'transparent',
-                '&:hover': {
-                  backgroundColor:
-                    theme.palette.mode === 'dark'
-                      ? theme.palette.primary.main + '20'
-                      : theme.palette.primary.main + '08',
-                },
-              }}
-            >
-              <ListItemIcon
-                sx={{
-                  color:
-                    activeSection === item.key
-                      ? theme.palette.primary.main
-                      : 'inherit',
-                  minWidth: 40,
-                }}
-              >
-                <item.icon size={20} />
-              </ListItemIcon>
-              <ListItemText
-                primary={item.text}
-                sx={{
-                  '& .MuiTypography-root': {
-                    fontWeight: activeSection === item.key ? 600 : 400,
-                    color:
-                      activeSection === item.key
-                        ? theme.palette.primary.main
-                        : 'inherit',
-                  },
-                }}
-              />
-            </ListItem>
+<ListItem disablePadding key={item.key}>
+  <ListItemButton onClick={() => setActiveSection(item.key)}
+    sx={{
+      mx: 1,
+      borderRadius: 2,
+      mb: 0.5,
+      backgroundColor:
+        activeSection === item.key
+          ? theme.palette.mode === 'dark'
+            ? theme.palette.primary.main + '40'
+            : theme.palette.primary.main + '15'
+          : 'transparent',
+      '&:hover': {
+        backgroundColor:
+          theme.palette.mode === 'dark'
+            ? theme.palette.primary.main + '20'
+            : theme.palette.primary.main + '08',
+      },
+    }}
+  >
+    <ListItemIcon
+      sx={{
+        color:
+          activeSection === item.key
+            ? theme.palette.primary.main
+            : 'inherit',
+        minWidth: 40,
+      }}
+    >
+      <item.icon size={20} />
+    </ListItemIcon>
+    <ListItemText
+      primary={item.text}
+      sx={{
+        '& .MuiTypography-root': {
+          fontWeight: activeSection === item.key ? 600 : 400,
+          color:
+            activeSection === item.key
+              ? theme.palette.primary.main
+              : 'inherit',
+        },
+      }}
+    />
+  </ListItemButton>
+</ListItem>
+
           ))}
         </List>
       </Box>

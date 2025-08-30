@@ -6,7 +6,7 @@ import ViewCarouselIcon from '@mui/icons-material/ViewCarousel';
 import { Menu as MenuIcon, Close as CloseIcon, Home, Search, Info, ContactMail, Logout } from "@mui/icons-material";
 
 //custom components
-import { UserContext } from "../contexts/UserContext";
+import { UserContext } from "../../contexts/UserContext";
 import NavbarLogo from "./NavbarLogo";
 import DesktopNavigation from "./NavbarDestopNavigation";
 import RightActions from "./NavbarRightActions";
