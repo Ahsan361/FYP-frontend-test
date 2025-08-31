@@ -4,7 +4,7 @@ import { Box, Typography, Grid, Table, TableBody, TableCell, TableContainer, Tab
   TextField, FormControl, InputLabel, Select, FormHelperText, OutlinedInput, 
 } from '@mui/material';
 //importing icons 
-import { MoreVertical, Edit, Trash2, Eye, Download, Upload, Search,Calendar } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, Eye, Upload, Search,Calendar } from 'lucide-react';
 //charts related content 
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -211,30 +211,30 @@ const filteredArtifacts = artifacts.filter((artifact) => {
               Quick Stats
             </Typography>
             <Box sx={{ space: 3 }}>
-  {[
-    { label: "Total Artifacts", value: stats.total, icon: Eye },
-    { label: "Published", value: stats.published, icon: Eye },
-    { label: "Under Review", value: stats.underReview, icon: Calendar },
-    { label: "Drafts", value: stats.drafts, icon: Edit }
-  ].map((stat, index) => (
-    <Box key={index} sx={{ 
-      display: "flex", 
-      justifyContent: "space-between", 
-      alignItems: "center",
-      py: 2,
-      borderBottom: index < 3 ? "1px solid" : "none",
-      borderColor: "divider"
-    }}>
-      <Box sx={{ display: "flex", alignItems: "center" }}>
-        <stat.icon size={18} style={{ marginRight: 8 }} />
-        <Typography variant="body2">{stat.label}</Typography>
-      </Box>
-      <Typography variant="h6" fontWeight="bold">
-        {stat.value}
-      </Typography>
-    </Box>
-  ))}
-</Box>
+            {[
+              { label: "Total Artifacts", value: stats.total, icon: Eye },
+              { label: "Published", value: stats.published, icon: Eye },
+              { label: "Under Review", value: stats.underReview, icon: Calendar },
+              { label: "Drafts", value: stats.drafts, icon: Edit }
+            ].map((stat, index) => (
+              <Box key={index} sx={{ 
+                display: "flex", 
+                justifyContent: "space-between", 
+                alignItems: "center",
+                py: 2,
+                borderBottom: index < 3 ? "1px solid" : "none",
+                borderColor: "divider"
+              }}>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <stat.icon size={18} style={{ marginRight: 8 }} />
+                  <Typography variant="body2">{stat.label}</Typography>
+                </Box>
+                <Typography variant="h6" fontWeight="bold">
+                  {stat.value}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
 
           </Card>
         </Grid>

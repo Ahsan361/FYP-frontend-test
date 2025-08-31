@@ -1,5 +1,52 @@
 import User from "../models/User.js";
 
+// Admin: Add new user
+export const addUser = async (req, res) => {
+  try {
+    const {
+      username,
+      email,
+      password,            // plain text from request
+      first_name,
+      last_name,
+      phone_number,
+      profile_picture_url,
+      role,
+      is_active,
+    } = req.body;
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists with this email" });
+    }
+
+    // Create new user (use password_hash here so pre-save hook runs)
+    const newUser = new User({
+      username,
+      email,
+      password_hash: password,  // 👈 aligns with schema + will get hashed
+      first_name,
+      last_name,
+      phone_number,
+      profile_picture_url,
+      role,
+      is_active: is_active ?? true,
+    });
+
+    const savedUser = await newUser.save();
+
+    // Hide password hash before sending response
+    const { password_hash, ...userWithoutPassword } = savedUser.toObject();
+
+    res.status(201).json(userWithoutPassword);
+  } catch (error) {
+    console.error("❌ Error in addUser:", error);
+    res.status(500).json({ message: "Error creating user" });
+  }
+};
+
+
 // Get profile
 export const getUserProfile = async (req, res) => {
   const user = await User.findById(req.user._id);
@@ -8,4 +55,55 @@ export const getUserProfile = async (req, res) => {
   } else {
     res.status(404).json({ message: "User not found" });
   }
+};
+
+// Admin: Get all users
+export const getAllUsers = async (req, res) => {
+  const users = await User.find().select("-password_hash");
+  res.json(users);
+};
+
+// Admin: Get user by ID
+export const getUserById = async (req, res) => {
+  const user = await User.findById(req.params.id).select("-password_hash");
+  if (user) res.json(user);
+  else res.status(404).json({ message: "User not found" });
+};
+
+// Admin: Update user
+export const updateUser = async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  user.username = req.body.username || user.username;
+  user.email = req.body.email || user.email;
+  user.first_name = req.body.first_name || user.first_name;
+  user.last_name = req.body.last_name || user.last_name;
+  user.role = req.body.role || user.role;
+  user.is_active = req.body.is_active ?? user.is_active;
+
+  const updatedUser = await user.save();
+  res.json(updatedUser);
+};
+
+// Admin: Delete user
+export const deleteUser = async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.log("❌ Error in deleteUser:", error);
+    res.status(500).json({ message: "Error deleting user" });
+  }
+};
+
+// Admin: Get user statistics (example: count active/inactive)
+export const getUserStats = async (req, res) => {
+  const totalUsers = await User.countDocuments();
+  const activeUsers = await User.countDocuments({ is_active: true });
+  const inactiveUsers = totalUsers - activeUsers;
+
+  res.json({ totalUsers, activeUsers, inactiveUsers });
 };
