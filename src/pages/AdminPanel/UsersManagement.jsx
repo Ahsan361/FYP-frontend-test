@@ -1,289 +1,305 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { 
-  Box, 
-  Typography, 
-  Grid, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow,
-  Chip,
-  Avatar,
-  IconButton,
-  Menu,
-  MenuItem,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Divider
+  Box, Typography, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+  Chip, Avatar, IconButton, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions,
+  TextField, FormControl, InputLabel, Select, FormHelperText, OutlinedInput, Switch, FormControlLabel
 } from '@mui/material';
-import { 
-  MoreVertical, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  UserPlus, 
-  Search,
-  Filter,
-  Mail,
-  Phone,
-  Calendar,
-  Award,
-  Clock,
-  Shield,
-  Users
-} from 'lucide-react';
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
-import { Card, Button, Input, Badge } from '../../components/ui';
 
-// Test data
-const users = [
-  {
-    id: 1,
-    name: 'Dr. Sarah Ahmed',
-    email: 'sarah.ahmed@example.com',
-    role: 'Researcher',
-    status: 'Active',
-    joinDate: '2024-01-15',
-    lastActive: '2024-02-28',
-    contributionsCount: 23,
-    viewsCount: 1247,
-    location: 'Lahore',
-    phone: '+92-300-1234567',
-    avatar: '/api/placeholder/40/40'
-  },
-  {
-    id: 2,
-    name: 'Muhammad Ali Khan',
-    email: 'ali.khan@example.com',
-    role: 'Curator',
-    status: 'Active',
-    joinDate: '2023-11-20',
-    lastActive: '2024-02-27',
-    contributionsCount: 67,
-    viewsCount: 2156,
-    location: 'Karachi',
-    phone: '+92-321-9876543',
-    avatar: '/api/placeholder/40/40'
-  },
-  {
-    id: 3,
-    name: 'Fatima Malik',
-    email: 'fatima.malik@example.com',
-    role: 'Student',
-    status: 'Active',
-    joinDate: '2024-02-01',
-    lastActive: '2024-02-26',
-    contributionsCount: 8,
-    viewsCount: 456,
-    location: 'Islamabad',
-    phone: '+92-333-5555444',
-    avatar: '/api/placeholder/40/40'
-  },
-  {
-    id: 4,
-    name: 'Prof. Ahmed Hassan',
-    email: 'ahmed.hassan@example.com',
-    role: 'Admin',
-    status: 'Active',
-    joinDate: '2023-08-10',
-    lastActive: '2024-02-28',
-    contributionsCount: 145,
-    viewsCount: 3421,
-    location: 'Peshawar',
-    phone: '+92-300-7777888',
-    avatar: '/api/placeholder/40/40'
-  },
-  {
-    id: 5,
-    name: 'Zara Sheikh',
-    email: 'zara.sheikh@example.com',
-    role: 'Visitor',
-    status: 'Inactive',
-    joinDate: '2024-01-05',
-    lastActive: '2024-02-10',
-    contributionsCount: 2,
-    viewsCount: 89,
-    location: 'Rawalpindi',
-    phone: '+92-345-1111222',
-    avatar: '/api/placeholder/40/40'
-  }
+// Importing icons
+import { MoreVertical, Edit, Trash2, Eye, UserPlus, Search, Calendar, Users, UserCheck, UserX } from 'lucide-react';
+
+// Charts related content
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+// Custom components
+import { Card, Button, Input } from '../../components/ui';
+
+// Importing context for user data
+import { UserContext } from "../../contexts/UserContext";
+
+// Importing services for API calls
+import { getAllUsers, getUserById, addUser, updateUser, deleteUser, getUserStats } from '../../services/userService';
+
+// Sample user growth data (replace with real data from backend if available)
+const userGrowthData = [
+  { date: '01/15', users: 150 },
+  { date: '01/22', users: 180 },
+  { date: '01/29', users: 220 },
+  { date: '02/05', users: 195 },
+  { date: '02/12', users: 280 },
+  { date: '02/19', users: 320 },
+  { date: '02/26', users: 350 }
 ];
 
-const userRoleData = [
-  { name: 'Visitors', value: 1847, color: '#1B4332' },
-  { name: 'Students', value: 523, color: '#2D5A3D' },
-  { name: 'Researchers', value: 234, color: '#B8860B' },
-  { name: 'Curators', value: 89, color: '#D4AF37' },
-  { name: 'Admins', value: 12, color: '#616161' }
-];
+const ROLE_OPTIONS = ["admin", "user"];
 
-const userActivityData = [
-  { month: 'Jan', active: 1234, new: 156 },
-  { month: 'Feb', active: 1456, new: 203 },
-  { month: 'Mar', active: 1678, new: 289 },
-  { month: 'Apr', active: 1834, new: 234 },
-  { month: 'May', active: 2012, new: 345 },
-  { month: 'Jun', active: 2156, new: 287 }
-];
-
-const roleColors = {
-  'Admin': 'error',
-  'Curator': 'warning',
-  'Researcher': 'info',
-  'Student': 'success',
-  'Visitor': 'default'
-};
-
-const statusColors = {
-  'Active': 'success',
-  'Inactive': 'default',
-  'Suspended': 'error'
-};
 
 function AdminUsers() {
+  const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRole, setSelectedRole] = useState('All');
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [formData, setFormData] = useState({});
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const [touched, setTouched] = useState(false);
+  const { user } = useContext(UserContext);
 
-  const handleMenuClick = (event, user) => {
+  // Email regex to enforce format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const isValidEmail = emailRegex.test(formData.email || "");
+
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    activeUsers: 0,
+    inactiveUsers: 0
+  });
+
+  // Fetch users on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getAllUsers(user.token);
+        setUsers(data);
+        const statsData = await getUserStats(user.token);
+        setStats(statsData);
+      } catch (error) {
+        console.error("Error fetching users", error);
+      }
+    };
+    fetchData();
+  }, [user.token]);
+
+  const handleMenuClick = (event, userItem) => {
     setAnchorEl(event.currentTarget);
-    setSelectedUser(user);
+    setSelectedUser(userItem);
   };
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedUser(null);
   };
 
-  const filteredUsers = users.filter(user => 
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    (selectedRole === 'All' || user.role === selectedRole)
-  );
+  // When edit clicked
+  const handleEditClick = (userItem) => {
+    setEditingUser(userItem);
+    setFormData(userItem);
+    setOpenDialog(true);
+  };
+
+  const handleViewClick = (userItem) => {
+    setSelectedUser(userItem);
+    setOpenDialog(true);
+  };
+
+  const handleDialogClose = () => {
+    setEditingUser(null);
+    setOpenDialog(false);
+    setFormSubmitted(false);
+  };
+
+  const handleAddClick = () => {
+    setEditingUser({});
+    setFormData({});
+    setOpenDialog(true);
+  };
+
+  // Submit handler
+  const handleSave = async (data) => {
+  setFormSubmitted(true);
+
+  // Basic validations
+  if (!formData.username || !formData.email || !formData.role ||  !emailRegex.test(formData.email)) {
+    return; // Stop submission, red fields will show
+  }
+
+  try {
+    if (editingUser?._id) {
+      // Editing existing user
+      await updateUser(editingUser._id, data, user.token);
+    } else {
+      // Adding new user
+      if (!formData.password_hash) return; // Password required
+
+      // Map password_hash to password for backend
+      const payload = {
+        ...data,
+        password: data.password_hash, // <-- key fix
+      };
+
+      await addUser(payload, user.token);
+    }
+
+    // Fetch fresh user list and update UI
+    const updated = await getAllUsers(user.token);
+    setUsers(updated);
+    handleDialogClose();
+
+    // Refresh stats immediately
+    const updatedStats = await getUserStats(user.token);
+    setStats(updatedStats);
+
+  } catch (error) {
+    console.error("Error saving user:", error);
+  }
+};
+
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteUser(id, user.token);
+      // Update details immediately
+      const updated = await getAllUsers(user.token);
+      setUsers(updated);
+      // Refresh stats immediately
+      const updatedStats = await getUserStats(user.token);
+      setStats(updatedStats);
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
+  };
+
+  const filteredUsers = users.filter((userItem) => {
+    const username = userItem.username?.toLowerCase() || "";
+    const email = userItem.email?.toLowerCase() || "";
+    const firstName = userItem.first_name?.toLowerCase() || "";
+    const lastName = userItem.last_name?.toLowerCase() || "";
+    
+    const matchesSearch = 
+      username.includes(searchTerm.toLowerCase()) ||
+      email.includes(searchTerm.toLowerCase()) ||
+      firstName.includes(searchTerm.toLowerCase()) ||
+      lastName.includes(searchTerm.toLowerCase());
+    
+    const matchesRole = selectedRole === "All" || userItem.role === selectedRole;
+
+    return matchesSearch && matchesRole;
+  });
 
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Box>
           <Typography variant="h4" fontWeight="bold" gutterBottom>
-            Users Management
+            User Management
           </Typography>
           <Typography variant="body1" color="textSecondary">
-            Monitor and manage platform users
+            Manage and monitor platform users
           </Typography>
         </Box>
         <Button 
           variant="contained" 
           startIcon={<UserPlus size={20} />}
           sx={{ px: 3, py: 1.5 }}
+          onClick={handleAddClick}
         >
           Add New User
         </Button>
       </Box>
 
-      {/* User Analytics */}
+      {/* Analytics Overview */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        {/* User Role Distribution */}
-        <Grid size = {{ xs:12, md:6}}>
+        <Grid size={{ xs: 12, lg: 8 }}>
           <Card sx={{ p: 3, height: 350 }}>
             <Typography variant="h6" fontWeight="bold" gutterBottom>
-              User Role Distribution
+              User Growth Over Time
             </Typography>
             <ResponsiveContainer width="100%" height="90%">
-              <PieChart>
-                <Pie
-                  data={userRoleData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  dataKey="value"
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                >
-                  {userRoleData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </Card>
-        </Grid>
-
-        {/* User Activity Trends */}
-        <Grid size = {{ xs:12, md:6}}>
-          <Card sx={{ p: 3, height: 350 }}>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
-              User Activity & Growth
-            </Typography>
-            <ResponsiveContainer width="100%" height="90%">
-              <BarChart data={userActivityData}>
+              <AreaChart data={userGrowthData}>
+                <defs>
+                  <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#1B4332" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#1B4332" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
+                <XAxis dataKey="date" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="active" fill="#1B4332" name="Active Users" />
-                <Bar dataKey="new" fill="#B8860B" name="New Users" />
-              </BarChart>
+                <Area 
+                  type="monotone" 
+                  dataKey="users" 
+                  stroke="#1B4332" 
+                  fillOpacity={1} 
+                  fill="url(#colorUsers)" 
+                  strokeWidth={2}
+                />
+              </AreaChart>
             </ResponsiveContainer>
           </Card>
         </Grid>
 
-        {/* Quick Stats */}
-        <Grid size = {{ xs:12}}>
-          <Grid container spacing={2}>
-            {[
-              { label: 'Total Users', value: '2,847', change: '+12.5%', icon: Users, color: '#1B4332' },
-              { label: 'Active Today', value: '234', change: '+5.2%', icon: Clock, color: '#2D5A3D' },
-              { label: 'New This Month', value: '156', change: '+8.7%', icon: UserPlus, color: '#B8860B' },
-              { label: 'Premium Members', value: '89', change: '+15.3%', icon: Award, color: '#D4AF37' }
-            ].map((stat, index) => (
-              <Grid size = {{xs:12, sm:6, md:3}} key={index}>
-                <Card sx={{ p: 2, borderLeft: `4px solid ${stat.color}` }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Box>
-                      <Typography variant="body2" color="textSecondary">
-                        {stat.label}
-                      </Typography>
-                      <Typography variant="h5" fontWeight="bold">
-                        {stat.value}
-                      </Typography>
-                      <Typography variant="caption" color="success.main">
-                        {stat.change}
-                      </Typography>
-                    </Box>
-                    <stat.icon size={24} color={stat.color} />
+        <Grid size={{ xs: 12, lg: 4 }}>
+          <Card sx={{ p: 3, height: 350 }}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>
+              Quick Stats
+            </Typography>
+            <Box sx={{ space: 3 }}>
+              {[
+                { label: "Total Users", value: stats.totalUsers, icon: Users },
+                { label: "Active Users", value: stats.activeUsers, icon: UserCheck },
+                { label: "Inactive Users", value: stats.inactiveUsers, icon: UserX },
+                { label: "Admins", value: users.filter(u => u.role === 'admin').length, icon: Eye }
+              ].map((stat, index) => (
+                <Box key={index} sx={{ 
+                  display: "flex", 
+                  justifyContent: "space-between", 
+                  alignItems: "center",
+                  py: 2,
+                  borderBottom: index < 3 ? "1px solid" : "none",
+                  borderColor: "divider"
+                }}>
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <stat.icon size={18} style={{ marginRight: 8 }} />
+                    <Typography variant="body2">{stat.label}</Typography>
                   </Box>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
+                  <Typography variant="h6" fontWeight="bold">
+                    {stat.value}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          </Card>
         </Grid>
       </Grid>
 
-      {/* Search and Filters */}
+      {/* Filters and Search */}
       <Card sx={{ p: 3, mb: 3 }}>
         <Grid container spacing={2} alignItems="center">
-          <Grid size = {{ xs:12, md:8}}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Input
-              placeholder="Search users by name or email..."
+              placeholder="Search users by name, username, or email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               startIcon={<Search size={20} />}
               fullWidth
             />
           </Grid>
-          <Grid size = {{ xs:12, md:4}}>
+          <Grid size={{ xs: 12, md: 3 }}>
+            <FormControl fullWidth>
+              <InputLabel>Filter by Role</InputLabel>
+              <Select
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value)}
+              >
+                <MenuItem value="All">All</MenuItem>
+                {ROLE_OPTIONS.map((role) => (
+                  <MenuItem key={role} value={role}>
+                    {role.charAt(0).toUpperCase() + role.slice(1)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 3 }}>
             <Button
               variant="outlined"
-              startIcon={<Filter size={20} />}
+              startIcon={<Calendar size={20} />}
               fullWidth
             >
-              Filter by Role
+              Date Range
             </Button>
           </Grid>
         </Grid>
@@ -295,80 +311,69 @@ function AdminUsers() {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>User</TableCell>
-                <TableCell>Role</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell align="center">Contributions</TableCell>
-                <TableCell align="center">Views</TableCell>
-                <TableCell>Last Active</TableCell>
-                <TableCell>Location</TableCell>
-                <TableCell align="center">Actions</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>User</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Username</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Email</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Phone</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Role</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Status</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Email Verified</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Last Login</TableCell>
+                <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Joined</TableCell>
+                <TableCell align="center" sx={{ fontWeight: "bold", fontSize: "1rem" }}>Actions</TableCell>
               </TableRow>
             </TableHead>
+
             <TableBody>
-              {filteredUsers.map((user) => (
-                <TableRow key={user.id} hover>
+              {filteredUsers.map((userItem) => (
+                <TableRow key={userItem._id} hover>
                   <TableCell>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <Avatar 
-                        src={user.avatar}
-                        sx={{ mr: 2, width: 40, height: 40 }}
-                      >
-                        {user.name.charAt(0)}
-                      </Avatar>
+                        src={userItem.profile_picture_url || "/api/placeholder/40/40"} 
+                        sx={{ width: 40, height: 40, mr: 2 }}
+                      />
                       <Box>
-                        <Typography variant="subtitle2" fontWeight="medium">
-                          {user.name}
-                        </Typography>
-                        <Typography variant="caption" color="textSecondary">
-                          {user.email}
+                        <Typography variant="body2" fontWeight="medium">
+                          {`${userItem.first_name || ''} ${userItem.last_name || ''}`.trim() || 'No Name'}
                         </Typography>
                       </Box>
                     </Box>
                   </TableCell>
+                  <TableCell>{userItem.username}</TableCell>
+                  <TableCell>{userItem.email}</TableCell>
+                  <TableCell>{userItem.phone_number || "-"}</TableCell>
                   <TableCell>
                     <Chip
-                      label={user.role}
-                      color={roleColors[user.role]}
-                      sx={{ textTransform: 'capitalize' }}
-                    >
-                      {user.role}
-                    </Chip>
+                      label={userItem.role}
+                      color={userItem.role === "admin" ? "primary" : "default"}
+                      sx={{ textTransform: "capitalize" }}
+                    />
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={user.status}
-                      color={statusColors[user.status]}
-                      sx={{ textTransform: 'capitalize' }}
-                    >
-                      {user.status}
-                    </Chip>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography variant="body2" fontWeight="medium">
-                      {user.contributionsCount}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography variant="body2">
-                      {user.viewsCount.toLocaleString()}
-                    </Typography>
+                      label={userItem.is_active ? "Active" : "Inactive"}
+                      color={userItem.is_active ? "success" : "error"}
+                    />
                   </TableCell>
                   <TableCell>
-                    <Typography variant="body2">
-                      {new Date(user.lastActive).toLocaleDateString()}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">
-                      {user.location}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <IconButton
+                    <Chip
+                      label={userItem.email_verified ? "Verified" : "Unverified"}
+                      color={userItem.email_verified ? "success" : "warning"}
                       size="small"
-                      onClick={(e) => handleMenuClick(e, user)}
-                    >
+                    />
+                  </TableCell>
+                  <TableCell>
+                    {userItem.last_login 
+                      ? new Date(userItem.last_login).toLocaleDateString() 
+                      : "Never"
+                    }
+                  </TableCell>
+                  <TableCell>
+                    {new Date(userItem.createdAt).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell align="center">
+                    <IconButton size="small" onClick={(e) => handleMenuClick(e, userItem)}>
                       <MoreVertical size={16} />
                     </IconButton>
                   </TableCell>
@@ -384,113 +389,70 @@ function AdminUsers() {
           open={Boolean(anchorEl)}
           onClose={handleMenuClose}
         >
-          <MenuItem onClick={() => { setOpenDialog(true); handleMenuClose(); }}>
+          <MenuItem onClick={() => { handleViewClick(selectedUser); handleMenuClose(); }}>
             <Eye size={16} style={{ marginRight: 8 }} />
-            View Profile
+            View Details
           </MenuItem>
-          <MenuItem onClick={handleMenuClose}>
+          <MenuItem onClick={() => { handleEditClick(selectedUser); handleMenuClose(); }}>
             <Edit size={16} style={{ marginRight: 8 }} />
-            Edit User
+            Edit
           </MenuItem>
-          <MenuItem onClick={handleMenuClose}>
-            <Mail size={16} style={{ marginRight: 8 }} />
-            Send Message
-          </MenuItem>
-          <MenuItem onClick={handleMenuClose}>
-            <Shield size={16} style={{ marginRight: 8 }} />
-            Manage Permissions
-          </MenuItem>
-          <MenuItem onClick={handleMenuClose} sx={{ color: 'error.main' }}>
+          <MenuItem 
+            onClick={() => { handleDelete(selectedUser._id); handleMenuClose(); }} 
+            sx={{ color: 'error.main' }}
+            disabled={selectedUser?._id === user._id} // Prevent self-deletion
+          >
             <Trash2 size={16} style={{ marginRight: 8 }} />
-            Suspend User
+            Delete
           </MenuItem>
         </Menu>
 
-        {/* User Details Dialog */}
-        <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="md" fullWidth>
+        {/* User Details Dialog (View Only) */}
+        <Dialog open={openDialog && !editingUser} onClose={handleDialogClose} maxWidth="md" fullWidth>
           {selectedUser && (
             <>
               <DialogTitle>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Avatar 
-                    src={selectedUser.avatar}
-                    sx={{ mr: 2, width: 50, height: 50 }}
-                  >
-                    {selectedUser.name.charAt(0)}
-                  </Avatar>
-                  <Box>
-                    <Typography variant="h6" fontWeight="bold">
-                      {selectedUser.name}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      {selectedUser.email}
-                    </Typography>
-                  </Box>
-                </Box>
+                <Typography component="span" variant="h6" fontWeight="bold">
+                  {selectedUser.username}
+                </Typography>
               </DialogTitle>
+
               <DialogContent>
                 <Grid container spacing={3}>
-                  <Grid size = {{ xs:12, md:6}}>
-                    <Box sx={{ space: 2 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                        <Shield size={18} style={{ marginRight: 8 }} />
-                        <Typography variant="subtitle2">Role:</Typography>
-                        <Badge variant={roleColors[selectedUser.role]} sx={{ ml: 1 }}>
-                          {selectedUser.role}
-                        </Badge>
-                      </Box>
-                      
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                        <Phone size={18} style={{ marginRight: 8 }} />
-                        <Typography variant="body2">
-                          {selectedUser.phone}
-                        </Typography>
-                      </Box>
-                      
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                        <Calendar size={18} style={{ marginRight: 8 }} />
-                        <Typography variant="body2">
-                          Joined: {new Date(selectedUser.joinDate).toLocaleDateString()}
-                        </Typography>
-                      </Box>
-                      
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                        <Clock size={18} style={{ marginRight: 8 }} />
-                        <Typography variant="body2">
-                          Last Active: {new Date(selectedUser.lastActive).toLocaleDateString()}
-                        </Typography>
-                      </Box>
-                    </Box>
+                  {/* Profile Picture Section */}
+                  <Grid size={{ xs: 12, md: 4 }}>
+                    <Avatar 
+                      src={selectedUser.profile_picture_url || "/api/placeholder/200/200"} 
+                      sx={{ width: '100%', height: 200 }} 
+                      variant="rounded" 
+                    />
                   </Grid>
-                  
-                  <Grid size = {{ xs:12, md:6}}>
-                    <Divider sx={{ my: 2 }} />
-                    <Typography variant="h6" gutterBottom>Activity Summary</Typography>
-                    <Box sx={{ space: 2 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography variant="body2">Contributions:</Typography>
-                        <Typography variant="body2" fontWeight="bold">
-                          {selectedUser.contributionsCount}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography variant="body2">Total Views:</Typography>
-                        <Typography variant="body2" fontWeight="bold">
-                          {selectedUser.viewsCount.toLocaleString()}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography variant="body2">Location:</Typography>
-                        <Typography variant="body2" fontWeight="bold">
-                          {selectedUser.location}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography variant="body2">Status:</Typography>
-                        <Badge variant={statusColors[selectedUser.status]}>
-                          {selectedUser.status}
-                        </Badge>
-                      </Box>
+
+                  {/* Details Section */}
+                  <Grid size={{ xs: 12, md: 8 }}>
+                    <Box>
+                      {[
+                        { label: "Username", value: selectedUser.username },
+                        { label: "Email", value: selectedUser.email },
+                        { label: "First Name", value: selectedUser.first_name },
+                        { label: "Last Name", value: selectedUser.last_name },
+                        { label: "Phone Number", value: selectedUser.phone_number },
+                        { label: "Role", value: selectedUser.role },
+                        { label: "Status", value: selectedUser.is_active ? "Active" : "Inactive" },
+                        { label: "Email Verified", value: selectedUser.email_verified ? "Yes" : "No" },
+                        { label: "Last Login", value: selectedUser.last_login ? new Date(selectedUser.last_login).toLocaleString() : "Never" },
+                        { label: "Account Created", value: new Date(selectedUser.createdAt).toLocaleString() },
+                        { label: "Last Updated", value: new Date(selectedUser.updatedAt).toLocaleString() },
+                      ].map((field, index) => (
+                        <Box key={index} sx={{ mb: 2 }}>
+                          <Typography variant="subtitle2" color="textSecondary">
+                            {field.label}
+                          </Typography>
+                          <Typography variant="body1">
+                            {field.value || "-"}
+                          </Typography>
+                        </Box>
+                      ))}
                     </Box>
                   </Grid>
                 </Grid>
@@ -499,11 +461,189 @@ function AdminUsers() {
                 <Button variant="outlined" onClick={() => setOpenDialog(false)}>
                   Close
                 </Button>
-                <Button variant="outlined" startIcon={<Mail size={16} />}>
-                  Send Message
+              </DialogActions>
+            </>
+          )}
+        </Dialog>
+
+        {/* User Edit Dialog */}
+        <Dialog open={Boolean(editingUser)} onClose={handleDialogClose} maxWidth="md" fullWidth>
+          {editingUser && (
+            <>
+              <DialogTitle>
+                <Typography component="span" variant="h6" fontWeight="bold">
+                  {editingUser?._id ? "Edit User" : "Add User"}
+                </Typography>
+              </DialogTitle>
+
+              <DialogContent
+                dividers 
+                sx={{ 
+                  maxHeight: "90vh",
+                  overflowY: "auto" 
+                }}
+              >
+                <Grid container spacing={3}>
+                  {/* Username */}
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <FormControl fullWidth error={!formData.username && formSubmitted}>
+                      <InputLabel shrink>Username</InputLabel>
+                      <OutlinedInput
+                        value={formData.username ?? editingUser.username ?? ""}
+                        onChange={(e) =>
+                          setFormData({ ...formData, username: e.target.value })
+                        }
+                        label="Username"
+                      />
+                      {!formData.username && formSubmitted && (
+                        <FormHelperText>Username is required</FormHelperText>
+                      )}
+                    </FormControl>
+                  </Grid>
+
+                  {/* Email */}
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <FormControl 
+                      fullWidth 
+                      error={(formSubmitted || touched) && !isValidEmail}
+                    >
+                      <InputLabel shrink>Email</InputLabel>
+                      <OutlinedInput
+                        type="email"
+                        value={formData.email ?? ""}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        onBlur={() => setTouched(true)}
+                        label="Email"
+                      />
+                      {(formSubmitted || touched) && !isValidEmail && (
+                        <FormHelperText>
+                          Please enter a valid email address (e.g., user@gmail.com)
+                        </FormHelperText>
+                      )}
+                    </FormControl>
+                  </Grid>
+
+                  {/* Password (only for new users) */}
+                  {!editingUser?._id && (
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <FormControl fullWidth error={!formData.password_hash && formSubmitted}>
+                        <InputLabel shrink>Password</InputLabel>
+                        <OutlinedInput
+                          type="password"
+                          value={formData.password_hash ?? ""}
+                          onChange={(e) =>
+                            setFormData({ ...formData, password_hash: e.target.value })
+                          }
+                          label="Password"
+                        />
+                        {!formData.password_hash && formSubmitted && (
+                          <FormHelperText>Password is required for new users</FormHelperText>
+                        )}
+                      </FormControl>
+                    </Grid>
+                  )}
+
+                  {/* Role */}
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <FormControl 
+                      fullWidth 
+                      required 
+                      error={!formData.role && formSubmitted}
+                    >
+                      <InputLabel>Role</InputLabel>
+                      <Select
+                        value={formData.role ?? editingUser?.role ?? ""}
+                        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                      >
+                        {ROLE_OPTIONS.map((option) => (
+                          <MenuItem key={option} value={option}>
+                            {option.charAt(0).toUpperCase() + option.slice(1)}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {!formData.role && formSubmitted && (
+                        <FormHelperText>Role is required</FormHelperText>
+                      )}
+                    </FormControl>
+                  </Grid>
+
+                  {/* First Name */}
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      fullWidth
+                      label="First Name"
+                      value={formData.first_name ?? editingUser.first_name ?? ""}
+                      onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                    />
+                  </Grid>
+
+                  {/* Last Name */}
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      fullWidth
+                      label="Last Name"
+                      value={formData.last_name ?? editingUser.last_name ?? ""}
+                      onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                    />
+                  </Grid>
+
+                  {/* Phone Number */}
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      fullWidth
+                      label="Phone Number"
+                      value={formData.phone_number ?? editingUser.phone_number ?? ""}
+                      onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+                    />
+                  </Grid>
+
+                  {/* Profile Picture URL */}
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      fullWidth
+                      label="Profile Picture URL"
+                      value={formData.profile_picture_url ?? editingUser.profile_picture_url ?? ""}
+                      onChange={(e) => setFormData({ ...formData, profile_picture_url: e.target.value })}
+                    />
+                  </Grid>
+
+                  {/* Active Status */}
+                  <Grid size={{ xs: 12 }}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={formData.is_active ?? editingUser.is_active ?? true}
+                          onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                        />
+                      }
+                      label="Active Account"
+                    />
+                  </Grid>
+
+                  {/* Email Verified Status */}
+                  <Grid size={{ xs: 12 }}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={formData.email_verified ?? editingUser.email_verified ?? false}
+                          onChange={(e) => setFormData({ ...formData, email_verified: e.target.checked })}
+                        />
+                      }
+                      label="Email Verified"
+                    />
+                  </Grid>
+                </Grid>
+              </DialogContent>
+              <DialogActions>
+                <Button variant="outlined" onClick={handleDialogClose}>
+                  Cancel
                 </Button>
-                <Button variant="contained" startIcon={<Edit size={16} />}>
-                  Edit User
+                <Button 
+                  variant="contained" 
+                  startIcon={<Edit size={16} />} 
+                  onClick={() => handleSave(formData)}
+                >
+                  {editingUser?._id ? "Save Changes" : "Add User"}
                 </Button>
               </DialogActions>
             </>

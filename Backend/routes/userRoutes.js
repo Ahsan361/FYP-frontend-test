@@ -1,9 +1,19 @@
 import express from "express";
-import { getUserProfile } from "../controllers/userController.js";
+import { addUser, getUserProfile, getAllUsers, getUserById, updateUser, deleteUser, getUserStats } from "../controllers/userController.js";
 import protect from "../middleware/authMiddleware.js";
-
+import { authorize } from "../middleware/rbac.js";
 const router = express.Router();
 
+//normal user routes
 router.get("/profile", protect, getUserProfile);
+
+// ✅ Admin routes (restricted)
+router.get("/", protect, authorize("admin"), getAllUsers);         // Get all users   
+router.post("/", protect, authorize("admin"), addUser)      // add user
+router.get("/stats", protect, authorize("admin"), getUserStats); // User statistics (example: active count etc.)
+router.get("/:id", protect, authorize("admin"), getUserById);         // Get single user by ID
+router.put("/:id", protect, authorize("admin"), updateUser);          // Update a user
+router.delete("/:id", protect, authorize("admin"), deleteUser);       // Delete a user
+
 
 export default router;
