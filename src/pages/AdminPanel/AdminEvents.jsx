@@ -1,133 +1,98 @@
-import React, { useState } from 'react';
-import {
-  Box,
-  Typography,
-  Grid,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Chip,
-  IconButton,
-  Menu,
-  MenuItem,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
+import React, { useState, useEffect, useContext } from 'react';
+import { Box, Typography, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip,
+  IconButton, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField,
+  Select, MenuItem as SelectMenuItem, FormControl, InputLabel 
 } from '@mui/material';
-import {
-  MoreVertical,
-  Edit,
-  Trash2,
-  Eye,
-  Calendar,
-  MapPin,
-  Users,
-  DollarSign,
-  CheckCircle,
-  XCircle,
-  Search,
-  Filter,
-} from 'lucide-react';
+import { MoreVertical, Edit, Trash2, Eye, Calendar, MapPin, Users, DollarSign, CheckCircle, Search, Filter } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Card, Input } from '../../components/ui'; // Assuming these are your custom components
 
-// Sample event data based on eventSchema
-const events = [
-  {
-    id: 1,
-    title: 'AI Research Conference 2025',
-    description: 'A global conference on AI advancements',
-    organizer_id: '60f1b2a3c4d5e6f7a8b9c0d1',
-    event_type: 'conference',
-    status: 'upcoming',
-    start_datetime: '2025-10-15T09:00:00Z',
-    end_datetime: '2025-10-17T17:00:00Z',
-    location: 'Virtual Event',
-    max_attendees: 1000,
-    current_registrations: 250,
-    registration_fee: 99.99,
-    is_free: false,
-    requires_registration: true,
-    target_audience: 'professionals',
-    banner_image_url: 'https://example.com/banner1.jpg',
-    created_at: '2025-08-01T10:00:00Z',
-  },
-  {
-    id: 2,
-    title: 'Web Development Workshop',
-    description: 'Hands-on workshop for modern web technologies',
-    organizer_id: '60f1b2a3c4d5e6f7a8b9c0d2',
-    event_type: 'workshop',
-    status: 'ongoing',
-    start_datetime: '2025-08-28T10:00:00Z',
-    end_datetime: '2025-08-30T16:00:00Z',
-    location: 'Tech Hub, Karachi',
-    max_attendees: 50,
-    current_registrations: 45,
-    registration_fee: 0,
-    is_free: true,
-    requires_registration: true,
-    target_audience: 'students',
-    banner_image_url: 'https://example.com/banner2.jpg',
-    created_at: '2025-07-15T14:00:00Z',
-  },
-  {
-    id: 3,
-    title: 'Art Exhibition',
-    description: 'Showcase of contemporary art',
-    organizer_id: '60f1b2a3c4d5e6f7a8b9c0d3',
-    event_type: 'exhibition',
-    status: 'completed',
-    start_datetime: '2025-06-10T11:00:00Z',
-    end_datetime: '2025-06-12T18:00:00Z',
-    location: 'Art Gallery, Lahore',
-    max_attendees: 200,
-    current_registrations: 180,
-    registration_fee: 10,
-    is_free: false,
-    requires_registration: false,
-    target_audience: 'public',
-    banner_image_url: 'https://example.com/banner3.jpg',
-    created_at: '2025-05-01T09:00:00Z',
-  },
-];
+// Import custom UI components
+import { Card, Input } from '../../components/ui';
 
-// Sample chart data for event types
-const eventTypeData = [
-  { name: 'Conference', count: 15, color: '#627EEA' },
-  { name: 'Workshop', count: 10, color: '#8247E5' },
-  { name: 'Seminar', count: 8, color: '#F3BA2F' },
-  { name: 'Exhibition', count: 5, color: '#E84142' },
-  { name: 'Other', count: 2, color: '#4CAF50' },
-];
+//importing services
+import { getEvents, createEvent, updateEvent, deleteEvent, getEventStats } from '../../services/EventService';
+
+//importing constants for event types and statuses
+import { EVENT_TYPES, EVENT_STATUSES, TARGET_AUDIENCES } from '../../constants/enum';
+
+//importing context for user data here
+import { UserContext } from "../../contexts/UserContext";
 
 // Colors for event types and statuses
 const eventTypeColors = {
-  conference: 'primary',
-  workshop: 'success',
-  seminar: 'info',
-  exhibition: 'warning',
-  other: 'secondary',
+  [EVENT_TYPES.CONFERENCE]: 'primary',
+  [EVENT_TYPES.WORKSHOP]: 'success',
+  [EVENT_TYPES.SEMINAR]: 'info',
+  [EVENT_TYPES.EXHIBITION]: 'warning',
+  [EVENT_TYPES.OTHER]: 'secondary',
 };
 
 const statusColors = {
-  upcoming: '#2196F3',
-  ongoing: '#4CAF50',
-  completed: '#9E9E9E',
+  [EVENT_STATUSES.UPCOMING]: '#2196F3',
+  [EVENT_STATUSES.ONGOING]: '#4CAF50',
+  [EVENT_STATUSES.COMPLETED]: '#9E9E9E',
 };
 
 function AdminEvents() {
+  const [events, setEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEventType, setSelectedEventType] = useState('All');
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openFormDialog, setOpenFormDialog] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    event_type: EVENT_TYPES.OTHER,
+    status: EVENT_STATUSES.UPCOMING,
+    start_datetime: '',
+    end_datetime: '',
+    location: '',
+    max_attendees: '',
+    registration_fee: 0,
+    is_free: false,
+    requires_registration: true,
+    target_audience: TARGET_AUDIENCES.ALL,
+    banner_image_url: '',
+  });
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [stats, setStats] = useState({
+    totalEvents: 0,
+    upcomingEvents: 0,
+    totalRegistrations: 0,
+    revenueGenerated: 0,
+  });
+  const [eventTypeData, setEventTypeData] = useState([]);
+  const { user } = useContext(UserContext);
+  const token = user?.token;
+
+  // Fetch events and stats on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch events
+        const eventsData = await getEvents();
+        setEvents(eventsData);
+
+        // ✅ Fetch stats from backend instead of recalculating
+        const statsData = await getEventStats();
+        setStats({
+          totalEvents: eventsData.length,   // or include in backend if you prefer
+          upcomingEvents: statsData.upcomingEvents,
+          totalRegistrations: statsData.totalRegistrations,
+          revenueGenerated: statsData.revenueGenerated.toFixed(2),
+        });
+        setEventTypeData(statsData.typeData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleMenuClick = (event, record) => {
     setAnchorEl(event.currentTarget);
@@ -136,13 +101,116 @@ function AdminEvents() {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedEvent(null);
+  };
+
+  const refreshData = async () => {
+    try { 
+      // Refresh stats
+      const statsData = await getEventStats();
+      setStats({
+        totalEvents: events.length + (isEditMode ? 0 : 1),
+        upcomingEvents: statsData.upcomingEvents,
+        totalRegistrations: statsData.totalRegistrations,
+        revenueGenerated: statsData.revenueGenerated.toFixed(2),
+      });
+      setEventTypeData(statsData.typeData);
+    } catch (error) {
+      console.error('Error refreshing stats:', error);
+    }
+  };
+
+  const handleFormOpen = (event = null) => {
+    if (event) {
+      setFormData({
+        title: event.title,
+        description: event.description || '',
+        event_type: event.event_type,
+        status: event.status,
+        start_datetime: new Date(event.start_datetime).toISOString().slice(0, 16),
+        end_datetime: new Date(event.end_datetime).toISOString().slice(0, 16),
+        location: event.location || '',
+        max_attendees: event.max_attendees || '',
+        registration_fee: event.registration_fee || 0,
+        is_free: event.is_free,
+        requires_registration: event.requires_registration,
+        target_audience: event.target_audience,
+        banner_image_url: event.banner_image_url || '',
+      });
+      setIsEditMode(true);
+    } else {
+      setFormData({
+        title: '',
+        description: '',
+        event_type: EVENT_TYPES.OTHER,
+        status: EVENT_STATUSES.UPCOMING,
+        start_datetime: '',
+        end_datetime: '',
+        location: '',
+        max_attendees: '',
+        registration_fee: 0,
+        is_free: false,
+        requires_registration: true,
+        target_audience: TARGET_AUDIENCES.ALL,
+        banner_image_url: '',
+      });
+      setIsEditMode(false);
+    }
+    setOpenFormDialog(true);
+  };
+
+  const handleFormClose = () => {
+    setOpenFormDialog(false);
+    setFormData({
+      title: '',
+      description: '',
+      event_type: EVENT_TYPES.OTHER,
+      status: EVENT_STATUSES.UPCOMING,
+      start_datetime: '',
+      end_datetime: '',
+      location: '',
+      max_attendees: '',
+      registration_fee: 0,
+      is_free: false,
+      requires_registration: true,
+      target_audience: TARGET_AUDIENCES.ALL,
+      banner_image_url: '',
+    });
+    setIsEditMode(false);
+  };
+
+  const handleFormSubmit = async () => {
+    if (!validateForm()) return; 
+
+    try {
+      if (isEditMode) {
+        const updatedEvent = await updateEvent(selectedEvent._id, formData, token);
+        setEvents(events.map(event => event._id === updatedEvent._id ? updatedEvent : event));
+      } else {
+        const newEvent = await createEvent(formData, token);
+        setEvents([...events, newEvent]);
+      }
+      handleFormClose();
+      refreshData();
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteEvent(selectedEvent._id, token);
+      setEvents(events.filter(event => event._id !== selectedEvent._id));
+      handleMenuClose();
+      refreshData();
+    } catch (error) {
+      console.error('Error deleting event:', error);
+    }
   };
 
   const filteredEvents = events.filter(
     (event) =>
       (event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        event.description?.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (event.description && event.description.toLowerCase().includes(searchTerm.toLowerCase()))) &&
       (selectedEventType === 'All' || event.event_type === selectedEventType) &&
       (selectedStatus === 'All' || event.status === selectedStatus)
   );
@@ -152,6 +220,83 @@ function AdminEvents() {
       dateStyle: 'medium',
       timeStyle: 'short',
     });
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    const now = new Date();
+
+    // Title
+    if (!formData.title.trim()) {
+      newErrors.title = "Title is required";
+    }
+
+    // Start Date
+    if (!formData.start_datetime) {
+      newErrors.start_datetime = "Start date & time is required";
+    } else {
+      const startDate = new Date(formData.start_datetime);
+      if (isNaN(startDate.getTime())) {
+        newErrors.start_datetime = "Invalid start date & time";
+      } else if (startDate <= now) {
+        newErrors.start_datetime = "Start date must be in the future";
+      }
+    }
+
+    // End Date
+    if (!formData.end_datetime) {
+      newErrors.end_datetime = "End date & time is required";
+    } else {
+      const endDate = new Date(formData.end_datetime);
+      const startDate = new Date(formData.start_datetime);
+
+      if (isNaN(endDate.getTime())) {
+        newErrors.end_datetime = "Invalid end date & time";
+      } else if (formData.start_datetime && endDate <= startDate) {
+        newErrors.end_datetime = "End date must be after start date";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateField = (name, value, currentFormData = formData) => {
+    let error = "";
+
+    if (name === "title") {
+      if (!value.trim()) error = "Title is required";
+    }
+
+    if (name === "start_datetime") {
+      if (!value) {
+        error = "Start date & time is required";
+      } else {
+        const now = new Date();
+        const startDate = new Date(value);
+        if (isNaN(startDate.getTime())) {
+          error = "Invalid start date & time";
+        } else if (startDate <= now) {
+          error = "Start date must be in the future";
+        }
+      }
+    }
+
+    if (name === "end_datetime") {
+      if (!value) {
+        error = "End date & time is required";
+      } else {
+        const endDate = new Date(value);
+        const startDate = new Date(currentFormData.start_datetime); // ✅ use passed state
+        if (isNaN(endDate.getTime())) {
+          error = "Invalid end date & time";
+        } else if (currentFormData.start_datetime && endDate <= startDate) {
+          error = "End date must be after start date";
+        }
+      }
+    }
+
+    setErrors((prev) => ({ ...prev, [name]: error }));
   };
 
   return (
@@ -166,7 +311,7 @@ function AdminEvents() {
             Monitor and manage events
           </Typography>
         </Box>
-        <Button variant="contained" startIcon={<Calendar size={20} />} sx={{ px: 3, py: 1.5 }}>
+        <Button variant="contained" startIcon={<Calendar size={20} />} sx={{ px: 3, py: 1.5 }} onClick={() => handleFormOpen()}>
           Create Event
         </Button>
       </Box>
@@ -196,10 +341,10 @@ function AdminEvents() {
             </Typography>
             <Box sx={{ space: 3 }}>
               {[
-                { label: 'Total Events', value: '35', icon: Calendar },
-                { label: 'Upcoming Events', value: '12', icon: CheckCircle },
-                { label: 'Total Registrations', value: '2,450', icon: Users },
-                { label: 'Revenue Generated', value: '$5,230', icon: DollarSign },
+                { label: 'Total Events', value: stats.totalEvents, icon: Calendar },
+                { label: 'Upcoming Events', value: stats.upcomingEvents, icon: CheckCircle },
+                { label: 'Total Registrations', value: stats.totalRegistrations, icon: Users },
+                { label: 'Revenue Generated', value: `$${stats.revenueGenerated}`, icon: DollarSign },
               ].map((stat, index) => (
                 <Box
                   key={index}
@@ -239,23 +384,38 @@ function AdminEvents() {
             />
           </Grid>
           <Grid size={{ xs: 12, md: 3 }}>
-            <Button
-              variant="outlined"
-              startIcon={<Filter size={20} />}
-              fullWidth
-              onClick={() => {}}
-            >
-              Event Type
-            </Button>
+            <FormControl fullWidth>
+              <InputLabel>Event Type</InputLabel>
+              <Select
+                value={selectedEventType}
+                onChange={(e) => setSelectedEventType(e.target.value)}
+                label="Event Type"
+              >
+                <SelectMenuItem value="All">All</SelectMenuItem>
+                {Object.values(EVENT_TYPES).map(type => (
+                  <SelectMenuItem key={type} value={type} sx={{ textTransform: 'capitalize' }}>
+                    {type}
+                  </SelectMenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Grid>
           <Grid size={{ xs: 12, md: 3 }}>
-            <Button
-              variant="outlined"
-              startIcon={<Filter size={20} />}
-              fullWidth
-            >
-              Status
-            </Button>
+            <FormControl fullWidth>
+              <InputLabel>Status</InputLabel>
+              <Select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                label="Status"
+              >
+                <SelectMenuItem value="All">All</SelectMenuItem>
+                {Object.values(EVENT_STATUSES).map(status => (
+                  <SelectMenuItem key={status} value={status} sx={{ textTransform: 'capitalize' }}>
+                    {status}
+                  </SelectMenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Grid>
           <Grid size={{ xs: 12, md: 2 }}>
             <Button
@@ -287,14 +447,14 @@ function AdminEvents() {
             </TableHead>
             <TableBody>
               {filteredEvents.map((event) => (
-                <TableRow key={event.id} hover>
+                <TableRow key={event._id} hover>
                   <TableCell>
                     <Box>
                       <Typography variant="subtitle2" fontWeight="medium">
                         {event.title}
                       </Typography>
                       <Typography variant="caption" color="textSecondary">
-                        {event.description?.substring(0, 50)}...
+                        {event.description?.substring(0, 50) || 'N/A'}...
                       </Typography>
                     </Box>
                   </TableCell>
@@ -356,11 +516,14 @@ function AdminEvents() {
             <Eye size={16} style={{ marginRight: 8 }} />
             View Details
           </MenuItem>
-          <MenuItem onClick={handleMenuClose}>
+          <MenuItem onClick={() => {
+            handleFormOpen(selectedEvent);
+            handleMenuClose();
+          }}>
             <Edit size={16} style={{ marginRight: 8 }} />
             Edit Event
           </MenuItem>
-          <MenuItem onClick={handleMenuClose} sx={{ color: 'error.main' }}>
+          <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
             <Trash2 size={16} style={{ marginRight: 8 }} />
             Delete Event
           </MenuItem>
@@ -402,10 +565,10 @@ function AdminEvents() {
                       </Box>
                       <Box sx={{ mb: 3 }}>
                         <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                          Organizer ID
+                          Organizer
                         </Typography>
                         <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                          {selectedEvent.organizer_id}
+                          {selectedEvent.organizer_id?.username || selectedEvent.organizer_id || 'N/A'}
                         </Typography>
                       </Box>
                       <Box sx={{ mb: 3 }}>
@@ -481,15 +644,206 @@ function AdminEvents() {
                 <Button variant="outlined" onClick={() => setOpenDialog(false)}>
                   Close
                 </Button>
-                <Button variant="contained" startIcon={<Edit size={16} />}>
+                <Button variant="contained" startIcon={<Edit size={16} />} onClick={() => {
+                  handleFormOpen(selectedEvent);
+                  setOpenDialog(false);
+                }}>
                   Edit Event
                 </Button>
               </DialogActions>
             </>
           )}
         </Dialog>
-      </Card>
-    </Box>
+
+        {/* Event Form Dialog */}
+        <Dialog open={openFormDialog} onClose={handleFormClose} maxWidth="md" fullWidth>
+          <DialogTitle>{isEditMode ? 'Edit Event' : 'Create Event'}</DialogTitle>
+          <DialogContent>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid size={{ xs: 12 }}>
+                <TextField
+                  label="Title"
+                  value={formData.title}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setFormData({ ...formData, title: value });
+                    validateField("title", value);
+                  }}
+                  fullWidth
+                  required
+                  error={!!errors.title}
+                  helperText={errors.title}
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <TextField
+                  label="Description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  fullWidth
+                  multiline
+                  rows={4}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Event Type</InputLabel>
+                  <Select
+                    value={formData.event_type}
+                    onChange={(e) => setFormData({ ...formData, event_type: e.target.value })}
+                    label="Event Type"
+                  >
+                    {Object.values(EVENT_TYPES).map(type => (
+                      <SelectMenuItem key={type} value={type} sx={{ textTransform: 'capitalize' }}>
+                        {type}
+                      </SelectMenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Status</InputLabel>
+                  <Select
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                    label="Status"
+                  >
+                    {Object.values(EVENT_STATUSES).map(status => (
+                      <SelectMenuItem key={status} value={status} sx={{ textTransform: 'capitalize' }}>
+                        {status}
+                      </SelectMenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <TextField
+                  label="Start Date & Time"
+                  type="datetime-local"
+                  value={formData.start_datetime}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const nextFormData = { ...formData, start_datetime: value };
+                    setFormData(nextFormData);
+                    validateField("start_datetime", value, nextFormData);
+                  }}
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  required
+                  error={!!errors.start_datetime}
+                  helperText={errors.start_datetime}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <TextField
+                  label="End Date & Time"
+                  type="datetime-local"
+                  value={formData.end_datetime}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const nextFormData = { ...formData, end_datetime: value };
+                    setFormData(nextFormData);
+                    validateField("end_datetime", value, nextFormData);
+                  }}
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  required
+                  error={!!errors.end_datetime}
+                  helperText={errors.end_datetime}
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <TextField
+                  label="Location"
+                  value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  fullWidth
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <TextField
+                  label="Max Attendees"
+                  type="number"
+                  value={formData.max_attendees}
+                  onChange={(e) => setFormData({ ...formData, max_attendees: e.target.value })}
+                  fullWidth
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <TextField
+                  label="Registration Fee"
+                  type="number"
+                  value={formData.registration_fee}
+                  onChange={(e) => setFormData({ ...formData, registration_fee: e.target.value })}
+                  fullWidth
+                  disabled={formData.is_free}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Target Audience</InputLabel>
+                  <Select
+                    value={formData.target_audience}
+                    onChange={(e) => setFormData({ ...formData, target_audience: e.target.value })}
+                    label="Target Audience"
+                  >
+                    {Object.values(TARGET_AUDIENCES).map(audience => (
+                      <SelectMenuItem key={audience} value={audience} sx={{ textTransform: 'capitalize' }}>
+                        {audience}
+                      </SelectMenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <TextField
+                  label="Banner Image URL"
+                  value={formData.banner_image_url}
+                  onChange={(e) => setFormData({ ...formData, banner_image_url: e.target.value })}
+                  fullWidth
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Is Free</InputLabel>
+                  <Select
+                    value={formData.is_free}
+                    onChange={(e) => setFormData({ ...formData, is_free: e.target.value, registration_fee: e.target.value ? 0 : formData.registration_fee })}
+                    label="Is Free"
+                  >
+                    <SelectMenuItem value={true}>Yes</SelectMenuItem>
+                    <SelectMenuItem value={false}>No</SelectMenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Requires Registration</InputLabel>
+                  <Select
+                    value={formData.requires_registration}
+                    onChange={(e) => setFormData({ ...formData, requires_registration: e.target.value })}
+                    label="Requires Registration"
+                  >
+                    <SelectMenuItem value={true}>Yes</SelectMenuItem>
+                    <SelectMenuItem value={false}>No</SelectMenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button variant="outlined" onClick={handleFormClose}>
+              Cancel
+            </Button>
+            <Button variant="contained" onClick={handleFormSubmit}>
+              {isEditMode ? 'Update' : 'Create'}
+            </Button>
+          </DialogActions>
+        </Dialog>
+        </ Card>
+      </Box>
+      
   );
 }
 

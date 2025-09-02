@@ -1,128 +1,113 @@
-import React, { useState } from 'react';
-import {
-  Box,
-  Typography,
-  Grid,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Chip,
-  IconButton,
-  Menu,
-  MenuItem,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
+import React, { useState, useEffect, useContext } from 'react';
+import { Box, Typography, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip,
+  IconButton, Menu, MenuItem, Dialog,
+  DialogTitle, DialogContent, DialogActions, Button, TextField, Select, MenuItem as SelectMenuItem, FormControl, InputLabel,
 } from '@mui/material';
-import {
-  MoreVertical,
-  Edit,
-  Trash2,
-  Eye,
-  Calendar,
-  MapPin,
-  Users,
-  DollarSign,
-  CheckCircle,
-  Star,
-  Search,
-  Filter,
-} from 'lucide-react';
+import { MoreVertical, Edit, Trash2, Eye, Calendar, MapPin, Users, DollarSign, CheckCircle, Star, Search, Filter, } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+//custom componets
 import { Card, Input } from '../../components/ui';
 
-// Sample exhibition data based on exhibitionSchema
-const exhibitions = [
-  {
-    id: 1,
-    title: 'Modern Art Showcase',
-    description: 'Contemporary art from local artists',
-    curator_id: '60f1b2a3c4d5e6f7a8b9c0d1',
-    category: 'art',
-    status: 'upcoming',
-    start_date: '2025-11-01T10:00:00Z',
-    end_date: '2025-11-15T18:00:00Z',
-    location: 'City Art Gallery, Islamabad',
-    max_capacity: 300,
-    current_bookings: 120,
-    entry_fee: 15,
-    age_restriction: 'All ages',
-    banner_image_url: 'https://example.com/art_banner.jpg',
-    is_featured: true,
-    created_at: '2025-08-15T09:00:00Z',
-  },
-  {
-    id: 2,
-    title: 'Ancient Civilizations Exhibit',
-    description: 'Artifacts from Indus Valley Civilization',
-    curator_id: '60f1b2a3c4d5e6f7a8b9c0d2',
-    category: 'history',
-    status: 'ongoing',
-    start_date: '2025-08-20T09:00:00Z',
-    end_date: '2025-09-05T17:00:00Z',
-    location: 'National Museum, Karachi',
-    max_capacity: 500,
-    current_bookings: 450,
-    entry_fee: 0,
-    age_restriction: '12+',
-    banner_image_url: 'https://example.com/history_banner.jpg',
-    is_featured: false,
-    created_at: '2025-07-20T14:00:00Z',
-  },
-  {
-    id: 3,
-    title: 'Space Exploration Expo',
-    description: 'Interactive science exhibition on space technology',
-    curator_id: '60f1b2a3c4d5e6f7a8b9c0d3',
-    category: 'science',
-    status: 'completed',
-    start_date: '2025-06-01T10:00:00Z',
-    end_date: '2025-06-10T18:00:00Z',
-    location: 'Science Center, Lahore',
-    max_capacity: 200,
-    current_bookings: 180,
-    entry_fee: 20,
-    age_restriction: '8+',
-    banner_image_url: 'https://example.com/science_banner.jpg',
-    is_featured: true,
-    created_at: '2025-05-10T11:00:00Z',
-  },
-];
+//api services
+import { getExhibitions, createExhibition, updateExhibition, deleteExhibition, getExhibitionStats } from '../../services/ExhibitionService';
 
-// Sample chart data for exhibition categories
-const categoryData = [
-  { name: 'Art', count: 20, color: '#627EEA' },
-  { name: 'History', count: 15, color: '#8247E5' },
-  { name: 'Science', count: 10, color: '#F3BA2F' },
-  { name: 'Other', count: 5, color: '#E84142' },
-];
+//constants
+import { EXHIBITION_CATEGORIES, EVENT_STATUSES } from '../../constants/enum';
+
+//importing context for user data here
+import { UserContext } from "../../contexts/UserContext";
 
 // Colors for categories and statuses
 const categoryColors = {
-  art: 'primary',
-  history: 'success',
-  science: 'info',
-  other: 'warning',
+  [EXHIBITION_CATEGORIES.ART]: 'primary',
+  [EXHIBITION_CATEGORIES.HISTORY]: 'success',
+  [EXHIBITION_CATEGORIES.SCIENCE]: 'info',
+  [EXHIBITION_CATEGORIES.OTHER]: 'warning',
 };
 
 const statusColors = {
-  upcoming: '#2196F3',
-  ongoing: '#4CAF50',
-  completed: '#9E9E9E',
+  [EVENT_STATUSES.UPCOMING]: '#2196F3',
+  [EVENT_STATUSES.ONGOING]: '#4CAF50',
+  [EVENT_STATUSES.COMPLETED]: '#9E9E9E',
 };
 
 function AdminExhibitions() {
+  const [exhibitions, setExhibitions] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedExhibition, setSelectedExhibition] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openFormDialog, setOpenFormDialog] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    category: EXHIBITION_CATEGORIES.ART,
+    status: EVENT_STATUSES.UPCOMING,
+    start_date: '',
+    end_date: '',
+    location: '',
+    max_capacity: '',
+    entry_fee: 0,
+    age_restriction: '',
+    banner_image_url: '',
+    is_featured: false,
+  });
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [stats, setStats] = useState({
+    totalExhibitions: 0,
+    featuredExhibitions: 0,
+    totalBookings: 0,
+    revenueGenerated: 0,
+  });
+  const [categoryData, setCategoryData] = useState([]);
+  const { user } = useContext(UserContext);
+  const token = user?.token;
+
+  // Fetch exhibitions and stats on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const exhibitionsData = await getExhibitions();
+        setExhibitions(exhibitionsData);
+
+        // Fetch stats from backend
+        const statsData = await getExhibitionStats();
+        setStats({
+          totalExhibitions: statsData.totalExhibitions,
+          featuredExhibitions: statsData.featuredExhibitions,
+          totalBookings: statsData.totalBookings,
+          revenueGenerated: statsData.revenueGenerated.toFixed(2),
+        });
+        setCategoryData(statsData.categoryData);
+      } catch (error) {
+        console.error("❌ Error fetching exhibitions/stats:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const refreshData = async () => {
+  try {
+    const exhibitionsData = await getExhibitions();
+    setExhibitions(exhibitionsData);
+
+    const statsData = await getExhibitionStats();
+    setStats({
+      totalExhibitions: statsData.totalExhibitions,
+      featuredExhibitions: statsData.featuredExhibitions,
+      totalBookings: statsData.totalBookings,
+      revenueGenerated: statsData.revenueGenerated.toFixed(2),
+    });
+    setCategoryData(statsData.categoryData);
+  } catch (error) {
+      console.error("Error refreshing data:", error);
+    }
+  };
 
   const handleMenuClick = (event, exhibition) => {
     setAnchorEl(event.currentTarget);
@@ -131,13 +116,93 @@ function AdminExhibitions() {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedExhibition(null);
+  };
+
+  const handleFormOpen = (exhibition = null) => {
+    if (exhibition) {
+      setFormData({
+        title: exhibition.title,
+        description: exhibition.description || '',
+        category: exhibition.category,
+        status: exhibition.status,
+        start_date: new Date(exhibition.start_date).toISOString().slice(0, 16),
+        end_date: new Date(exhibition.end_date).toISOString().slice(0, 16),
+        location: exhibition.location || '',
+        max_capacity: exhibition.max_capacity || '',
+        entry_fee: exhibition.entry_fee || 0,
+        age_restriction: exhibition.age_restriction || '',
+        banner_image_url: exhibition.banner_image_url || '',
+        is_featured: exhibition.is_featured,
+      });
+      setIsEditMode(true);
+    } else {
+      setFormData({
+        title: '',
+        description: '',
+        category: EXHIBITION_CATEGORIES.ART,
+        status: EVENT_STATUSES.UPCOMING,
+        start_date: '',
+        end_date: '',
+        location: '',
+        max_capacity: '',
+        entry_fee: 0,
+        age_restriction: '',
+        banner_image_url: '',
+        is_featured: false,
+      });
+      setIsEditMode(false);
+    }
+    setOpenFormDialog(true);
+  };
+
+  const handleFormClose = () => {
+    setOpenFormDialog(false);
+    setFormData({
+      title: '',
+      description: '',
+      category: EXHIBITION_CATEGORIES.ART,
+      status: EVENT_STATUSES.UPCOMING,
+      start_date: '',
+      end_date: '',
+      location: '',
+      max_capacity: '',
+      entry_fee: 0,
+      age_restriction: '',
+      banner_image_url: '',
+      is_featured: false,
+    });
+    setIsEditMode(false);
+  };
+
+  const handleFormSubmit = async () => {
+    if (!validateForm()) return; // stop if validation fails
+    try {
+      if (isEditMode) {
+        await updateExhibition(selectedExhibition._id, formData, token);
+      } else {
+        await createExhibition(formData, token);
+      }
+      handleFormClose();
+      await refreshData(); 
+    } catch (error) {
+        console.error("Error submitting form:", error);
+      }
+  };
+
+  const handleDelete = async () => {
+  try {
+    await deleteExhibition(selectedExhibition._id, token);
+    handleMenuClose();
+    await refreshData(); 
+  } catch (error) {
+      console.error("Error deleting exhibition:", error);
+    }
   };
 
   const filteredExhibitions = exhibitions.filter(
     (exhibition) =>
       (exhibition.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        exhibition.description?.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        (exhibition.description && exhibition.description.toLowerCase().includes(searchTerm.toLowerCase()))) &&
       (selectedCategory === 'All' || exhibition.category === selectedCategory) &&
       (selectedStatus === 'All' || exhibition.status === selectedStatus)
   );
@@ -148,6 +213,84 @@ function AdminExhibitions() {
       timeStyle: 'short',
     });
   };
+
+  const validateForm = () => {
+    const newErrors = {};
+    const now = new Date();
+
+    // Title
+    if (!formData.title.trim()) {
+      newErrors.title = "Title is required";
+    }
+
+    // Start Date
+    if (!formData.start_date) {
+      newErrors.start_date = "Start date & time is required";
+    } else {
+      const startDate = new Date(formData.start_date);
+      if (isNaN(startDate.getTime())) {
+        newErrors.start_date = "Invalid start date & time";
+      } else if (startDate <= now) {
+        newErrors.start_date = "Start date must be in the future";
+      }
+    }
+
+    // End Date
+    if (!formData.end_date) {
+      newErrors.end_date = "End date & time is required";
+    } else {
+      const endDate = new Date(formData.end_date);
+      const startDate = new Date(formData.start_date);
+
+      if (isNaN(endDate.getTime())) {
+        newErrors.end_date = "Invalid end date & time";
+      } else if (formData.start_date && endDate <= startDate) {
+        newErrors.end_date = "End date must be after start date";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateField = (name, value) => {
+  let error = "";
+
+  if (name === "title") {
+    if (!value.trim()) error = "Title is required";
+  }
+
+  if (name === "start_date") {
+    if (!value) {
+      error = "Start date & time is required";
+    } else {
+      const now = new Date();
+      const startDate = new Date(value);
+      if (isNaN(startDate.getTime())) {
+        error = "Invalid start date & time";
+      } else if (startDate <= now) {
+        error = "Start date must be in the future";
+      }
+    }
+  }
+
+  if (name === "end_date") {
+    if (!value) {
+      error = "End date & time is required";
+    } else {
+      const endDate = new Date(value);
+      const startDate = new Date(formData.start_date);
+      if (isNaN(endDate.getTime())) {
+        error = "Invalid end date & time";
+      } else if (formData.start_date && endDate <= startDate) {
+        error = "End date must be after start date";
+      }
+    }
+  }
+
+  setErrors((prev) => ({ ...prev, [name]: error }));
+};
+
 
   return (
     <Box sx={{ p: 3 }}>
@@ -161,7 +304,7 @@ function AdminExhibitions() {
             Monitor and manage exhibitions
           </Typography>
         </Box>
-        <Button variant="contained" startIcon={<Calendar size={20} />} sx={{ px: 3, py: 1.5 }}>
+        <Button variant="contained" startIcon={<Calendar size={20} />} sx={{ px: 3, py: 1.5 }} onClick={() => handleFormOpen()}>
           Create Exhibition
         </Button>
       </Box>
@@ -191,10 +334,10 @@ function AdminExhibitions() {
             </Typography>
             <Box sx={{ space: 3 }}>
               {[
-                { label: 'Total Exhibitions', value: '50', icon: Calendar },
-                { label: 'Featured Exhibitions', value: '8', icon: Star },
-                { label: 'Total Bookings', value: '3,200', icon: Users },
-                { label: 'Revenue Generated', value: '$7,890', icon: DollarSign },
+                { label: 'Total Exhibitions', value: stats.totalExhibitions, icon: Calendar },
+                { label: 'Featured Exhibitions', value: stats.featuredExhibitions, icon: Star },
+                { label: 'Total Bookings', value: stats.totalBookings, icon: Users },
+                { label: 'Revenue Generated', value: `$${stats.revenueGenerated}`, icon: DollarSign },
               ].map((stat, index) => (
                 <Box
                   key={index}
@@ -234,23 +377,38 @@ function AdminExhibitions() {
             />
           </Grid>
           <Grid size={{ xs: 12, md: 3 }}>
-            <Button
-              variant="outlined"
-              startIcon={<Filter size={20} />}
-              fullWidth
-              onClick={() => {}}
-            >
-              Category Filter
-            </Button>
+            <FormControl fullWidth>
+              <InputLabel>Category</InputLabel>
+              <Select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                label="Category"
+              >
+                <SelectMenuItem value="All">All</SelectMenuItem>
+                {Object.values(EXHIBITION_CATEGORIES).map(category => (
+                  <SelectMenuItem key={category} value={category} sx={{ textTransform: 'capitalize' }}>
+                    {category}
+                  </SelectMenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Grid>
           <Grid size={{ xs: 12, md: 3 }}>
-            <Button
-              variant="outlined"
-              startIcon={<Filter size={20} />}
-              fullWidth
-            >
-              Status Filter
-            </Button>
+            <FormControl fullWidth>
+              <InputLabel>Status</InputLabel>
+              <Select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                label="Status"
+              >
+                <SelectMenuItem value="All">All</SelectMenuItem>
+                {Object.values(EVENT_STATUSES).map(status => (
+                  <SelectMenuItem key={status} value={status} sx={{ textTransform: 'capitalize' }}>
+                    {status}
+                  </SelectMenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Grid>
           <Grid size={{ xs: 12, md: 2 }}>
             <Button
@@ -283,14 +441,14 @@ function AdminExhibitions() {
             </TableHead>
             <TableBody>
               {filteredExhibitions.map((exhibition) => (
-                <TableRow key={exhibition.id} hover>
+                <TableRow key={exhibition._id} hover>
                   <TableCell>
                     <Box>
                       <Typography variant="subtitle2" fontWeight="medium">
                         {exhibition.title}
                       </Typography>
                       <Typography variant="caption" color="textSecondary">
-                        {exhibition.description?.substring(0, 50)}...
+                        {exhibition.description?.substring(0, 50) || 'N/A'}...
                       </Typography>
                     </Box>
                   </TableCell>
@@ -359,11 +517,14 @@ function AdminExhibitions() {
             <Eye size={16} style={{ marginRight: 8 }} />
             View Details
           </MenuItem>
-          <MenuItem onClick={handleMenuClose}>
+          <MenuItem onClick={() => {
+            handleFormOpen(selectedExhibition);
+            handleMenuClose();
+          }}>
             <Edit size={16} style={{ marginRight: 8 }} />
             Edit Exhibition
           </MenuItem>
-          <MenuItem onClick={handleMenuClose} sx={{ color: 'error.main' }}>
+          <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
             <Trash2 size={16} style={{ marginRight: 8 }} />
             Delete Exhibition
           </MenuItem>
@@ -405,10 +566,10 @@ function AdminExhibitions() {
                       </Box>
                       <Box sx={{ mb: 3 }}>
                         <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                          Curator ID
+                          Curator
                         </Typography>
                         <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                          {selectedExhibition.curator_id}
+                          {selectedExhibition.curator_id?.username || selectedExhibition.curator_id || 'N/A'}
                         </Typography>
                       </Box>
                       <Box sx={{ mb: 3 }}>
@@ -501,15 +662,181 @@ function AdminExhibitions() {
                 <Button variant="outlined" onClick={() => setOpenDialog(false)}>
                   Close
                 </Button>
-                <Button variant="contained" startIcon={<Edit size={16} />}>
+                <Button variant="contained" startIcon={<Edit size={16} />} onClick={() => {
+                  handleFormOpen(selectedExhibition);
+                  setOpenDialog(false);
+                }}>
                   Edit Exhibition
                 </Button>
               </DialogActions>
             </>
           )}
         </Dialog>
-      </Card>
-    </Box>
+
+        {/* Exhibition Form Dialog */}
+        <Dialog open={openFormDialog} onClose={handleFormClose} maxWidth="md" fullWidth>
+          <DialogTitle>{isEditMode ? 'Edit Exhibition' : 'Create Exhibition'}</DialogTitle>
+          <DialogContent>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid size={{ xs: 12 }}>
+                <TextField
+                  label="Title"
+                  value={formData.title}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setFormData({ ...formData, title: value });
+                    validateField("title", value);
+                  }}
+                  fullWidth
+                  required
+                  error={!!errors.title}
+                  helperText={errors.title}
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <TextField
+                  label="Description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  fullWidth
+                  multiline
+                  rows={4}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Category</InputLabel>
+                  <Select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    label="Category"
+                  >
+                    {Object.values(EXHIBITION_CATEGORIES).map(category => (
+                      <SelectMenuItem key={category} value={category} sx={{ textTransform: 'capitalize' }}>
+                        {category}
+                      </SelectMenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Status</InputLabel>
+                  <Select
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                    label="Status"
+                  >
+                    {Object.values(EVENT_STATUSES).map(status => (
+                      <SelectMenuItem key={status} value={status} sx={{ textTransform: 'capitalize' }}>
+                        {status}
+                      </SelectMenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <TextField
+                  label="Start Date & Time"
+                  type="datetime-local"
+                  value={formData.start_date}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setFormData({ ...formData, start_date: value });
+                    validateField("start_date", value);
+                  }}
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  required
+                  error={!!errors.start_date}
+                  helperText={errors.start_date}                  
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <TextField
+                  label="End Date & Time"
+                  type="datetime-local"
+                  value={formData.end_date}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setFormData({ ...formData, end_date: value });
+                    validateField("end_date", value);
+                  }}
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  required
+                  error={!!errors.end_date}
+                  helperText={errors.end_date}                  
+                />
+              </Grid>
+              <Grid size={{ xs: 12 }}>
+                <TextField
+                  label="Location"
+                  value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  fullWidth
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <TextField
+                  label="Max Capacity"
+                  type="number"
+                  value={formData.max_capacity}
+                  onChange={(e) => setFormData({ ...formData, max_capacity: e.target.value })}
+                  fullWidth
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <TextField
+                  label="Entry Fee"
+                  type="number"
+                  value={formData.entry_fee}
+                  onChange={(e) => setFormData({ ...formData, entry_fee: e.target.value })}
+                  fullWidth
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <TextField
+                  label="Age Restriction"
+                  value={formData.age_restriction}
+                  onChange={(e) => setFormData({ ...formData, age_restriction: e.target.value })}
+                  fullWidth
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <TextField
+                  label="Banner Image URL"
+                  value={formData.banner_image_url}
+                  onChange={(e) => setFormData({ ...formData, banner_image_url: e.target.value })}
+                  fullWidth
+                />
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Is Featured</InputLabel>
+                  <Select
+                    value={formData.is_featured}
+                    onChange={(e) => setFormData({ ...formData, is_featured: e.target.value })}
+                    label="Is Featured"
+                  >
+                    <SelectMenuItem value={true}>Yes</SelectMenuItem>
+                    <SelectMenuItem value={false}>No</SelectMenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button variant="outlined" onClick={handleFormClose}>
+              Cancel
+            </Button>
+            <Button variant="contained" onClick={handleFormSubmit}>
+              {isEditMode ? 'Update' : 'Create'}
+            </Button>
+          </DialogActions>
+        </Dialog>
+        </Card>
+      </Box>
   );
 }
 

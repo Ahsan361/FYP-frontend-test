@@ -4,6 +4,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
 
+console.log(import.meta.env.VITE_API_BASE_URL);
+
 function Login({ onLogin }) {
   const navigate = useNavigate();
   const { setUser } = useContext(UserContext);
@@ -18,7 +20,7 @@ function Login({ onLogin }) {
     setSuccess("");
 
     try {
-      const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, {
+      const { data } = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, {
         email,
         password_hash: password,
       });

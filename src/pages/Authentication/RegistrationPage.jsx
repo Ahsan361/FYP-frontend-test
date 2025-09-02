@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Box, Button, TextField, Typography, Paper, Fade } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../../contexts/UserContext";
 
 function Register({ onRegister }) {
   const navigate = useNavigate();
+  const { setUser } = useContext(UserContext);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,7 +20,7 @@ function Register({ onRegister }) {
 
     try {
       const { data } = await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/register`,
+        `${import.meta.env.VITE_API_BASE_URL}/auth/register`,
         {
           username,
           email,
@@ -26,12 +28,13 @@ function Register({ onRegister }) {
         }
       );
 
+      localStorage.setItem("token", data.token);
+      setUser(data);
       setSuccess("✅ Registration successful! Redirecting...");
       onRegister?.(data);
 
-      // redirect to login after short delay
       setTimeout(() => {
-        navigate("/login");
+        navigate("/");
       }, 1500);
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");

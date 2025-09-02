@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/users"; // adjust if different
+const API_URL = `${import.meta.env.VITE_API_BASE_URL}/users`; 
 
 // Get all users (Admin only)
 export const getAllUsers = async (token) => {

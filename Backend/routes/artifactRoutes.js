@@ -11,4 +11,5 @@ router.get("/:id", getArtifactById);            // Get one
 router.put("/:id", protect, updateArtifact);    // Update
 router.delete("/:id", protect, deleteArtifact); // Delete
 
+
 export default router;
