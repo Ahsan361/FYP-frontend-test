@@ -65,3 +65,15 @@ export const deleteBid = async (req, res) => {
     res.status(500).json({ message: "Error deleting bid" });
   }
 };
+
+//get all bids
+export const getAllBids = async (req, res) => {
+  try {
+    const bids = await AuctionBid.find()
+    .populate("bidder_id", "username email")
+    .populate("listing_id", "title current_price starting_price");
+    res.status(200).json(bids);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

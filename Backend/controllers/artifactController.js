@@ -17,6 +17,7 @@ export const getArtifacts = async (req, res) => {
     const artifacts = await Artifact.find().populate("contributor_id", "username email");
     res.json(artifacts);
   } catch (error) {
+    console.log("❌ Error in getArtifacts:", error); 
     res.status(500).json({ message: "Error fetching artifacts" });
   }
 };
@@ -28,6 +29,7 @@ export const getArtifactById = async (req, res) => {
     if (!artifact) return res.status(404).json({ message: "Artifact not found" });
     res.json(artifact);
   } catch (error) {
+    console.log("❌ Error in getSingleArtifacts:", error); 
     res.status(500).json({ message: "Error fetching artifact" });
   }
 };
@@ -39,6 +41,7 @@ export const updateArtifact = async (req, res) => {
     if (!artifact) return res.status(404).json({ message: "Artifact not found" });
     res.json(artifact);
   } catch (error) {
+    console.log("❌ Error in UpdateArtifacts:", error); 
     res.status(500).json({ message: "Error updating artifact" });
   }
 };
@@ -50,6 +53,7 @@ export const deleteArtifact = async (req, res) => {
     if (!artifact) return res.status(404).json({ message: "Artifact not found" });
     res.json({ message: "Artifact deleted successfully" });
   } catch (error) {
+    console.log("❌ Error in DeleteArtifacts:", error); 
     res.status(500).json({ message: "Error deleting artifact" });
   }
 };

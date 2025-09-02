@@ -1,13 +1,18 @@
 import express from "express";
-import { createExhibition, getExhibitions, getExhibitionById, updateExhibition, deleteExhibition } from "../controllers/exhibitionController.js";
+import { createExhibition, getExhibitions, getExhibitionById, updateExhibition, deleteExhibition, getExhibitionStats } from "../controllers/exhibitionController.js";
 import protect from "../middleware/authMiddleware.js";
+import { authorize } from "../middleware/rbac.js";
 
 const router = express.Router();
-
-router.post("/", protect, createExhibition);          // Create exhibition
+//user routes
 router.get("/", getExhibitions);                      // Get all exhibitions
-router.get("/:id", getExhibitionById);                // Get one
-router.put("/:id", protect, updateExhibition);        // Update
-router.delete("/:id", protect, deleteExhibition);     // Delete
+router.get("/stats", getExhibitionStats)            
+router.get("/:id", getExhibitionById);    // Get one
+
+
+//admin only routes
+router.post("/", protect, authorize("admin"), createExhibition);          // Create exhibition
+router.put("/:id",  protect, authorize("admin"), updateExhibition);        // Update
+router.delete("/:id",  protect, authorize("admin"), protect, deleteExhibition);     // Delete
 
 export default router;
