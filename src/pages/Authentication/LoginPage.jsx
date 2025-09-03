@@ -2,9 +2,9 @@ import React, { useState, useContext } from "react";
 import { Box, Button, TextField, Typography, Paper, Fade } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "../../contexts/UserContext";
 
-console.log(import.meta.env.VITE_API_BASE_URL);
+//import user context
+import { UserContext } from "../../contexts/UserContext";
 
 function Login({ onLogin }) {
   const navigate = useNavigate();
@@ -30,11 +30,11 @@ function Login({ onLogin }) {
       setSuccess("Login successful! 🎉");
 
       onLogin?.(data);
-      if (data.role === "admin") {
+      if (data.role === "admin") { 
         navigate("/adminDashboard");
         } 
       else {
-        navigate("/"); // normal user → landing page
+        navigate("/");
         }
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
