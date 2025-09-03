@@ -1,112 +1,27 @@
-import React, { useState } from 'react';
-import {
-  Box,
-  Typography,
-  Grid,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Chip,
-  IconButton,
-  Menu,
-  MenuItem,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-} from '@mui/material';
-import {
-  MoreVertical,
-  Edit,
-  Trash2,
-  Eye,
-  DollarSign,
-  Clock,
-  Gavel,
-  Star,
-  Search,
-  Filter,
-  EyeIcon,
-} from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Card, Input } from '../../components/ui';
+import React, { useState, useEffect, useContext } from 'react';
+import { Box, Typography, Chip, TableCell, DialogActions, DialogContent, DialogTitle, Grid } from '@mui/material';
+import { Gavel, Edit, DollarSign, Star, EyeIcon } from 'lucide-react';
 
-// Sample marketplace listing data based on marketplaceListingSchema
-const marketplaceListings = [
-  {
-    id: 1,
-    artifact_id: '60f1b2a3c4d5e6f7a8b9c0d1',
-    seller_id: '60f1b2a3c4d5e6f7a8b9c0e1',
-    listing_type: 'auction',
-    title: 'Vintage Mughal Painting',
-    description: 'Authentic 18th-century Mughal miniature painting',
-    starting_price: 500,
-    current_price: 750,
-    reserve_price: 600,
-    buy_now_price: 1000,
-    currency: 'USD',
-    status: 'active',
-    auction_start_time: '2025-08-25T10:00:00Z',
-    auction_end_time: '2025-09-01T18:00:00Z',
-    auto_extend_minutes: 5,
-    shipping_cost: 50,
-    is_featured: true,
-    view_count: 120,
-    created_at: '2025-08-20T09:00:00Z',
-  },
-  {
-    id: 2,
-    artifact_id: '60f1b2a3c4d5e6f7a8b9c0d2',
-    seller_id: '60f1b2a3c4d5e6f7a8b9c0e2',
-    listing_type: 'fixed',
-    title: 'Ancient Pottery Vase',
-    description: 'Well-preserved pottery from the Indus Valley',
-    starting_price: 300,
-    current_price: 300,
-    reserve_price: null,
-    buy_now_price: 300,
-    currency: 'USD',
-    status: 'sold',
-    auction_start_time: null,
-    auction_end_time: null,
-    auto_extend_minutes: null,
-    shipping_cost: 30,
-    is_featured: false,
-    view_count: 80,
-    created_at: '2025-08-15T14:00:00Z',
-  },
-  {
-    id: 3,
-    artifact_id: '60f1b2a3c4d5e6f7a8b9c0d3',
-    seller_id: '60f1b2a3c4d5e6f7a8b9c0e3',
-    listing_type: 'reserve',
-    title: 'Antique Gold Necklace',
-    description: 'Ornate gold necklace from the 19th century',
-    starting_price: 1000,
-    current_price: 1200,
-    reserve_price: 1100,
-    buy_now_price: 1500,
-    currency: 'USD',
-    status: 'active',
-    auction_start_time: '2025-08-28T12:00:00Z',
-    auction_end_time: '2025-09-05T18:00:00Z',
-    auto_extend_minutes: 10,
-    shipping_cost: 75,
-    is_featured: true,
-    view_count: 200,
-    created_at: '2025-08-10T11:00:00Z',
-  },
-];
+// Import the reusable AdminTable component
+import AdminTable from '../../components/ui/AdminTable';
+import { Button } from '../../components/ui';
 
-// Sample chart data for listing types
-const listingTypeData = [
-  { name: 'Auction', count: 25, color: '#627EEA' },
-  { name: 'Fixed', count: 15, color: '#8247E5' },
-  { name: 'Reserve', count: 10, color: '#F3BA2F' },
+// Context
+import { UserContext } from '../../contexts/UserContext';
+
+// Services
+import { getAllListings, createListing, updateListing, deleteListing, getMarketplaceStats } from '../../services/marketPlaceService';
+import { getArtifacts } from '../../services/artifactService';
+
+// Sample chart data for listing revenue over time
+const revenueData = [
+  { date: '01/15', revenue: 1200 },
+  { date: '01/22', revenue: 1800 },
+  { date: '01/29', revenue: 2400 },
+  { date: '02/05', revenue: 1900 },
+  { date: '02/12', revenue: 2800 },
+  { date: '02/19', revenue: 3200 },
+  { date: '02/26', revenue: 2950 }
 ];
 
 // Colors for listing types and statuses
@@ -117,419 +32,491 @@ const listingTypeColors = {
 };
 
 const statusColors = {
-  active: '#2196F3',
-  sold: '#4CAF50',
-  cancelled: '#F44336',
+  active: 'primary',
+  sold: 'success',
+  cancelled: 'error',
+  expired: 'default'
 };
 
 function AdminMarketplace() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedListingType, setSelectedListingType] = useState('All');
-  const [selectedStatus, setSelectedStatus] = useState('All');
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedListing, setSelectedListing] = useState(null);
-  const [openDialog, setOpenDialog] = useState(false);
+  const [listings, setListings] = useState([]);
+  const [artifacts, setArtifacts] = useState([]);
+  const [stats, setStats] = useState({
+    totalListings: 0,
+    featuredListings: 0,
+    totalViews: 0,
+    revenueGenerated: 0
+  });
+  const { user } = useContext(UserContext);
 
-  const handleMenuClick = (event, listing) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedListing(listing);
+  // Fetch listings, artifacts, and stats on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [listingsData, artifactsData, statsData] = await Promise.all([
+          getAllListings(user.token),
+          getArtifacts(user.token),
+          getMarketplaceStats(user.token)
+        ]);
+        setListings(listingsData || []);
+        setArtifacts(artifactsData || []);
+        setStats(statsData || {
+            activeListings: statsData?.activeListings || 0,
+            soldListings: statsData?.soldListings || 0,
+            cancelledListings: statsData?.cancelledListings || 0,
+            totalRevenue: statsData?.totalRevenue || 0
+        });
+      } catch (error) {
+        console.error('Error fetching marketplace data:', error);
+      }
+    };
+    fetchData();
+  }, [user.token]);
+
+  // Table columns configuration
+  const tableColumns = [
+    { field: 'title', label: 'Title' },
+    { field: 'listing_type', label: 'Type' },
+    { field: 'status', label: 'Status' },
+    { field: 'current_price', label: 'Current Price' },
+    { field: 'auction_end_time', label: 'End Date' },
+    { field: 'view_count', label: 'Views', align: 'center' },
+    { field: 'is_featured', label: 'Featured', align: 'center' }
+  ];
+
+  // Form fields configuration
+  const formFields = [
+    {
+      name: 'artifact_id',
+      label: 'Select Artifact',
+      type: 'select',
+      required: true,
+      options: artifacts.map(artifact => ({
+        value: artifact._id,
+        label: artifact.title
+      })),
+      gridSize: { xs: 12, sm: 6 },
+      onChange: (value, setFormData, formData) => {
+        const selectedArtifact = artifacts.find(a => a._id === value);
+        if (selectedArtifact) {
+          setFormData(prev => ({
+            ...prev,
+            artifact_id: value,
+            title: selectedArtifact.title,
+            description: selectedArtifact.description || ''
+          }));
+        }
+      }
+    },
+    {
+      name: 'listing_type',
+      label: 'Listing Type',
+      type: 'select',
+      required: true,
+      options: [
+        { value: 'fixed', label: 'Fixed Price' },
+        { value: 'auction', label: 'Auction' },
+        { value: 'reserve', label: 'Reserve Auction' }
+      ],
+      gridSize: { xs: 12, sm: 6 }
+    },
+    { 
+      name: 'description', 
+      label: 'Description', 
+      multiline: true,
+      rows: 3,
+      gridSize: { xs: 12 }
+    },
+    {
+      name: 'starting_price',
+      label: 'Starting Price ($)',
+      type: 'number',
+      required: true,
+      gridSize: { xs: 12, sm: 6 }
+    },
+    {
+      name: 'reserve_price',
+      label: 'Reserve Price ($)',
+      type: 'number',
+      gridSize: { xs: 12, sm: 6 },
+      disabled: (formData) => formData.listing_type !== 'reserve'
+    },
+    {
+      name: 'buy_now_price',
+      label: 'Buy Now Price ($)',
+      type: 'number',
+      gridSize: { xs: 12, sm: 6 }
+    },
+    {
+      name: 'shipping_cost',
+      label: 'Shipping Cost ($)',
+      type: 'number',
+      gridSize: { xs: 12, sm: 6 }
+    },
+    {
+      name: 'auction_start_time',
+      label: 'Auction Start Time',
+      type: 'datetime-local',
+      gridSize: { xs: 12, sm: 6 },
+      disabled: (formData) => formData.listing_type === 'fixed'
+    },
+    {
+      name: 'auction_end_time',
+      label: 'Auction End Time',
+      type: 'datetime-local',
+      gridSize: { xs: 12, sm: 6 },
+      disabled: (formData) => formData.listing_type === 'fixed'
+    },
+    {
+      name: 'auto_extend_minutes',
+      label: 'Auto Extend (minutes)',
+      type: 'number',
+      gridSize: { xs: 12, sm: 6 },
+      disabled: (formData) => formData.listing_type === 'fixed'
+    },
+    {
+      name: 'currency',
+      label: 'Currency',
+      type: 'select',
+      options: [
+        { value: 'USD', label: 'USD' },
+        { value: 'EUR', label: 'EUR' },
+        { value: 'GBP', label: 'GBP' }
+      ],
+      gridSize: { xs: 12, sm: 6 }
+    },
+    {
+      name: 'status',
+      label: 'Status',
+      type: 'select',
+      options: [
+        { value: 'active', label: 'Active' },
+        { value: 'sold', label: 'Sold' },
+        { value: 'cancelled', label: 'Cancelled' },
+        { value: 'expired', label: 'Expired' }
+      ],
+      gridSize: { xs: 12, sm: 6 }
+    },
+    {
+      name: 'is_featured',
+      label: 'Featured Listing',
+      type: 'switch',
+      gridSize: { xs: 12, sm: 6 }
+    }
+  ];
+
+  // Stats data configuration
+  const statsData = [
+    { label: 'Active Listings', value: stats.activeListings || 0, icon: Gavel },
+    { label: 'Sold Listings',  value: stats.soldListings || 0, icon: Star },
+    { label: 'Cancelled Listings', value: stats.cancelledListings || 0, icon: EyeIcon },
+    { label: 'Revenue Generated',  value: `$${stats.totalRevenue?.toLocaleString() || '0'}`, icon: DollarSign }
+  ];
+
+  // Validation functions
+  const validateForm = (formData, errors, setErrors) => {
+    const newErrors = {};
+
+    if (!formData.artifact_id) {
+      newErrors.artifact_id = 'Please select an artifact';
+    }
+
+    if (!formData.listing_type) {
+      newErrors.listing_type = 'Listing type is required';
+    }
+
+    if (!formData.starting_price || formData.starting_price <= 0) {
+      newErrors.starting_price = 'Starting price must be greater than 0';
+    }
+
+    if (formData.listing_type === 'reserve' && (!formData.reserve_price || formData.reserve_price <= 0)) {
+      newErrors.reserve_price = 'Reserve price is required for reserve auctions';
+    }
+
+    if (formData.listing_type !== 'fixed') {
+      if (!formData.auction_start_time) {
+        newErrors.auction_start_time = 'Auction start time is required';
+      }
+      if (!formData.auction_end_time) {
+        newErrors.auction_end_time = 'Auction end time is required';
+      }
+      if (formData.auction_start_time && formData.auction_end_time && 
+          new Date(formData.auction_start_time) >= new Date(formData.auction_end_time)) {
+        newErrors.auction_end_time = 'End time must be after start time';
+      }
+    }
+
+    if (formData.shipping_cost && formData.shipping_cost < 0) {
+      newErrors.shipping_cost = 'Shipping cost cannot be negative';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setSelectedListing(null);
+  const validateField = (name, value, formData, setErrors) => {
+    let error = '';
+
+    if (name === 'artifact_id' && !value) {
+      error = 'Please select an artifact';
+    }
+
+    if (name === 'listing_type' && !value) {
+      error = 'Listing type is required';
+    }
+
+    if (name === 'starting_price' && (!value || value <= 0)) {
+      error = 'Starting price must be greater than 0';
+    }
+
+    if (name === 'reserve_price' && formData.listing_type === 'reserve' && (!value || value <= 0)) {
+      error = 'Reserve price is required for reserve auctions';
+    }
+
+    if (name === 'auction_start_time' && formData.listing_type !== 'fixed' && !value) {
+      error = 'Auction start time is required';
+    }
+
+    if (name === 'auction_end_time' && formData.listing_type !== 'fixed' && !value) {
+      error = 'Auction end time is required';
+    }
+
+    if (name === 'shipping_cost' && value && value < 0) {
+      error = 'Shipping cost cannot be negative';
+    }
+
+    setErrors((prev) => ({ ...prev, [name]: error }));
   };
 
-  const filteredListings = marketplaceListings.filter(
-    (listing) =>
-      (listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        listing.description?.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (selectedListingType === 'All' || listing.listing_type === selectedListingType) &&
-      (selectedStatus === 'All' || listing.status === selectedStatus)
-  );
+  // Handle form submission
+  const handleFormSubmit = async (formData, isEditMode, selectedItem) => {
+    try {
+      // Set default values
+      const listingData = {
+        ...formData,
+        currency: formData.currency || 'USD',
+        current_price: formData.starting_price,
+        status: formData.status || 'active'
+      };
 
-  const formatDate = (date) => {
-    return date
-      ? new Date(date).toLocaleString('en-US', {
-          dateStyle: 'medium',
-          timeStyle: 'short',
-        })
-      : 'N/A';
+      if (isEditMode) {
+        await updateListing(selectedItem._id, listingData, user.token);
+      } else {
+        await createListing(listingData, user.token);
+      }
+      
+      // Refresh data
+      const [updatedListings, updatedStats] = await Promise.all([
+        getAllListings(user.token),
+        getMarketplaceStats(user.token)
+      ]);
+      
+      setListings(updatedListings || []);
+      setStats(updatedStats || {
+          activeListings: statsData?.activeListings || 0,
+          soldListings: statsData?.soldListings || 0,
+          cancelledListings: statsData?.cancelledListings || 0,
+          totalRevenue: statsData?.totalRevenue || 0
+      });
+    } catch (error) {
+      console.error('Error saving listing:', error);
+      throw error;
+    }
   };
 
-  const formatCurrency = (amount) => {
-    return amount ? `$${amount.toFixed(2)}` : 'N/A';
+  // Handle menu actions
+  const handleMenuAction = async (action, item) => {
+    if (action === 'delete') {
+      try {
+        await deleteListing(item._id, user.token);
+        
+        // Refresh data
+        const [updatedListings, updatedStats] = await Promise.all([
+          getAllListings(user.token),
+          getMarketplaceStats(user.token)
+        ]);
+        
+        setListings(updatedListings || []);
+        setStats(updatedStats || {
+          activeListings: statsData?.activeListings || 0,
+          soldListings: statsData?.soldListings || 0,
+          cancelledListings: statsData?.cancelledListings || 0,
+          totalRevenue: statsData?.totalRevenue || 0
+        });
+      } catch (error) {
+        console.error('Error deleting listing:', error);
+      }
+    }
+  };
+
+  // Custom table row renderer
+  const renderTableRow = (listing) => {
+    const formatDate = (date) => {
+      return date ? new Date(date).toLocaleDateString() : 'N/A';
+    };
+
+    const formatCurrency = (amount) => {
+      return amount ? `$${amount.toFixed(2)}` : 'N/A';
+    };
+
+    return (
+      <>
+        <TableCell>
+          <Box>
+            <Typography variant="subtitle2" fontWeight="medium">
+              {listing.title}
+            </Typography>
+            <Typography variant="caption" color="textSecondary">
+              {listing.description?.substring(0, 50)}...
+            </Typography>
+          </Box>
+        </TableCell>
+        <TableCell>
+          <Chip
+            label={listing.listing_type}
+            color={listingTypeColors[listing.listing_type] || 'default'}
+            sx={{ textTransform: 'capitalize' }}
+          />
+        </TableCell>
+        <TableCell>
+          <Chip
+            label={listing.status}
+            color={statusColors[listing.status] || 'default'}
+            sx={{ textTransform: 'capitalize' }}
+          />
+        </TableCell>
+        <TableCell>{formatCurrency(listing.current_price)}</TableCell>
+        <TableCell>{formatDate(listing.auction_end_time)}</TableCell>
+        <TableCell align="center">{listing.view_count || 0}</TableCell>
+        <TableCell align="center">
+          {listing.is_featured ? (
+            <Star size={18} color="#4CAF50" fill="#4CAF50" />
+          ) : (
+            <Star size={18} color="#B0BEC5" />
+          )}
+        </TableCell>
+      </>
+    );
+  };
+
+  // Custom details dialog renderer
+  const renderDetailsDialog = (listing, onClose, onEdit) => {
+    const formatDate = (date) => {
+      return date ? new Date(date).toLocaleString() : 'N/A';
+    };
+
+    const formatCurrency = (amount) => {
+      return amount ? `$${amount.toFixed(2)}` : 'N/A';
+    };
+
+    return (
+      <>
+        <DialogTitle>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h6" fontWeight="bold">
+              {listing.title}
+            </Typography>
+            <Chip
+              label={listing.listing_type}
+              color={listingTypeColors[listing.listing_type] || 'default'}
+              sx={{ textTransform: 'capitalize' }}
+            />
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Grid container spacing={3} sx={{ mt: 2 }}>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Box>
+                {[
+                  { label: 'Description', value: listing.description || '-' },
+                  { label: 'Listing Type', value: listing.listing_type },
+                  { label: 'Status', value: listing.status },
+                  { label: 'Starting Price', value: formatCurrency(listing.starting_price) },
+                  { label: 'Current Price', value: formatCurrency(listing.current_price) },
+                  { label: 'Reserve Price', value: formatCurrency(listing.reserve_price) },
+                  { label: 'Buy Now Price', value: formatCurrency(listing.buy_now_price) },
+                  { label: 'Currency', value: listing.currency || 'USD' }
+                ].map((field, index) => (
+                  <Box key={index} sx={{ mb: 2 }}>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      {field.label}
+                    </Typography>
+                    <Typography variant="body1">{field.value}</Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Box>
+                {[
+                  { label: 'Auction Start', value: formatDate(listing.auction_start_time) },
+                  { label: 'Auction End', value: formatDate(listing.auction_end_time) },
+                  { label: 'Auto Extend', value: `${listing.auto_extend_minutes || 0} minutes` },
+                  { label: 'Shipping Cost', value: formatCurrency(listing.shipping_cost) },
+                  { label: 'Featured', value: listing.is_featured ? 'Yes' : 'No' },
+                  { label: 'Views', value: listing.view_count?.toLocaleString() || '0' },
+                  { label: 'Created At', value: formatDate(listing.created_at) },
+                  { label: 'Artifact ID', value: listing.artifact_id?._id || listing.artifact_id || '-' }
+                ].map((field, index) => (
+                  <Box key={index} sx={{ mb: 2 }}>
+                    <Typography variant="subtitle2" color="textSecondary">
+                      {field.label}
+                    </Typography>
+                    <Typography variant="body1">{field.value}</Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="outlined" onClick={onClose}>
+            Close
+          </Button>
+          <Button variant="contained" startIcon={<Edit size={16} />} onClick={onEdit}>
+            Edit Listing
+          </Button>
+        </DialogActions>
+      </>
+    );
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-        <Box>
-          <Typography variant="h4" fontWeight="bold" gutterBottom>
-            Marketplace Management
-          </Typography>
-          <Typography variant="body1" color="textSecondary">
-            Monitor and manage marketplace listings
-          </Typography>
-        </Box>
-        <Button variant="contained" startIcon={<Gavel size={20} />} sx={{ px: 3, py: 1.5 }}>
-          Create Listing
-        </Button>
-      </Box>
-
-      {/* Analytics Overview */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid size={{ xs: 12, lg: 8 }}>
-          <Card sx={{ p: 3, height: 350 }}>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
-              Listing Type Distribution
-            </Typography>
-            <ResponsiveContainer width="100%" height="90%">
-              <BarChart data={listingTypeData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="count" fill="#1B4332" />
-              </BarChart>
-            </ResponsiveContainer>
-          </Card>
-        </Grid>
-        <Grid size={{ xs: 12, lg: 4 }}>
-          <Card sx={{ p: 3, height: 350 }}>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
-              Marketplace Statistics
-            </Typography>
-            <Box sx={{ space: 3 }}>
-              {[
-                { label: 'Total Listings', value: '65', icon: Gavel },
-                { label: 'Featured Listings', value: '10', icon: Star },
-                { label: 'Total Views', value: '5,430', icon: EyeIcon },
-                { label: 'Revenue Generated', value: '$12,750', icon: DollarSign },
-              ].map((stat, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    py: 2,
-                    borderBottom: index < 3 ? '1px solid' : 'none',
-                    borderColor: 'divider',
-                  }}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <stat.icon size={18} style={{ marginRight: 8 }} />
-                    <Typography variant="body2">{stat.label}</Typography>
-                  </Box>
-                  <Typography variant="h6" fontWeight="bold">
-                    {stat.value}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
-          </Card>
-        </Grid>
-      </Grid>
-
-      {/* Filters and Search */}
-      <Card sx={{ p: 3, mb: 3 }}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Input
-              placeholder="Search by title or description..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              startIcon={<Search size={20} />}
-              fullWidth
-            />
-          </Grid>
-          <Grid size={{ xs: 12, md: 3 }}>
-            <Button
-              variant="outlined"
-              startIcon={<Filter size={20} />}
-              fullWidth
-              onClick={() => {}}
-            >
-              Listing Type
-            </Button>
-          </Grid>
-          <Grid size={{ xs: 12, md: 3 }}>
-            <Button
-              variant="outlined"
-              startIcon={<Filter size={20} />}
-              fullWidth
-            >
-              Status
-            </Button>
-          </Grid>
-          <Grid size={{ xs: 12, md: 2 }}>
-            <Button
-              variant="outlined"
-              startIcon={<Clock size={20} />}
-              fullWidth
-            >
-              Date Range
-            </Button>
-          </Grid>
-        </Grid>
-      </Card>
-
-      {/* Marketplace Listings Table */}
-      <Card>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Title</TableCell>
-                <TableCell>Listing Type</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Current Price</TableCell>
-                <TableCell>End Date</TableCell>
-                <TableCell align="center">Views</TableCell>
-                <TableCell align="center">Featured</TableCell>
-                <TableCell align="center">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredListings.map((listing) => (
-                <TableRow key={listing.id} hover>
-                  <TableCell>
-                    <Box>
-                      <Typography variant="subtitle2" fontWeight="medium">
-                        {listing.title}
-                      </Typography>
-                      <Typography variant="caption" color="textSecondary">
-                        {listing.description?.substring(0, 50)}...
-                      </Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={listing.listing_type}
-                      color={listingTypeColors[listing.listing_type]}
-                      sx={{ textTransform: 'capitalize' }}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={listing.status}
-                      sx={{
-                        backgroundColor: `${statusColors[listing.status]}20`,
-                        color: statusColors[listing.status],
-                        fontWeight: 'medium',
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">{formatCurrency(listing.current_price)}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2">{formatDate(listing.auction_end_time)}</Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography variant="body2">{listing.view_count}</Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    {listing.is_featured ? (
-                      <Star size={18} color="#4CAF50" />
-                    ) : (
-                      <Star size={18} color="#B0BEC5" />
-                    )}
-                  </TableCell>
-                  <TableCell align="center">
-                    <IconButton size="small" onClick={(e) => handleMenuClick(e, listing)}>
-                      <MoreVertical size={16} />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        {/* Action Menu */}
-        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-          <MenuItem
-            onClick={() => {
-              setOpenDialog(true);
-              handleMenuClose();
-            }}
-          >
-            <Eye size={16} style={{ marginRight: 8 }} />
-            View Details
-          </MenuItem>
-          <MenuItem onClick={handleMenuClose}>
-            <Edit size={16} style={{ marginRight: 8 }} />
-            Edit Listing
-          </MenuItem>
-          <MenuItem onClick={handleMenuClose} sx={{ color: 'error.main' }}>
-            <Trash2 size={16} style={{ marginRight: 8 }} />
-            Delete Listing
-          </MenuItem>
-        </Menu>
-
-        {/* Listing Details Dialog */}
-        <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="lg" fullWidth>
-          {selectedListing && (
-            <>
-              <DialogTitle>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography variant="h6" fontWeight="bold">
-                    Listing Details
-                  </Typography>
-                  <Chip
-                    label={selectedListing.listing_type}
-                    color={listingTypeColors[selectedListing.listing_type]}
-                    sx={{ textTransform: 'capitalize' }}
-                  />
-                </Box>
-              </DialogTitle>
-              <DialogContent>
-                <Grid container spacing={3}>
-                  <Grid size={{ xs: 12, md: 6 }}>
-                    <Box sx={{ space: 3 }}>
-                      <Box sx={{ mb: 3 }}>
-                        <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                          Title
-                        </Typography>
-                        <Typography variant="body1" fontWeight="medium">
-                          {selectedListing.title}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ mb: 3 }}>
-                        <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                          Description
-                        </Typography>
-                        <Typography variant="body2">{selectedListing.description || 'N/A'}</Typography>
-                      </Box>
-                      <Box sx={{ mb: 3 }}>
-                        <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                          Artifact ID
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                          {selectedListing.artifact_id}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ mb: 3 }}>
-                        <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                          Seller ID
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                          {selectedListing.seller_id}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ mb: 3 }}>
-                        <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                          Auction Dates
-                        </Typography>
-                        <Typography variant="body2">
-                          <strong>Start:</strong> {formatDate(selectedListing.auction_start_time)}
-                        </Typography>
-                        <Typography variant="body2">
-                          <strong>End:</strong> {formatDate(selectedListing.auction_end_time)}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Grid>
-                  <Grid size={{ xs: 12, md: 6 }}>
-                    <Box sx={{ space: 3 }}>
-                      <Box sx={{ mb: 3 }}>
-                        <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                          Pricing
-                        </Typography>
-                        <Typography variant="body2">
-                          <strong>Starting Price:</strong> {formatCurrency(selectedListing.starting_price)}
-                        </Typography>
-                        <Typography variant="body2">
-                          <strong>Current Price:</strong> {formatCurrency(selectedListing.current_price)}
-                        </Typography>
-                        <Typography variant="body2">
-                          <strong>Reserve Price:</strong> {formatCurrency(selectedListing.reserve_price)}
-                        </Typography>
-                        <Typography variant="body2">
-                          <strong>Buy Now Price:</strong> {formatCurrency(selectedListing.buy_now_price)}
-                        </Typography>
-                        <Typography variant="body2">
-                          <strong>Currency:</strong> {selectedListing.currency}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ mb: 3 }}>
-                        <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                          Auction Details
-                        </Typography>
-                        <Typography variant="body2">
-                          <strong>Auto Extend:</strong> {selectedListing.auto_extend_minutes || 'N/A'} minutes
-                        </Typography>
-                        <Typography variant="body2">
-                          <strong>Shipping Cost:</strong> {formatCurrency(selectedListing.shipping_cost)}
-                        </Typography>
-                      </Box>
-                      <Box sx={{ mb: 3 }}>
-                        <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                          Status
-                        </Typography>
-                        <Chip
-                          label={selectedListing.status}
-                          sx={{
-                            backgroundColor: `${statusColors[selectedListing.status]}20`,
-                            color: statusColors[selectedListing.status],
-                            fontWeight: 'medium',
-                          }}
-                        />
-                      </Box>
-                      <Box sx={{ mb: 3 }}>
-                        <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                          Featured
-                        </Typography>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          {selectedListing.is_featured ? (
-                            <>
-                              <Star size={18} color="#4CAF50" />
-                              <Typography variant="body2" color="success.main">
-                                Featured
-                              </Typography>
-                            </>
-                          ) : (
-                            <>
-                              <Star size={18} color="#B0BEC5" />
-                              <Typography variant="body2" color="textSecondary">
-                                Not Featured
-                              </Typography>
-                            </>
-                          )}
-                        </Box>
-                      </Box>
-                      <Box sx={{ mb: 3 }}>
-                        <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                          Views
-                        </Typography>
-                        <Typography variant="body2">{selectedListing.view_count}</Typography>
-                      </Box>
-                      <Box sx={{ mb: 3 }}>
-                        <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                          Created At
-                        </Typography>
-                        <Typography variant="body2">{formatDate(selectedListing.created_at)}</Typography>
-                      </Box>
-                    </Box>
-                  </Grid>
-                </Grid>
-              </DialogContent>
-              <DialogActions>
-                <Button variant="outlined" onClick={() => setOpenDialog(false)}>
-                  Close
-                </Button>
-                <Button variant="contained" startIcon={<Edit size={16} />}>
-                  Edit Listing
-                </Button>
-              </DialogActions>
-            </>
-          )}
-        </Dialog>
-      </Card>
-    </Box>
+    <AdminTable
+      title="Marketplace Management"
+      subtitle="Monitor and manage marketplace listings"
+      createButtonText="Create Listing"
+      createButtonIcon={<Gavel size={20} />}
+      chartData={revenueData}
+      chartType="area"
+      chartDataKey="revenue"
+      chartXAxisKey="date"
+      chartTitle="Revenue Over Time"
+      statsData={statsData}
+      tableColumns={tableColumns}
+      tableData={listings}
+      searchFields={['title', 'description']}
+      filterOptions={[
+        {
+          label: 'Listing Type',
+          field: 'listing_type',
+          options: ['All', 'auction', 'fixed', 'reserve']
+        },
+        {
+          label: 'Status',
+          field: 'status',
+          options: ['All', 'active', 'sold', 'cancelled', 'expired']
+        }
+      ]}
+      onFormSubmit={handleFormSubmit}
+      onMenuAction={handleMenuAction}
+      renderTableRow={renderTableRow}
+      renderDetailsDialog={renderDetailsDialog}
+      formFields={formFields}
+      validateForm={validateForm}
+      validateField={validateField}
+      statusColors={statusColors}
+    />
   );
 }
 
