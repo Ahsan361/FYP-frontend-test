@@ -27,7 +27,7 @@ export const EXHIBITION_CATEGORIES = {
   ART: "art",
   HISTORY: "history",
   SCIENCE: "science",
-  OTHER: "other"
+  OTHER: "other",
 };
 
 
