@@ -1,25 +1,21 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Box, Typography, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Chip, Avatar, IconButton, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions,
-  TextField, FormControl, InputLabel, Select, FormHelperText, OutlinedInput, 
-} from '@mui/material';
-//importing icons 
-import { MoreVertical, Edit, Trash2, Eye, Upload, Search,Calendar } from 'lucide-react';
-//charts related content 
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Box, Typography, Chip, Avatar, TableCell, DialogActions, DialogContent, DialogTitle, Grid } from '@mui/material';
+import { Upload, Eye, Edit, Trash2, Calendar } from 'lucide-react';
 
-//custom components
-import { Card, Button, Input } from '../../components/ui';
+// Import the reusable AdminTable component
+import AdminTable from '../../components/ui/AdminTable';
+import { Button } from '../../components/ui';
 
-//importing context for user data here
-import { UserContext } from "../../contexts/UserContext";
+// Context
+import { UserContext } from '../../contexts/UserContext';
 
-//importing services for api calls
-import { getArtifacts, createArtifact, editArtifact, deleteArtifact, getArtifactStats  } from '../../services/artifactService';
+// Services
+import { getArtifacts, createArtifact, editArtifact, deleteArtifact, getArtifactStats } from '../../services/artifactService';
 
-//importing constants for dropdown options
-import { CATEGORY_OPTIONS, CONDITION_OPTIONS, STATUS_OPTIONS } from "../../constants/enum";
+// Constants
+import { CATEGORY_OPTIONS, CONDITION_OPTIONS, STATUS_OPTIONS } from '../../constants/enum';
 
+// Sample views data
 const viewsData = [
   { date: '01/15', views: 1200 },
   { date: '01/22', views: 1800 },
@@ -30,571 +26,348 @@ const viewsData = [
   { date: '02/26', views: 2950 }
 ];
 
+// Status colors
 const statusColors = {
-  'Published': 'success',
-  'Under Review': 'warning', 
-  'Draft': 'default',
-  'Rejected': 'error'
+  Published: 'success',
+  'Under Review': 'warning',
+  Draft: 'default',
+  Rejected: 'error'
 };
 
 function AdminArtifacts() {
   const [artifacts, setArtifacts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedArtifact, setSelectedArtifact] = useState(null);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [editingArtifact, setEditingArtifact] = useState(null);
-  const [formData, setFormData] = useState({});
-  const [formSubmitted, setFormSubmitted] = useState(false);
-  const { user } = useContext(UserContext);
   const [stats, setStats] = useState({
     total: 0,
     published: 0,
     drafts: 0,
     underReview: 0
   });
- 
-  
-  // ✅ Fetch artifacts on mount
+  const { user } = useContext(UserContext);
+
+  // Fetch artifacts and stats on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await getArtifacts();
-        setArtifacts(data);
+        setArtifacts(data || []);
         const statsData = await getArtifactStats();
-        setStats(statsData);
+        setStats(statsData || { total: 0, published: 0, drafts: 0, underReview: 0 });
       } catch (error) {
-        console.error("Error fetching artifacts", error);
+        console.error('Error fetching artifacts or stats:', error);
       }
     };
     fetchData();
   }, []);
 
-  const handleMenuClick = (event, artifact) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedArtifact(artifact);
-  };
+  // Table columns configuration
+  const tableColumns = [
+    { field: 'title', label: 'Title' },
+    { field: 'category', label: 'Category' },
+    { field: 'material', label: 'Material' },
+    { field: 'time_period', label: 'Time Period' },
+    { field: 'geographical_origin', label: 'Origin' },
+    { field: 'artistic_style', label: 'Style' },
+    { field: 'condition_status', label: 'Condition' },
+    { field: 'status', label: 'Status' },
+    { field: 'view_count', label: 'Views', align: 'center' },
+    { field: 'contributor', label: 'Contributor' }
+  ];
 
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
+  // Form fields configuration
+  const formFields = [
+    { name: 'title', label: 'Title', required: true, gridSize: { xs: 12, sm: 6 } },
+    { name: 'description', label: 'Description', gridSize: { xs: 12, sm: 6 } },
+    {
+      name: 'category',
+      label: 'Category',
+      type: 'select',
+      required: true,
+      options: CATEGORY_OPTIONS.map(option => ({ value: option, label: option })),
+      gridSize: { xs: 12, sm: 6 }
+    },
+    {
+      name: 'condition_status',
+      label: 'Condition',
+      type: 'select',
+      required: true,
+      options: CONDITION_OPTIONS.map(option => ({ value: option, label: option })),
+      gridSize: { xs: 12, sm: 6 }
+    },
+    {
+      name: 'status',
+      label: 'Status',
+      type: 'select',
+      required: true,
+      options: STATUS_OPTIONS.map(option => ({ value: option, label: option })),
+      gridSize: { xs: 12, sm: 6 }
+    },
+    { name: 'material', label: 'Material', gridSize: { xs: 12, sm: 6 } },
+    { name: 'time_period', label: 'Time Period', gridSize: { xs: 12, sm: 6 } },
+    { name: 'geographical_origin', label: 'Origin', gridSize: { xs: 12, sm: 6 } },
+    { name: 'artistic_style', label: 'Artistic Style', gridSize: { xs: 12, sm: 6 } },
+    {
+      name: 'dimensions_length',
+      label: 'Dimensions Length (cm)',
+      type: 'number',
+      gridSize: { xs: 12, sm: 6 }
+    },
+    {
+      name: 'dimensions_width',
+      label: 'Dimensions Width (cm)',
+      type: 'number',
+      gridSize: { xs: 12, sm: 6 }
+    },
+    {
+      name: 'dimensions_height',
+      label: 'Dimensions Height (cm)',
+      type: 'number',
+      gridSize: { xs: 12, sm: 6 }
+    },
+    { name: 'weight', label: 'Weight (kg)', type: 'number', gridSize: { xs: 12, sm: 6 } },
+    {
+      name: 'cultural_significance',
+      label: 'Cultural Significance',
+      gridSize: { xs: 12, sm: 6 }
+    },
+    { name: 'historical_context', label: 'Historical Context', gridSize: { xs: 12, sm: 6 } },
+    { name: 'image', label: 'Image URL', gridSize: { xs: 12, sm: 6 } }
+  ];
 
-  // When edit clicked
-const handleEditClick = (artifact) => {
-  setEditingArtifact(artifact);
-  setFormData(artifact); 
-};
+  // Stats data configuration
+  const statsData = [
+    { label: 'Total Artifacts', value: stats.total, icon: Eye },
+    { label: 'Published', value: stats.published, icon: Eye },
+    { label: 'Under Review', value: stats.underReview, icon: Calendar },
+    { label: 'Drafts', value: stats.drafts, icon: Edit }
+  ];
 
-const handleViewClick = (artifact) => {
-  setSelectedArtifact(artifact);
-  setOpenDialog(true);
-};
+  // Validation functions
+  const validateForm = (formData, errors, setErrors) => {
+    const newErrors = {};
 
-const handleDialogClose = () => {
-  setEditingArtifact(null);
-  setOpenDialog(false);
-};
-
-const handleAddClick = () => {
-  setEditingArtifact({});
-  setFormData({});
-  setOpenDialog(true);
-};
-
-
-// Submit handler
-const handleSave = async (data) => {
-  setFormSubmitted(true);
-  if (!formData.title|| !formData.category || !formData.status || !formData.condition_status) {
-    return; // stop submission, red fields will show
-  }
-
-  try {
-    if (editingArtifact?._id) {
-      await editArtifact(editingArtifact._id, data, user.token);
-    } else {
-      await createArtifact(data, user.token);
+    if (!formData.title?.trim()) {
+      newErrors.title = 'Title is required';
     }
-    const updated = await getArtifacts();   // fetch fresh list
-    setArtifacts(updated);                  // update UI
-    handleDialogClose();
 
-    // ✅ Refresh stats immediately
-    const updatedStats = await getArtifactStats();
-    setStats(updatedStats);
+    if (!formData.category) {
+      newErrors.category = 'Category is required';
+    }
 
-  } catch (error) {
-    console.error("Error saving artifact:", error);
-  }
-};
+    if (!formData.condition_status) {
+      newErrors.condition_status = 'Condition is required';
+    }
 
-const handleDelete = async (id) => {
-  try {
-    await deleteArtifact(id, user.token);
-    //update details imediately
-    const updated = await getArtifacts();
-    setArtifacts(updated);
-    // ✅ Refresh stats immediately
-    const updatedStats = await getArtifactStats();
-    setStats(updatedStats);
-  } catch (error) {
-    console.error("Error deleting artifact:", error);
-  }
-};
+    if (!formData.status) {
+      newErrors.status = 'Status is required';
+    }
 
-const filteredArtifacts = artifacts.filter((artifact) => {
-  const title = artifact.title?.toLowerCase() || "";
-  const matchesTitle = title.includes(searchTerm.toLowerCase());
-  const matchesCategory =
-    selectedCategory === "All" || artifact.category === selectedCategory;
+    if (formData.dimensions_length && isNaN(formData.dimensions_length)) {
+      newErrors.dimensions_length = 'Length must be a valid number';
+    }
 
-  return matchesTitle && matchesCategory;
-});
+    if (formData.dimensions_width && isNaN(formData.dimensions_width)) {
+      newErrors.dimensions_width = 'Width must be a valid number';
+    }
 
-  return (
-    <Box sx={{ p: 3 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-        <Box>
-          <Typography variant="h4" fontWeight="bold" gutterBottom>
-            Artifacts Management
+    if (formData.dimensions_height && isNaN(formData.dimensions_height)) {
+      newErrors.dimensions_height = 'Height must be a valid number';
+    }
+
+    if (formData.weight && isNaN(formData.weight)) {
+      newErrors.weight = 'Weight must be a valid number';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateField = (name, value, formData, setErrors) => {
+    let error = '';
+
+    if (name === 'title' && !value?.trim()) {
+      error = 'Title is required';
+    }
+
+    if (name === 'category' && !value) {
+      error = 'Category is required';
+    }
+
+    if (name === 'condition_status' && !value) {
+      error = 'Condition is required';
+    }
+
+    if (name === 'status' && !value) {
+      error = 'Status is required';
+    }
+
+    if (
+      ['dimensions_length', 'dimensions_width', 'dimensions_height', 'weight'].includes(name) &&
+      value &&
+      isNaN(value)
+    ) {
+      error = `${name.replace('_', ' ')} must be a valid number`;
+    }
+
+    setErrors((prev) => ({ ...prev, [name]: error }));
+  };
+
+  // Handle form submission
+  const handleFormSubmit = async (formData, isEditMode, selectedItem) => {
+    try {
+      if (isEditMode) {
+        await editArtifact(selectedItem._id, formData, user.token);
+      } else {
+        await createArtifact(formData, user.token);
+      }
+      const updated = await getArtifacts();
+      setArtifacts(updated || []);
+      const updatedStats = await getArtifactStats();
+      setStats(updatedStats || { total: 0, published: 0, drafts: 0, underReview: 0 });
+    } catch (error) {
+      console.error('Error saving artifact:', error);
+      throw error;
+    }
+  };
+
+  // Handle menu actions
+  const handleMenuAction = async (action, item) => {
+    if (action === 'delete') {
+      try {
+        await deleteArtifact(item._id, user.token);
+        const updated = await getArtifacts();
+        setArtifacts(updated || []);
+        const updatedStats = await getArtifactStats();
+        setStats(updatedStats || { total: 0, published: 0, drafts: 0, underReview: 0 });
+      } catch (error) {
+        console.error('Error deleting artifact:', error);
+      }
+    }
+  };
+
+  // Custom table row renderer
+  const renderTableRow = (artifact) => (
+    <>
+      <TableCell>{artifact.title}</TableCell>
+      <TableCell>{artifact.category}</TableCell>
+      <TableCell>{artifact.material || '-'}</TableCell>
+      <TableCell>{artifact.time_period || '-'}</TableCell>
+      <TableCell>{artifact.geographical_origin || '-'}</TableCell>
+      <TableCell>{artifact.artistic_style || '-'}</TableCell>
+      <TableCell>{artifact.condition_status}</TableCell>
+      <TableCell>
+        <Chip
+          label={artifact.status}
+          color={statusColors[artifact.status] || 'default'}
+          sx={{ textTransform: 'capitalize' }}
+        />
+      </TableCell>
+      <TableCell align="center">{artifact.view_count?.toLocaleString() || 0}</TableCell>
+      <TableCell>{artifact.contributor_id?.username || 'Unknown'}</TableCell>
+    </>
+  );
+
+  // Custom details dialog renderer
+  const renderDetailsDialog = (artifact, onClose, onEdit) => (
+    <>
+      <DialogTitle>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography variant="h6" fontWeight="bold">
+            {artifact.title}
           </Typography>
-          <Typography variant="body1" color="textSecondary">
-            Manage and monitor your cultural heritage artifacts
-          </Typography>
+          <Chip
+            label={artifact.status}
+            color={statusColors[artifact.status] || 'default'}
+            sx={{ textTransform: 'capitalize' }}
+          />
         </Box>
-        <Button 
-          variant="contained" 
-          startIcon={<Upload size={20} />}
-          sx={{ px: 3, py: 1.5 }}
-          onClick={handleAddClick}
-        >
-          Add New Artifact
-        </Button>
-      </Box>
-
-      {/* Analytics Overview */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid size = {{ xs:12, lg:8}}>
-          <Card sx={{ p: 3, height: 350 }}>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
-              Artifact Views Over Time
-            </Typography>
-            <ResponsiveContainer width="100%" height="90%">
-              <AreaChart data={viewsData}>
-                <defs>
-                  <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#1B4332" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#1B4332" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Area 
-                  type="monotone" 
-                  dataKey="views" 
-                  stroke="#1B4332" 
-                  fillOpacity={1} 
-                  fill="url(#colorViews)" 
-                  strokeWidth={2}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </Card>
-        </Grid>
-
-        <Grid size = {{ xs:12, lg:4}}>
-          <Card sx={{ p: 3, height: 350 }}>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
-              Quick Stats
-            </Typography>
-            <Box sx={{ space: 3 }}>
-            {[
-              { label: "Total Artifacts", value: stats.total, icon: Eye },
-              { label: "Published", value: stats.published, icon: Eye },
-              { label: "Under Review", value: stats.underReview, icon: Calendar },
-              { label: "Drafts", value: stats.drafts, icon: Edit }
-            ].map((stat, index) => (
-              <Box key={index} sx={{ 
-                display: "flex", 
-                justifyContent: "space-between", 
-                alignItems: "center",
-                py: 2,
-                borderBottom: index < 3 ? "1px solid" : "none",
-                borderColor: "divider"
-              }}>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <stat.icon size={18} style={{ marginRight: 8 }} />
-                  <Typography variant="body2">{stat.label}</Typography>
-                </Box>
-                <Typography variant="h6" fontWeight="bold">
-                  {stat.value}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-
-          </Card>
-        </Grid>
-      </Grid>
-
-      {/* Filters and Search */}
-      <Card sx={{ p: 3, mb: 3 }}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid size = {{ xs:12, md:6}}>
-            <Input
-              placeholder="Search artifacts..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              startIcon={<Search size={20} />}
-              fullWidth
+      </DialogTitle>
+      <DialogContent>
+        <Grid container spacing={3} sx={{ mt: 2 }}>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Avatar
+              src={artifact.image || '/api/placeholder/200/200'}
+              sx={{ width: '100%', height: 200 }}
+              variant="rounded"
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 3 }}>
-            <FormControl fullWidth>
-              <InputLabel>Filter by Category</InputLabel>
-              <Select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-              >
-                <MenuItem value="All">All</MenuItem>
-                {CATEGORY_OPTIONS.map((cat) => (
-                  <MenuItem key={cat} value={cat}>
-                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-
-          <Grid size = {{ xs:12, md:3}}>
-            <Button
-              variant="outlined"
-              startIcon={<Calendar size={20} />}
-              fullWidth
-            >
-              Date Range
-            </Button>
+          <Grid size={{ xs: 12, md: 8 }}>
+            <Box>
+              {[
+                { label: 'Description', value: artifact.description || '-' },
+                { label: 'Category', value: artifact.category },
+                { label: 'Material', value: artifact.material || '-' },
+                { label: 'Time Period', value: artifact.time_period || '-' },
+                { label: 'Origin', value: artifact.geographical_origin || '-' },
+                { label: 'Artistic Style', value: artifact.artistic_style || '-' },
+                { label: 'Condition', value: artifact.condition_status },
+                {
+                  label: 'Dimensions',
+                  value: `${artifact.dimensions_length || 0} x ${artifact.dimensions_width || 0} x ${artifact.dimensions_height || 0} cm`
+                },
+                { label: 'Weight', value: artifact.weight ? `${artifact.weight} kg` : '-' },
+                { label: 'Cultural Significance', value: artifact.cultural_significance || '-' },
+                { label: 'Historical Context', value: artifact.historical_context || '-' },
+                { label: 'Status', value: artifact.status },
+                { label: 'Featured', value: artifact.is_featured ? 'Yes' : 'No' },
+                { label: 'Views', value: `${artifact.view_count?.toLocaleString() || 0} views` },
+                { label: 'Contributor', value: artifact.contributor_id?.username || 'Unknown' },
+                { label: 'Curator', value: artifact.curator_id?.username || 'Unknown' },
+                {
+                  label: 'Published At',
+                  value: artifact.published_at ? new Date(artifact.published_at).toLocaleDateString() : '-'
+                }
+              ].map((field, index) => (
+                <Box key={index} sx={{ mb: 2 }}>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    {field.label}
+                  </Typography>
+                  <Typography variant="body1">{field.value}</Typography>
+                </Box>
+              ))}
+            </Box>
           </Grid>
         </Grid>
-      </Card>
+      </DialogContent>
+      <DialogActions>
+        <Button variant="outlined" onClick={onClose}>
+          Close
+        </Button>
+        <Button variant="contained" startIcon={<Edit size={16} />} onClick={onEdit}>
+          Edit Artifact
+        </Button>
+      </DialogActions>
+    </>
+  );
 
-      {/* Artifacts Table */}
-      <Card>
-        <TableContainer>
-          <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Title</TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Category</TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Material</TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Time Period</TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Origin</TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Style</TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Condition</TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Status</TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold", fontSize: "1rem" }}>Views</TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: "1rem" }}>Contributor</TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold", fontSize: "1rem" }}>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-
-            <TableBody>
-               {filteredArtifacts.map((artifact) => (
-                  <TableRow key={artifact._id} hover>
-                    <TableCell>{artifact.title}</TableCell>
-                    <TableCell>{artifact.category}</TableCell>
-                    <TableCell>{artifact.material || "-"}</TableCell>
-                    <TableCell>{artifact.time_period || "-"}</TableCell>
-                    <TableCell>{artifact.geographical_origin || "-"}</TableCell>
-                    <TableCell>{artifact.artistic_style || "-"}</TableCell>
-                    <TableCell>{artifact.condition_status}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={artifact.status}
-                        color={artifact.status === "published" ? "success" : "default"}
-                        sx={{ textTransform: "capitalize" }}
-                      />
-                    </TableCell>
-                    <TableCell align="center">{artifact.view_count}</TableCell>
-                    <TableCell>
-                      {artifact.contributor_id?.username || "Unknown"}
-                    </TableCell>
-                    <TableCell align="center">
-                      <IconButton size="small" onClick={(e) => handleMenuClick(e, artifact)}>
-                        <MoreVertical size={16} />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        {/* Action Menu */}
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleMenuClose}
-        >
-          <MenuItem onClick={() => { handleViewClick(selectedArtifact); handleMenuClose(); }}>
-            <Eye size={16} style={{ marginRight: 8 }} />
-            View Details
-          </MenuItem>
-          <MenuItem onClick={() => { handleEditClick(selectedArtifact); handleMenuClose(); }}>
-            <Edit size={16} style={{ marginRight: 8 }} />
-            Edit
-          </MenuItem>
-          <MenuItem onClick={() => handleDelete(selectedArtifact._id)} sx={{ color: 'error.main' }}>
-            <Trash2 size={16} style={{ marginRight: 8 }} />
-            Delete
-          </MenuItem>
-        </Menu>
-
-        {/* Artifact Details Dialog (View Only) */}
-        <Dialog open={openDialog} onClose={handleDialogClose} maxWidth="md" fullWidth>
-          {selectedArtifact && (
-            <>
-              <DialogTitle>
-                <Typography component="span" variant="h6" fontWeight="bold">
-                  {editingArtifact ? "Edit Artifact" : selectedArtifact.title}
-                </Typography>
-              </DialogTitle>
-
-              <DialogContent>
-                <Grid container spacing={3}>
-                  {/* Image Section */}
-                  <Grid size={{ xs:12, md:4}}>
-                    <Avatar 
-                      src={selectedArtifact.image || "/api/placeholder/200/200"} 
-                      sx={{ width: '100%', height: 200 }} 
-                      variant="rounded" 
-                    />
-                  </Grid>
-
-                  {/* Details Section */}
-                  <Grid size ={{xs:12, md:8}}>
-                    <Box>
-                      {[
-                        { label: "Description", value: selectedArtifact.description },
-                        { label: "Category", value: selectedArtifact.category },
-                        { label: "Material", value: selectedArtifact.material },
-                        { label: "Time Period", value: selectedArtifact.time_period },
-                        { label: "Origin", value: selectedArtifact.geographical_origin },
-                        { label: "Artistic Style", value: selectedArtifact.artistic_style },
-                        { label: "Condition", value: selectedArtifact.condition_status },
-                        { label: "Dimensions", value: 
-                            `${selectedArtifact.dimensions_length || 0} x ${selectedArtifact.dimensions_width || 0} x ${selectedArtifact.dimensions_height || 0} cm` },
-                        { label: "Weight", value: selectedArtifact.weight ? `${selectedArtifact.weight} kg` : "-" },
-                        { label: "Cultural Significance", value: selectedArtifact.cultural_significance },
-                        { label: "Historical Context", value: selectedArtifact.historical_context },
-                        { label: "Status", value: selectedArtifact.status },
-                        { label: "Featured", value: selectedArtifact.is_featured ? "Yes" : "No" },
-                        { label: "Views", value: `${selectedArtifact.view_count?.toLocaleString() || 0} views` },
-                        { label: "Contributor", value: selectedArtifact.contributor_id?.username || "Unknown" },
-                        { label: "Curator", value: selectedArtifact.curator_id?.username || "Unknown" },
-                        { label: "Published At", value: selectedArtifact.published_at ? new Date(selectedArtifact.published_at).toLocaleDateString() : "-" },
-                      ].map((field, index) => (
-                        <Box key={index} sx={{ mb: 2 }}>
-                          <Typography variant="subtitle2" color="textSecondary">
-                            {field.label}
-                          </Typography>
-                          <Typography variant="body1">
-                            {field.value || "-"}
-                          </Typography>
-                        </Box>
-                      ))}
-                    </Box>
-                  </Grid>
-                </Grid>
-              </DialogContent>
-              <DialogActions>
-                <Button variant="outlined" onClick={() => setOpenDialog(false)}>
-                  Close
-                </Button>
-              </DialogActions>
-            </>
-          )}
-        </Dialog>
-
-        {/* Artifact Edit Dialog */}
-        <Dialog open={Boolean(editingArtifact)} onClose={handleDialogClose} maxWidth="md" fullWidth>
-          {editingArtifact && (
-            <>
-              <DialogTitle>
-                <Typography component="span" variant="h6" fontWeight="bold">
-                  {editingArtifact?._id ? "Edit Artifact" : "Add Artifact"}
-                </Typography>
-              </DialogTitle>
-
-              <DialogContent
-                dividers 
-                  sx={{ 
-                    maxHeight: "90vh",
-                    overflowY: "auto" 
-                  }}
-              >
-              <Grid container spacing={3}>
-                {/* Title, Description, Material etc → still TextField */}
-                <Grid size={{xs:12, sm:6}}>
-                  <FormControl fullWidth error={!formData.title}>
-                    <InputLabel shrink>Title</InputLabel>
-                    <OutlinedInput
-                      value={formData.title ?? editingArtifact.title ?? ""}
-                      onChange={(e) =>
-                        setFormData({ ...formData, title: e.target.value })
-                      }
-                      label="Title"
-                    />
-                    {!formData.title && (
-                      <FormHelperText>Title is required</FormHelperText>
-                    )}
-                  </FormControl>
-
-                </Grid>
-
-                <Grid size={{xs:12, sm:6}}>
-                  <TextField
-                    fullWidth
-                    label="Description"
-                    value={formData.description ?? editingArtifact.description ?? ""}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  />
-                </Grid>
-
-                {/* ✅ Category as Select */}
-                <Grid size={{xs:12, sm:6}}>
-                <FormControl 
-                  fullWidth 
-                  required 
-                  error={!formData.category && formSubmitted} // turns red when empty after submit
-                >
-                  <InputLabel>Category</InputLabel>
-                  <Select
-                    value={formData.category ?? editingArtifact?.category ?? ""}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  >
-                    {CATEGORY_OPTIONS.map((option) => (
-                      <MenuItem key={option} value={option}>
-                        {option}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  {!formData.category && formSubmitted && (
-                    <FormHelperText>Category is required</FormHelperText>
-                  )}
-                </FormControl>
-
-                </Grid>
-
-                {/* ✅ Condition as Select */}
-                <Grid size={{xs:12, sm:6}}>
-                  <FormControl
-                    fullWidth
-                    required 
-                    error={!formData.condition_status && formSubmitted}
-                  >
-                    <InputLabel>Condition</InputLabel>
-                    <Select
-                      value={formData.condition_status ?? editingArtifact.condition_status ?? ""}
-                      onChange={(e) =>
-                        setFormData({ ...formData, condition_status: e.target.value })
-                      }
-                    >
-                      {CONDITION_OPTIONS.map((option) => (
-                        <MenuItem key={option} value={option}>
-                          {option}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {!formData.condition_status && formSubmitted && (
-                      <FormHelperText>Condition is required</FormHelperText>
-                    )}
-                  </FormControl>
-                </Grid>
-
-                {/* ✅ Status as Select */}
-                <Grid size={{xs:12, sm:6}}>
-                  <FormControl
-                    fullWidth 
-                    required 
-                    error={!formData.status && formSubmitted}
-                  >
-                    <InputLabel>Status</InputLabel>
-                    <Select
-                      value={formData.status ?? editingArtifact.status ?? ""}
-                      onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    >
-                      {STATUS_OPTIONS.map((option) => (
-                        <MenuItem key={option} value={option}>
-                          {option}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {!formData.status && formSubmitted && (
-                    <FormHelperText>Status is required</FormHelperText>
-                  )}
-                  </FormControl>
-                </Grid>
-                  {[
-                    { label: "Material", field: "material" },
-                    { label: "Time Period", field: "time_period" },
-                    { label: "Origin", field: "geographical_origin" },
-                    { label: "Artistic Style", field: "artistic_style" },
-                    { label: "Dimensions Length", field: "dimensions_length" },
-                    { label: "Dimensions Width", field: "dimensions_width" },
-                    { label: "Dimensions Height", field: "dimensions_height" },
-                    { label: "Weight", field: "weight" },
-                    { label: "Cultural Significance", field: "cultural_significance" },
-                    { label: "Historical Context", field: "historical_context" },
-                  ].map((field, index) => (
-                    <Grid size={{ xs: 12, sm: 6 }} key={index}>
-                        <TextField
-                          fullWidth
-                          label={field.label}
-                          type={
-                            ["dimensions_length", "dimensions_width", "dimensions_height", "weight"].includes(field.field)
-                              ? "number"
-                              : "text"
-                          }
-                          value={formData[field.field] ?? editingArtifact[field.field] ?? ""}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (
-                              ["dimensions_length", "dimensions_width", "dimensions_height", "weight"].includes(field.field)
-                            ) {
-                              // Allow only numbers and decimal point
-                              if (/^\d*\.?\d*$/.test(value)) {
-                                setFormData({ ...formData, [field.field]: value });
-                              }
-                            } else {
-                              setFormData({ ...formData, [field.field]: value });
-                            }
-                          }}
-                        />
-                      </Grid>
-                    ))}
-              </Grid>
-              </DialogContent>
-              <DialogActions>
-                <Button variant="outlined" onClick={handleDialogClose}>
-                  Cancel
-                </Button>
-                <Button 
-                  variant="contained" 
-                  startIcon={<Edit size={16} />} 
-                  onClick={() => handleSave(formData)}
-                >
-                   {editingArtifact?._id ? "Save Changes" : "Save"}
-                </Button>
-              </DialogActions>
-            </>
-          )}
-        </Dialog>
-      </Card>
-    </Box>
+  return (
+    <AdminTable
+      title="Artifacts Management"
+      subtitle="Manage and monitor your cultural heritage artifacts"
+      createButtonText="Add New Artifact"
+      createButtonIcon={<Upload size={20} />}
+      chartData={viewsData}
+      chartType="area"
+      chartDataKey="views"
+      chartXAxisKey="date"
+      chartTitle="Artifact Views Over Time"
+      statsData={statsData}
+      tableColumns={tableColumns}
+      tableData={artifacts}
+      searchFields={['title']}
+      filterOptions={{
+        label: 'Category',
+        field: 'category',
+        options: ['All', ...CATEGORY_OPTIONS]
+      }}
+      onFormSubmit={handleFormSubmit}
+      onMenuAction={handleMenuAction}
+      renderTableRow={renderTableRow}
+      renderDetailsDialog={renderDetailsDialog}
+      formFields={formFields}
+      validateForm={validateForm}
+      validateField={validateField}
+      statusColors={statusColors}
+    />
   );
 }
 
