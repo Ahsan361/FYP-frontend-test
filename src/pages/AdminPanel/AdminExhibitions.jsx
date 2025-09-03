@@ -48,10 +48,10 @@ function AdminExhibitions() {
 
   const fetchData = async () => {
     try {
-      const exhibitionsData = await getExhibitions();
+      const exhibitionsData = await getExhibitions(user.token);
       setExhibitions(exhibitionsData);
 
-      const statsData = await getExhibitionStats();
+      const statsData = await getExhibitionStats(user.token);
       setStats({
         totalExhibitions: statsData.totalExhibitions,
         featuredExhibitions: statsData.featuredExhibitions,

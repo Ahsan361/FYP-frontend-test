@@ -14,7 +14,6 @@ const EVENT_STATUSES = {
   COMPLETED: "completed"
 };
 
-
 // Create event
 export const createEvent = async (req, res) => {
   try {
@@ -32,6 +31,7 @@ export const getEvents = async (req, res) => {
     const events = await Event.find().populate("organizer_id", "username email");
     res.json(events);
   } catch (error) {
+    console.log("❌ Error in getEvents:", error);
     res.status(500).json({ message: "Error fetching events" });
   }
 };
@@ -43,6 +43,7 @@ export const getEventById = async (req, res) => {
     if (!event) return res.status(404).json({ message: "Event not found" });
     res.json(event);
   } catch (error) {
+    console.log("❌ Error in getEventById:", error);
     res.status(500).json({ message: "Error fetching event" });
   }
 };
@@ -54,6 +55,7 @@ export const updateEvent = async (req, res) => {
     if (!event) return res.status(404).json({ message: "Event not found" });
     res.json(event);
   } catch (error) {
+    console.log("❌ Error in updateEvent:", error);
     res.status(500).json({ message: "Error updating event" });
   }
 };
@@ -65,6 +67,7 @@ export const deleteEvent = async (req, res) => {
     if (!event) return res.status(404).json({ message: "Event not found" });
     res.json({ message: "Event deleted successfully" });
   } catch (error) {
+    console.log("❌ Error in deleteEvent:", error);
     res.status(500).json({ message: "Error deleting event" });
   }
 };

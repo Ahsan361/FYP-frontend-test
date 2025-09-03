@@ -4,14 +4,18 @@ const API_URL = "http://localhost:5000/api/events"; // Adjust if different
 const REGISTRATION_API_URL = "http://localhost:5000/api/event-registrations"; // Adjust if different
 
 // Get all events
-export const getEvents = async () => {
-  const res = await axios.get(API_URL);
+export const getEvents = async (token) => {
+  const res = await axios.get(API_URL, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
   return res.data;
 };
 
 // Get single event by ID
-export const getEventById = async (id) => {
-  const res = await axios.get(`${API_URL}/${id}`);
+export const getEventById = async (id, token) => {
+  const res = await axios.get(`${API_URL}/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
   return res.data;
 };
 
@@ -48,8 +52,10 @@ export const registerForEvent = async (eventId, token) => {
 };
 
 // Get all registrations for an event
-export const getRegistrationsForEvent = async (eventId) => {
-  const res = await axios.get(`${REGISTRATION_API_URL}/event/${eventId}`);
+export const getRegistrationsForEvent = async (eventId, token) => {
+  const res = await axios.get(`${REGISTRATION_API_URL}/event/${eventId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
   return res.data;
 };
 
@@ -70,7 +76,9 @@ export const cancelRegistration = async (id, token) => {
 };
 
 // 📊 Get Event Stats
-export const getEventStats = async () => {
-  const res = await axios.get(`${API_URL}/stats`);
+export const getEventStats = async (token) => {
+  const res = await axios.get(`${API_URL}/stats`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return res.data;
 };

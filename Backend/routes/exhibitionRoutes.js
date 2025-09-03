@@ -5,14 +5,13 @@ import { authorize } from "../middleware/rbac.js";
 
 const router = express.Router();
 //user routes
-router.get("/", getExhibitions);                      // Get all exhibitions
-router.get("/stats", getExhibitionStats)            
-router.get("/:id", getExhibitionById);    // Get one
-
+router.get("/", protect, getExhibitions);                  //user specific route
+router.post("/", protect, authorize("admin"), createExhibition);          //admin specific route
+router.get("/stats", protect, authorize("admin"), getExhibitionStats)      //admin specific routes
 
 //admin only routes
-router.post("/", protect, authorize("admin"), createExhibition);          // Create exhibition
-router.put("/:id",  protect, authorize("admin"), updateExhibition);        // Update
-router.delete("/:id",  protect, authorize("admin"), protect, deleteExhibition);     // Delete
+router.get("/:id", protect, getExhibitionById);    //user specific route
+router.put("/:id",  protect, authorize("admin"), updateExhibition);       //admin specific route
+router.delete("/:id",  protect, authorize("admin"), protect, deleteExhibition);    //admin specific route
 
 export default router;

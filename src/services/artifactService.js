@@ -4,8 +4,10 @@ import axios from "axios";
 const API_URL = "http://localhost:5000/api/artifacts"; // adjust if different
 
 // Get all artifacts
-export const getArtifacts = async () => {
-  const res = await axios.get(API_URL);
+export const getArtifacts = async (token) => {
+  const res = await axios.get(API_URL, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return res.data;
 };
 
@@ -35,7 +37,9 @@ export const deleteArtifact = async (id, token) => {
 };
 
 //get artifacts stats
-export const getArtifactStats = async () => {
-  const res = await axios.get(`${API_URL}/stats`);
+export const getArtifactStats = async (token) => {
+  const res = await axios.get(`${API_URL}/stats`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return res.data; // { total, published, drafts, underReview }
 };

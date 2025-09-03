@@ -17,6 +17,7 @@ export const getExhibitions = async (req, res) => {
     const exhibitions = await Exhibition.find().populate("curator_id", "username email");
     res.json(exhibitions);
   } catch (error) {
+    console.log("Error in getExhibitions:", error);
     res.status(500).json({ message: "Error fetching exhibitions" });
   }
 };
@@ -28,6 +29,7 @@ export const getExhibitionById = async (req, res) => {
     if (!exhibition) return res.status(404).json({ message: "Exhibition not found" });
     res.json(exhibition);
   } catch (error) {
+    console.log("Error in getExhibitionById:", error);
     res.status(500).json({ message: "Error fetching exhibition" });
   }
 };
@@ -51,6 +53,7 @@ export const deleteExhibition = async (req, res) => {
     if (!exhibition) return res.status(404).json({ message: "Exhibition not found" });
     res.json({ message: "Exhibition deleted successfully" });
   } catch (error) {
+    console.log("Error in deleteExhibition:", error);
     res.status(500).json({ message: "Error deleting exhibition" });
   }
 };
