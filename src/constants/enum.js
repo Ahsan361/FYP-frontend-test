@@ -30,5 +30,17 @@ export const EXHIBITION_CATEGORIES = {
   OTHER: "other",
 };
 
+// enums/marketplaceEnums.js
+export const LISTING_TYPES = {
+  AUCTION: "auction",
+  FIXED: "fixed",
+  RESERVE: "reserve",
+};
+
+export const LISTING_STATUSES = {
+  ACTIVE: "active",
+  SOLD: "sold",
+  CANCELLED: "cancelled",
+};
 
 

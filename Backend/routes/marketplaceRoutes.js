@@ -1,13 +1,16 @@
 import express from "express";
-import { createListing, getAllListings, getListingById, updateListing, deleteListing } from "../controllers/marketplaceController.js";
+import { createListing, getAllListings, getListingById, updateListing, deleteListing, getMarketplaceStats } from "../controllers/marketplaceController.js";
 import protect from "../middleware/authMiddleware.js";
+import { authorize } from "../middleware/rbac.js";
 
 const router = express.Router();
 
-router.post("/", protect, createListing);         // Create listing
-router.get("/", getAllListings);                  // Get all
-router.get("/:id", getListingById);               // Get one
-router.put("/:id", protect, updateListing);       // Update
-router.delete("/:id", protect, deleteListing);    // Delete
+router.post("/", protect, authorize("admin"), createListing);         // admin specific route
+router.get("/", getAllListings);                  // user specific route
+router.get("/stats", protect, authorize("admin"), getMarketplaceStats);       // admin specific route
+
+router.get("/:id", protect, authorize("admin"), getListingById);               // admin specific route
+router.put("/:id", protect, authorize("admin"),updateListing);      // admin specific route
+router.delete("/:id", protect, authorize("admin"), deleteListing);    // admin specific route
 
 export default router;

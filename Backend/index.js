@@ -31,7 +31,7 @@ app.use("/api/artifacts", artifactRoutes);
 app.use("/api/artifact-media", artifactMediaRoutes);
 app.use("/api/blockchain", blockchainRoutes);
 app.use("/api/ownerships", ownershipRoutes);
-app.use("/api/listings", marketplaceRoutes);
+app.use("/api/marketplace", marketplaceRoutes);
 app.use("/api/bids", auctionBidRoutes);
 app.use("/api/exhibitions", exhibitionRoutes);
 app.use("/api/exhibition-artifacts", exhibitionArtifactRoutes);

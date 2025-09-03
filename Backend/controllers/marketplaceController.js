@@ -6,6 +6,7 @@ export const createListing = async (req, res) => {
     const listing = await MarketplaceListing.create({ ...req.body, seller_id: req.user._id });
     res.status(201).json(listing);
   } catch (error) {
+    console.log("❌ Error in createListing:", error);
     res.status(500).json({ message: "Error creating listing", error: error.message });
   }
 };
@@ -54,5 +55,45 @@ export const deleteListing = async (req, res) => {
     res.json({ message: "Listing deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error deleting listing" });
+  }
+};
+
+// 📊 Marketplace stats
+export const getMarketplaceStats = async (req, res) => {
+  try {
+    const listings = await MarketplaceListing.find();
+
+    // 1. Active listings
+    const activeListings = listings.filter(l => l.status === "active").length;
+
+    // 2. Sold listings
+    const soldListings = listings.filter(l => l.status === "sold").length;
+
+    // 3. Cancelled listings
+    const cancelledListings = listings.filter(l => l.status === "cancelled").length;
+
+    // 4. Total revenue (sum of sold items by current_price or buy_now_price)
+    const totalRevenue = listings.reduce((sum, l) => {
+      if (l.status === "sold") {
+        return sum + (l.current_price || l.buy_now_price || 0);
+      }
+      return sum;
+    }, 0);
+
+    // 5. Listing type distribution
+    const typeCounts = listings.reduce((acc, l) => {
+      acc[l.listing_type] = (acc[l.listing_type] || 0) + 1;
+      return acc;
+    }, {});
+
+    res.json({
+      activeListings,
+      soldListings,
+      cancelledListings,
+      totalRevenue,
+      typeCounts,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching marketplace stats", error: error.message });
   }
 };
