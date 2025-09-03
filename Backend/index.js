@@ -11,7 +11,6 @@ import auctionBidRoutes from "./routes/auctionBidRoutes.js";
 import exhibitionRoutes from "./routes/exhibitionRoutes.js";
 import exhibitionArtifactRoutes from "./routes/exhibitionArtifactRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
-import { optionalAuth, readOnlyUnlessAdmin } from "./middleware/rbac.js";
 import authRoutes from "./routes/authRoutes.js";
 import aiProcessingRoutes from "./routes/aiProcessingRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
@@ -26,25 +25,6 @@ app.use(cors({
   origin: "http://localhost:5173",  // frontend URL
   credentials: true,                 // if you’re sending cookies or auth headers
 }));
-
-// For every model where users can view but only admins can write:
-const readonlyBases = [
-  "/api/artifacts",
-  "/api/artifact-media",
-  "/api/blockchain",
-  "/api/ownerships",
-  "/api/listings",
-  "/api/bids",
-  "/api/exhibitions",
-  "/api/exhibition-artifacts",
-  "/api/events",
-  // add other CRUD modules here...
-];
-
-// Attach: parse token if present, then block writes for non-admins
-readonlyBases.forEach(base => {
-  app.use(base, optionalAuth, readOnlyUnlessAdmin);
-});
 
 // Mount your routers after the guard:
 app.use("/api/artifacts", artifactRoutes);

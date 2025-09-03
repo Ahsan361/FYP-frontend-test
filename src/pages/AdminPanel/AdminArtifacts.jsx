@@ -48,9 +48,9 @@ function AdminArtifacts() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getArtifacts();
+        const data = await getArtifacts(user.token);
         setArtifacts(data || []);
-        const statsData = await getArtifactStats();
+        const statsData = await getArtifactStats(user.token);
         setStats(statsData || { total: 0, published: 0, drafts: 0, underReview: 0 });
       } catch (error) {
         console.error('Error fetching artifacts or stats:', error);
@@ -219,9 +219,9 @@ function AdminArtifacts() {
       } else {
         await createArtifact(formData, user.token);
       }
-      const updated = await getArtifacts();
+      const updated = await getArtifacts(user.token);
       setArtifacts(updated || []);
-      const updatedStats = await getArtifactStats();
+      const updatedStats = await getArtifactStats(user.token);
       setStats(updatedStats || { total: 0, published: 0, drafts: 0, underReview: 0 });
     } catch (error) {
       console.error('Error saving artifact:', error);
@@ -234,9 +234,9 @@ function AdminArtifacts() {
     if (action === 'delete') {
       try {
         await deleteArtifact(item._id, user.token);
-        const updated = await getArtifacts();
+        const updated = await getArtifacts(user.token);
         setArtifacts(updated || []);
-        const updatedStats = await getArtifactStats();
+        const updatedStats = await getArtifactStats(user.token);
         setStats(updatedStats || { total: 0, published: 0, drafts: 0, underReview: 0 });
       } catch (error) {
         console.error('Error deleting artifact:', error);

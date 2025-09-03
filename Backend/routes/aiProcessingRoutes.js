@@ -1,6 +1,7 @@
 import express from "express";
 import { createProcessing, getAllProcessing, getProcessingById, updateProcessing, deleteProcessing } from "../controllers/aiProcessingController.js";
-import { protect, authorize } from "../middleware/rbac.js";
+import { authorize } from "../middleware/rbac.js";
+import protect from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 

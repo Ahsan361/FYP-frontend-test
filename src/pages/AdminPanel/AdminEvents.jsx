@@ -45,10 +45,10 @@ function AdminEvents() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const eventsData = await getEvents();
+        const eventsData = await getEvents(user.token);
         setEvents(eventsData);
 
-        const statsData = await getEventStats();
+        const statsData = await getEventStats(user.token);
         setStats({
           totalEvents: eventsData.length,
           upcomingEvents: statsData.upcomingEvents,
@@ -245,7 +245,7 @@ function AdminEvents() {
         setEvents([...events, newEvent]);
       }
       // Refresh stats
-      const statsData = await getEventStats();
+      const statsData = await getEventStats(user.token);
       setStats({
         totalEvents: events.length + (isEditMode ? 0 : 1),
         upcomingEvents: statsData.upcomingEvents,
@@ -266,7 +266,7 @@ function AdminEvents() {
         await deleteEvent(item._id, token);
         setEvents(events.filter(event => event._id !== item._id));
         // Refresh stats
-        const statsData = await getEventStats();
+        const statsData = await getEventStats(user.token);
         setStats({
           totalEvents: events.length - 1,
           upcomingEvents: statsData.upcomingEvents,
