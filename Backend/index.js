@@ -14,6 +14,7 @@ import eventRoutes from "./routes/eventRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import aiProcessingRoutes from "./routes/aiProcessingRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import EventRegistration from "./routes/eventRegistrationRoutes.js"
 
 dotenv.config();
 connectDB();
@@ -39,6 +40,7 @@ app.use("/api/events", eventRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/ai-processing", aiProcessingRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/event-registrations", EventRegistration)
 
 
 const PORT = process.env.PORT || 5000;

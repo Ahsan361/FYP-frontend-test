@@ -1,18 +1,16 @@
 import React, { useState, useEffect, useContext } from 'react';
 import {
   Box, Typography, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Chip, Avatar, IconButton, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions,
+  IconButton, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions,
   TextField, FormControl, InputLabel, Select, MenuItem as SelectMenuItem, FormHelperText, 
-  OutlinedInput, Switch, FormControlLabel
+  Switch, FormControlLabel, useMediaQuery, useTheme
 } from '@mui/material';
-import { MoreVertical, Edit, Trash2, Eye, Search, Calendar } from 'lucide-react';
-import { BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+import { MoreVertical, Edit, Trash2, Eye, Search, Calendar, XCircle, CreditCard } from 'lucide-react';
+import { BarChart, Bar, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ComposedChart, Line, PieChart, Pie, Cell, Legend } from 'recharts';
 
 // Custom components
 import { Card, Button, Input } from '.';
-
-// Context
-import { UserContext } from "../../contexts/UserContext";
 
 const AdminTable = ({
   title,
@@ -38,6 +36,11 @@ const AdminTable = ({
   validateField,
   statusColors = {},
   categoryColors = {},
+  onCancel,        // New prop
+  onPayment,       // New prop
+  showCancel = false,    // New prop to control visibility
+  showPayment = false,    // New prop to control visibility
+  additionalCharts
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilters, setSelectedFilters] = useState({});
@@ -50,8 +53,8 @@ const AdminTable = ({
   const [isEditMode, setIsEditMode] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [touched, setTouched] = useState(false);
-
-  const { user } = useContext(UserContext);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md')); 
 
   // Initialize selectedFilters based on filterOptions
   useEffect(() => {
@@ -116,6 +119,7 @@ const AdminTable = ({
     }
   };
 
+  // Enhanced handleMenuAction to support cancel and payment
   const handleMenuAction = async (action, item) => {
     switch (action) {
       case 'view':
@@ -130,6 +134,18 @@ const AdminTable = ({
       case 'delete':
         setAnchorEl(null);
         await onMenuAction(action, item);
+        break;
+      case 'cancel':
+        setAnchorEl(null);
+        if (onCancel) {
+          await onCancel(item);
+        }
+        break;
+      case 'payment':
+        setAnchorEl(null);
+        if (onPayment) {
+          await onPayment(item);
+        }
         break;
       default:
         break;
@@ -183,9 +199,9 @@ const AdminTable = ({
                   <Bar dataKey={chartDataKey} fill="#1B4332" />
                 </BarChart>
               ) : (
-                <AreaChart data={chartData}>
+                <ComposedChart data={chartData}>
                   <defs>
-                    <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient id="colorRegistrations" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#1B4332" stopOpacity={0.3} />
                       <stop offset="95%" stopColor="#1B4332" stopOpacity={0} />
                     </linearGradient>
@@ -199,42 +215,78 @@ const AdminTable = ({
                     dataKey={chartDataKey}
                     stroke="#1B4332"
                     fillOpacity={1}
-                    fill="url(#colorUsers)"
+                    fill="url(#colorRegistrations)"
                     strokeWidth={2}
                   />
-                </AreaChart>
+                  <Line type="monotone" dataKey="revenue" stroke="#52B788" strokeWidth={2} dot={false} />
+                </ComposedChart>
               )}
             </ResponsiveContainer>
           </Card>
         </Grid>
         <Grid size={{ xs: 12, lg: 4 }}>
           <Card sx={{ p: 3, height: 350 }}>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
-              Statistics
-            </Typography>
-            <Box sx={{ space: 3 }}>
-              {statsData.map((stat, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    py: 2,
-                    borderBottom: index < statsData.length - 1 ? '1px solid' : 'none',
-                    borderColor: 'divider',
-                  }}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <stat.icon size={18} style={{ marginRight: 8 }} />
-                    <Typography variant="body2">{stat.label}</Typography>
-                  </Box>
-                  <Typography variant="h6" fontWeight="bold">
-                    {stat.value}
+            {additionalCharts ? (
+              additionalCharts.map((chart, index) => (
+                <Box key={index} sx={{ mb: index < additionalCharts.length - 1 ? 2 : 0 }}>
+                  <Typography variant="subtitle1" fontWeight="bold" gutterBottom  sx={{ pb: 2 }}  >
+                    {chart.title}
                   </Typography>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
+                      <Pie
+                        data={chart.data}
+                        dataKey={chart.dataKey}
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={40}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+                      >
+                        {chart.data.map((entry, i) => (
+                          <Cell key={`cell-${i}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend 
+                        layout="horizontal" 
+                        verticalAlign="bottom" 
+                        align="center" 
+                        wrapperStyle={{
+                          bottom: isMobile ? -35 : -15, // adjust per breakpoint
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
                 </Box>
-              ))}
-            </Box>
+              ))
+            ) : (
+              <Box sx={{ space: 3 }}>
+                {statsData.map((stat, index) => (
+                  <Box
+                    key={index}
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      py: 2,
+                      borderBottom: index < statsData.length - 1 ? '1px solid' : 'none',
+                      borderColor: 'divider',
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <stat.icon size={18} style={{ marginRight: 8 }} />
+                      <Typography variant="body2">{stat.label}</Typography>
+                    </Box>
+                    <Typography variant="h6" fontWeight="bold">
+                      {stat.value}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            )}
           </Card>
         </Grid>
       </Grid>
@@ -354,6 +406,24 @@ const AdminTable = ({
             <Trash2 size={16} style={{ marginRight: 8 }} />
             Delete
           </MenuItem>
+          {showCancel && (
+            <MenuItem 
+              onClick={() => handleMenuAction('cancel', selectedItem)} 
+              sx={{ color: 'error.main' }}
+            >
+              <XCircle size={16} style={{ marginRight: 8 }} />
+              Cancel Registration
+            </MenuItem>
+          )}
+          {showPayment && (
+            <MenuItem 
+              onClick={() => handleMenuAction('payment', selectedItem)} 
+              sx={{ color: 'success.main' }}
+            >
+              <CreditCard size={16} style={{ marginRight: 8 }} />
+              Confirm Payment
+            </MenuItem>
+          )}
         </Menu>
       </Card>
 
