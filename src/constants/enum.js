@@ -44,3 +44,18 @@ export const LISTING_STATUSES = {
 };
 
 
+// Event Registration enums
+export const REGISTRATION_STATUS_OPTIONS = ["pending", "confirmed", "cancelled"];
+export const PAYMENT_STATUS_OPTIONS = ["unpaid", "paid", "refunded"];
+
+export const REGISTRATION_STATUS_COLORS = {
+  'confirmed': 'success',
+  'pending': 'warning',
+  'cancelled': 'error'
+};
+
+export const PAYMENT_STATUS_COLORS = {
+  'paid': 'success',
+  'unpaid': 'warning', 
+  'refunded': 'info'
+};
