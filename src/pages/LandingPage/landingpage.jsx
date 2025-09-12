@@ -8,6 +8,7 @@ import { Loading } from '../../components/ui';
 import Navbar from '../../components/Navbar/Navbar';
 import Footer from '../../components/Footer/Footer';
 import { lightTheme, darkTheme } from '../../styles/theme';
+import LoadingBackground from "../../components/ui/LoadingBackground"
 
 import StaticHeroSection from './StaticHeroSection';
 import ExhibitionsEventsSection from './ExhibitionsEventsSection';
@@ -32,13 +33,20 @@ function LandingPage() {
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Box sx={{ 
-          height: '100vh', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center' 
-        }}>
-          <Loading message="Loading MIRAS Digital Heritage..." size={60} />
+        <Box sx={{ height: "100vh", position: "relative" }}>
+          <LoadingBackground />
+          <Box
+            sx={{
+              position: "relative",
+              zIndex: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              height: "100vh",
+            }}
+          >
+            <Loading message="Loading MIRAS Digital Heritage..." size={60} />
+          </Box>
         </Box>
       </ThemeProvider>
     );
