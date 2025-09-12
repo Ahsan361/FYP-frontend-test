@@ -20,4 +20,5 @@ router.put("/confirm/:id", protect, authorize("admin"), confirmRegistration); //
 router.put("/process-payment/:id", protect, authorize("admin"), processPayment); //admin specific route
 router.put("/cancel/:id", protect, cancelRegistration);             // not user specific route
 router.put("/:id", protect, authorize("admin"), updateRegistration); //admin specific route
+
 export default router;
