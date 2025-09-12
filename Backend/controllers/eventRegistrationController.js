@@ -25,6 +25,7 @@ export const registerForEvent = async (req, res) => {
 
     res.status(201).json(registration);
   } catch (error) {
+    console.log("❌ Error in registerForEvent:", error);
     res.status(500).json({ message: "Error registering for event", error: error.message });
   }
 };

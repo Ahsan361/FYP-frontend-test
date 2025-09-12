@@ -1,7 +1,7 @@
 // src/services/artifactService.js
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/artifacts"; // adjust if different
+const API_URL = "http://localhost:5000/api/artifacts"; 
 
 // Get all artifacts
 export const getArtifacts = async (token) => {
@@ -41,5 +41,5 @@ export const getArtifactStats = async (token) => {
   const res = await axios.get(`${API_URL}/stats`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  return res.data; // { total, published, drafts, underReview }
+  return res.data; 
 };
