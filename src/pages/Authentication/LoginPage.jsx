@@ -314,7 +314,6 @@ const inputStyle = {
     background: 'none',
     border: 'none',
     color: 'white',
-    textDecoration: 'underline',
     cursor: 'pointer',
     fontSize: '14px',
     padding: '0',
@@ -524,14 +523,13 @@ const inputStyle = {
               fontSize: '14px',
               marginBottom: '10px'
             }}>
-              Want to Login as guest?{" "}
               <button
                 style={linkButtonStyle}
                 className="link-button"
                 onClick={handleGuestLogin}
                 type="button"
               >
-                Guest Account
+                Continue as Guest
               </button>
             </p>
             
