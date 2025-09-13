@@ -207,7 +207,7 @@ function Register({ onRegister }) {
     fontWeight: 600, 
     cursor: loading ? "not-allowed" : "pointer" 
   };
-  const linkButtonStyle = { background: "none", border: "none", color: "white", textDecoration: "underline", cursor: "pointer", fontSize: "14px", marginLeft: "5px" };
+  const linkButtonStyle = { background: "none", border: "none", color: "white", cursor: "pointer", fontSize: "14px", marginLeft: "5px" };
   const errorStyle = { padding: "12px", borderRadius: "8px", textAlign: "center", background: "rgba(255, 82, 82, 0.2)", border: "1px solid rgba(255, 82, 82, 0.5)", color: "#ff5252" };
   const successStyle = { padding: "12px", borderRadius: "8px", textAlign: "center", background: "rgba(76, 175, 80, 0.2)", border: "1px solid rgba(76, 175, 80, 0.5)", color: "#4caf50" };
 
