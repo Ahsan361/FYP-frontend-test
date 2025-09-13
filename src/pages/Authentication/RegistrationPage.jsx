@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react"; 
+
+//user context
 import { UserContext } from "../../contexts/UserContext";
 
 // Reuse the animated background class
@@ -117,6 +120,7 @@ function Register({ onRegister }) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // 👈 Add state for password visibility
 
   const canvasRef = useRef(null);
   const flowingLinesRef = useRef(null);
@@ -180,14 +184,57 @@ function Register({ onRegister }) {
   const cardStyle = { background: "rgba(255, 255, 255, 0.1)", backdropFilter: "blur(20px)", border: "1px solid rgba(255, 255, 255, 0.2)", borderRadius: "20px", padding: "40px", maxWidth: "450px", width: "100%", boxShadow: "0 25px 45px rgba(0, 0, 0, 0.1)" };
   const titleStyle = { color: "#fff", fontSize: "2.5rem", fontWeight: 700, marginBottom: "10px", textAlign: "center" };
   const subtitleStyle = { color: "rgba(255, 255, 255, 0.8)", fontSize: "1rem", textAlign: "center", marginBottom: "30px" };
-  const inputStyle = { width: "100%", padding: "15px 20px", background: "rgba(255, 255, 255, 0.1)", border: "1px solid rgba(255, 255, 255, 0.3)", borderRadius: "12px", color: "#fff", fontSize: "16px", marginBottom: "20px", outline: "none" };
-  const buttonStyle = { width: "100%", padding: "15px", background: loading ? "rgba(153,153,153,0.6)" : "linear-gradient(135deg, #1B4332 0%, #2D5A3D 100%)", color: "#fff", border: "none", borderRadius: "12px", fontSize: "16px", fontWeight: 600, cursor: loading ? "not-allowed" : "pointer", marginTop: "10px" };
+  const inputStyle = { 
+    width: "100%", 
+    padding: "15px 20px", 
+    background: "rgba(255, 255, 255, 0.1)", 
+    border: "1px solid rgba(255, 255, 255, 0.3)", 
+    borderRadius: "12px", 
+    color: "#fff", 
+    fontSize: "16px", 
+    outline: "none", 
+    boxSizing: "border-box",
+    lineHeight: "18px" // 👈 Added from Login for consistency
+  };
+  const buttonStyle = { 
+    width: "100%", 
+    padding: "15px", 
+    background: loading ? "rgba(153,153,153,0.6)" : "linear-gradient(135deg, #1B4332 0%, #2D5A3D 100%)", 
+    color: "#fff", 
+    border: "none", 
+    borderRadius: "12px", 
+    fontSize: "16px", 
+    fontWeight: 600, 
+    cursor: loading ? "not-allowed" : "pointer" 
+  };
   const linkButtonStyle = { background: "none", border: "none", color: "white", textDecoration: "underline", cursor: "pointer", fontSize: "14px", marginLeft: "5px" };
-  const errorStyle = { padding: "12px", borderRadius: "8px", marginBottom: "20px", textAlign: "center", background: "rgba(255, 82, 82, 0.2)", border: "1px solid rgba(255, 82, 82, 0.5)", color: "#ff5252" };
-  const successStyle = { padding: "12px", borderRadius: "8px", marginBottom: "20px", textAlign: "center", background: "rgba(76, 175, 80, 0.2)", border: "1px solid rgba(76, 175, 80, 0.5)", color: "#4caf50" };
+  const errorStyle = { padding: "12px", borderRadius: "8px", textAlign: "center", background: "rgba(255, 82, 82, 0.2)", border: "1px solid rgba(255, 82, 82, 0.5)", color: "#ff5252" };
+  const successStyle = { padding: "12px", borderRadius: "8px", textAlign: "center", background: "rgba(76, 175, 80, 0.2)", border: "1px solid rgba(76, 175, 80, 0.5)", color: "#4caf50" };
 
   return (
     <div style={containerStyle}>
+      <style>{`
+        .form-input:focus {
+          border-color: #fff;
+          background: rgba(255, 255, 255, 0.15);
+          transform: scale(1.02);
+        }
+        .form-input::placeholder {
+          color: rgba(255, 255, 255, 0.6);
+        }
+        .login-btn:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .login-btn:active:not(:disabled) {
+          transform: translateY(0);
+        }
+        .link-button:hover {
+          background: rgba(255, 255, 255, 0.1) !important;
+          border-radius: 4px;
+          padding: 2px 4px !important;
+        }
+      `}</style>
       <div style={videoContainerStyle}>
         <canvas ref={canvasRef} style={canvasStyle} />
         <div style={overlayStyle} />
@@ -199,22 +246,80 @@ function Register({ onRegister }) {
           <p style={subtitleStyle}>Join our cultural heritage community</p>
 
           <form onSubmit={handleRegister}>
-            <input type="text" placeholder="Username" style={inputStyle} value={username} onChange={(e) => setUsername(e.target.value)} required disabled={loading} />
-            <input type="email" placeholder="Email Address" style={inputStyle} value={email} onChange={(e) => setEmail(e.target.value)} required disabled={loading} />
-            <input type="password" placeholder="Password" style={inputStyle} value={password} onChange={(e) => setPassword(e.target.value)} required disabled={loading} />
-
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom:"2rem" }}>
+              <input 
+                type="text" 
+                placeholder="Username" 
+                style={inputStyle} 
+                className="form-input"
+                value={username} 
+                onChange={(e) => setUsername(e.target.value)} 
+                required 
+                disabled={loading} 
+              />
+              <input 
+                type="email" 
+                placeholder="Email Address" 
+                style={inputStyle} 
+                className="form-input"
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                required 
+                disabled={loading} 
+              />
+              <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  style={{ ...inputStyle, paddingRight: "40px" }}
+                  className="form-input"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "#fff",
+                    padding: 0,
+                    width: "24px",
+                    height: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    position: "absolute",
+                    right: "12px",
+                  }}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            </div>
             {error && <div style={errorStyle}>{error}</div>}
             {success && <div style={successStyle}>{success}</div>}
-
-            <button type="submit" style={buttonStyle} disabled={loading}>
+            <button 
+              type="submit" 
+              style={buttonStyle} 
+              className="login-btn"
+              disabled={loading}
+            >
               {loading ? "Creating Account..." : "Register"}
             </button>
           </form>
 
-          <div style={{ textAlign: "center", marginTop: "25px" }}>
+          <div style={{ textAlign: "center", paddingTop: "25px" }}>
             <p style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}>
               Already have an account?
-              <button style={linkButtonStyle} onClick={() => navigate("/login")}>
+              <button 
+                style={linkButtonStyle} 
+                className="link-button"
+                onClick={() => navigate("/login")}
+              >
                 Login
               </button>
             </p>

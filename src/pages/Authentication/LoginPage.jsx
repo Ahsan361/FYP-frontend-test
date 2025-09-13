@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import axios from "axios";
+import { Eye, EyeOff } from "lucide-react"; 
 import { useNavigate } from "react-router-dom";
+
+//user context 
 import { UserContext } from "../../contexts/UserContext";
+
+//custom components
+import LoadingBackground from "../../components/ui/LoadingBackground";
 
 // Animated background class
 class FlowingLines {
@@ -129,6 +135,7 @@ function Login({ onLogin }) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   const canvasRef = useRef(null);
   const flowingLinesRef = useRef(null);
@@ -159,7 +166,6 @@ function Login({ onLogin }) {
 
       localStorage.setItem("token", data.token);
       setUser(data);
-      setSuccess("Login successful! 🎉");
 
       onLogin?.(data);
       
@@ -268,20 +274,20 @@ function Login({ onLogin }) {
     marginBottom: '30px',
   };
 
-  const inputStyle = {
-    width: '100%',
-    padding: '15px 20px',
-    background: 'rgba(255, 255, 255, 0.1)',
-    border: '1px solid rgba(255, 255, 255, 0.3)',
-    borderRadius: '12px',
-    color: '#fff',
-    fontSize: '16px',
-    marginBottom: '20px',
-    transition: 'all 0.3s ease',
-    backdropFilter: 'blur(10px)',
-    outline: 'none',
-    boxSizing: 'border-box',
-  };
+const inputStyle = {
+  width: '100%',
+  padding: '15px 20px',
+  background: 'rgba(255, 255, 255, 0.1)',
+  border: '1px solid rgba(255, 255, 255, 0.3)',
+  borderRadius: '12px',
+  color: '#fff',
+  fontSize: '16px',
+  transition: 'all 0.3s ease',
+  backdropFilter: 'blur(10px)',
+  outline: 'none',
+  boxSizing: 'border-box',
+  lineHeight: '18px', // 👈 Match content height to reduce internal spacing
+};
 
   const buttonStyle = {
     width: '100%',
@@ -446,40 +452,62 @@ function Login({ onLogin }) {
           </div>
 
           <form onSubmit={handleLogin}>
-            <input
-              type="email"
-              placeholder="Email Address"
-              style={inputStyle}
-              className="form-input"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={loading}
-            />
-            
-            <input
-              type="password"
-              placeholder="Password"
-              style={inputStyle}
-              className="form-input"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={loading}
-            />
-
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom:"1rem" }}>
+              <input
+                type="email"
+                placeholder="Email Address"
+                style={inputStyle}
+                className="form-input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                disabled={loading}
+              />
+              <div style={{ position: "relative" }}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  style={{ ...inputStyle, paddingRight: "40px" }}
+                  className="form-input"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: "absolute",
+                    right: "12px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "#fff",
+                    padding: 0,
+                    width: "24px",
+                    height: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            </div>
             {error && (
               <div style={errorStyle}>
                 {error}
               </div>
             )}
-
             {success && (
               <div style={successStyle}>
-                {success}
+                <LoadingBackground message="Redirecting..." size={50} />
               </div>
             )}
-
             <button
               type="submit"
               style={buttonStyle}
