@@ -2,34 +2,109 @@ import ExhibitionRegistration from "../models/ExhibitionRegistration.js";
 import Exhibition from "../models/Exhibition.js";
 
 // Register for an exhibition
+// Updated registerForExhibition function in exhibitionRegistrationController.js
+
 export const registerForExhibition = async (req, res) => {
   try {
-    const { exhibition_id } = req.body;
+    const { exhibition_id, spots_requested = 1, attendees = [] } = req.body;
+    
+    // Validate spots_requested
+    if (spots_requested < 1 || spots_requested > 10) {
+      return res.status(400).json({ message: "Spots requested must be between 1 and 10" });
+    }
+
+    // Validate attendees array
+    if (attendees.length !== spots_requested) {
+      return res.status(400).json({ 
+        message: `Number of attendees (${attendees.length}) must match spots requested (${spots_requested})` 
+      });
+    }
+
     const exhibition = await Exhibition.findById(exhibition_id);
     if (!exhibition) return res.status(404).json({ message: "Exhibition not found" });
 
-    // Check capacity
-    if (exhibition.max_capacity && exhibition.current_bookings >= exhibition.max_capacity) {
-      return res.status(400).json({ message: "Exhibition is fully booked" });
+    // Check if user meets age restriction
+    if (exhibition.age_restriction) {
+      const minAge = parseInt(exhibition.age_restriction);
+      const underageAttendees = attendees.filter(attendee => attendee.age < minAge);
+      if (underageAttendees.length > 0) {
+        return res.status(400).json({ 
+          message: `All attendees must be at least ${minAge} years old. Found ${underageAttendees.length} underage attendee(s)` 
+        });
+      }
     }
 
-    // Prevent duplicate registration
+    // Check capacity (now considering multiple spots)
+    if (exhibition.max_capacity && (exhibition.current_bookings + spots_requested) > exhibition.max_capacity) {
+      const availableSpots = exhibition.max_capacity - exhibition.current_bookings;
+      return res.status(400).json({ 
+        message: `Not enough spots available. Requested: ${spots_requested}, Available: ${availableSpots}` 
+      });
+    }
+
+    // Prevent duplicate registration for the same exhibition by the same user
     const existing = await ExhibitionRegistration.findOne({
       exhibition_id,
-      user_id: req.body.user_id || req.user._id
+      user_id: req.body.user_id || req.user._id,
+      registration_status: { $ne: 'cancelled' }
     });
     if (existing) return res.status(400).json({ message: "Already registered for this exhibition" });
+
+    // Validate CNIC format for each attendee
+    const cnicRegex = /^\d{5}-\d{7}-\d{1}$/;
+    const invalidCNICs = attendees.filter(attendee => !cnicRegex.test(attendee.cnic));
+    if (invalidCNICs.length > 0) {
+      return res.status(400).json({ 
+        message: "Invalid CNIC format. Use format: 12345-1234567-1" 
+      });
+    }
+
+    // Check for duplicate CNICs in the same registration
+    const cnics = attendees.map(a => a.cnic);
+    const duplicateCNICs = cnics.filter((cnic, index) => cnics.indexOf(cnic) !== index);
+    if (duplicateCNICs.length > 0) {
+      return res.status(400).json({ 
+        message: "Duplicate CNICs found in the same registration" 
+      });
+    }
+
+    // Check if any CNIC is already registered for this exhibition
+    const existingRegistrations = await ExhibitionRegistration.find({
+      exhibition_id,
+      registration_status: { $ne: 'cancelled' },
+      'attendees.cnic': { $in: cnics }
+    });
+
+    if (existingRegistrations.length > 0) {
+      const registeredCNICs = [];
+      existingRegistrations.forEach(reg => {
+        reg.attendees.forEach(attendee => {
+          if (cnics.includes(attendee.cnic)) {
+            registeredCNICs.push(attendee.cnic);
+          }
+        });
+      });
+      return res.status(400).json({ 
+        message: `The following CNICs are already registered for this exhibition: ${[...new Set(registeredCNICs)].join(', ')}` 
+      });
+    }
+
+    // Calculate total amount
+    const total_amount = (exhibition.entry_fee || 0) * spots_requested;
 
     // Create new registration
     const registration = await ExhibitionRegistration.create({
       ...req.body,
       user_id: req.body.user_id || req.user._id,
+      spots_requested,
+      attendees,
+      total_amount,
       registration_status: "confirmed",
       confirmation_code: Math.random().toString(36).substring(2, 10).toUpperCase()
     });
 
-    // Update current bookings
-    exhibition.current_bookings += 1;
+    // Update current bookings (now by spots_requested, not just +1)
+    exhibition.current_bookings += spots_requested;
     await exhibition.save();
 
     res.status(201).json(registration);
