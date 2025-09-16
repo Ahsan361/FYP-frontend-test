@@ -11,7 +11,7 @@ import { UserContext } from '../../contexts/UserContext';
 import { getArtifacts, getArtifactStats } from '../../services/artifactService';
 import { getEventRegistrations, getEventRegistrationStats } from '../../services/EventRegistrationService';
 import { getEvents, getEventStats } from '../../services/EventService';
-import { getExhibitions, getExhibitionStats } from '../../services/ExhibitionService';
+import {getExhibitions, getExhibitionStats} from "../../services/ExhibitionService";
 import { getAllListings, getMarketplaceStats } from '../../services/marketPlaceService';
 import { getAllUsers, getUserStats } from '../../services/userService';
 
@@ -124,7 +124,6 @@ function AdminHome() {
         setEventStatistics(eventStatisticsData);
         setExhibitionStatistics(exhibitionStatisticsData);
         setMarketplaceStatistics(marketplaceStatisticsData);
-        console.log(exhibitionStatisticsData)
         setRegistrationStatistics(registrationStatisticsData);
       } catch (err) {
         console.error('Error fetching statistics:', err);

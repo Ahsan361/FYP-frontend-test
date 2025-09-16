@@ -61,6 +61,7 @@ import AdminEvents from './AdminEvents';
 import AdminExhibitions from './AdminExhibitions';
 import AdminMarketplace from './AdminMarketPlace';
 import AdminMediaOwnership from './AdminArtifactMedia';
+import AdminExhibitionRegistration from './AdminExhibitionRegistration';
 
 const drawerWidth = 260;
 
@@ -70,9 +71,10 @@ const menuItems = [
   { text: 'Users', icon: Users, key: 'users' },
   { text: 'Auctions', icon: Gavel, key: 'auctions' },
   { text: 'Events', icon: Calendar, key: 'events' },
+  { text: 'Event Registration', icon: ClipboardList, key: 'eventBookings' },
   { text: 'Exhibitions', icon: Image, key: 'exhibitions' },  
+  { text: 'Exhibitions Registration', icon: Image, key: 'exhibitionBookings' },  
   { text: 'Blockchain', icon: Blocks, key: 'blockchain' },
-  { text: 'Event Registration', icon: ClipboardList, key: 'bookings' },
   { text: 'Market Place', icon: ShoppingCart, key: 'marketplace' },
   { text: 'Artifact Media', icon: GalleryHorizontal, key: 'artifactMedia' },
 ];
@@ -118,13 +120,15 @@ function AdminPanel() {
         return <AdminAuctions />;
       case 'blockchain':
         return <AdminBlockchain />;        
-      case 'bookings':
+      case 'eventBookings':
         return <AdminEventRegistration />;           
       case 'events':
         return <AdminEvents />;    
       case 'exhibitions':
         return <AdminExhibitions />;            
-      case 'marketplace':
+      case 'exhibitionBookings':
+      return <AdminExhibitionRegistration />;           
+        case 'marketplace':
         return <AdminMarketplace />;         
       case 'artifactMedia':
         return <AdminMediaOwnership />;                 
@@ -194,11 +198,11 @@ function AdminPanel() {
             activeSection === item.key
               ? theme.palette.primary.main
               : 'inherit',
-        },
-      }}
-    />
-  </ListItemButton>
-</ListItem>
+            },
+          }}
+        />
+      </ListItemButton>
+    </ListItem>
 
           ))}
         </List>
