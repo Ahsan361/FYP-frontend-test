@@ -7,11 +7,19 @@ import AdminTable from '../../components/ui/AdminTable';
 import { Button } from '../../components/ui';
 
 // API services
-import { getEvents } from '../../services/EventService';
+import { getExhibitions } from '../../services/exhibitionService';
 import { getAllUsers } from '../../services/userService';
-import { getEventRegistrations, createEventRegistration, editEventRegistration, deleteEventRegistration,
-  confirmEventRegistration, processPayment, cancelEventRegistration, getEventRegistrationStats 
-} from "../../services/EventRegistrationService";
+
+import { 
+  getAllExhibitionRegistrations, 
+  createExhibitionRegistration, 
+  updateExhibitionRegistration, 
+  deleteExhibitionRegistration,
+  confirmExhibitionRegistration, 
+  processExhibitionPayment, 
+  cancelExhibitionRegistration, 
+  getExhibitionRegistrationStats 
+} from "../../services/exhibitionRegistrationService";
 
 // Constants
 import { REGISTRATION_STATUS_OPTIONS, PAYMENT_STATUS_OPTIONS, REGISTRATION_STATUS_COLORS, PAYMENT_STATUS_COLORS } from '../../constants/enum';
@@ -19,7 +27,7 @@ import { REGISTRATION_STATUS_OPTIONS, PAYMENT_STATUS_OPTIONS, REGISTRATION_STATU
 // Context
 import { UserContext } from "../../contexts/UserContext";
 
-function AdminEventRegistration() {
+function AdminExhibitionRegistration() {
   const [registrations, setRegistrations] = useState([]);
   const [stats, setStats] = useState({
     totalBookings: 0,
@@ -29,8 +37,8 @@ function AdminEventRegistration() {
   });
   const [registrationTrends, setRegistrationTrends] = useState([]);
   const [statusDistribution, setStatusDistribution] = useState([]);
-  const [paymentDistribution, setPaymentDistribution] = useState([]);
-  const [events, setEvents] = useState([]);
+  // Removed unused paymentDistribution
+  const [exhibitions, setExhibitions] = useState([]);
   const [users, setUsers] = useState([]);
   const { user } = useContext(UserContext);
 
@@ -41,10 +49,10 @@ function AdminEventRegistration() {
 
   const fetchData = async () => {
     try {
-      const registrationsData = await getEventRegistrations(user.token);
+      const registrationsData = await getAllExhibitionRegistrations(user.token);
       setRegistrations(registrationsData);
 
-      const statsData = await getEventRegistrationStats(user.token);
+      const statsData = await getExhibitionRegistrationStats(user.token);
       setStats({
         totalBookings: statsData.totalBookings,
         confirmed: statsData.confirmed,
@@ -52,42 +60,42 @@ function AdminEventRegistration() {
         revenue: statsData.revenue.toFixed(2),
       });
       
-      const [eventsData, usersData] = await Promise.all([
-        getEvents(user.token),
+      const [exhibitionsData, usersData] = await Promise.all([
+        getExhibitions(user.token),
         getAllUsers(user.token)
       ]);
-      setEvents(eventsData);
+      setExhibitions(exhibitionsData);
       setUsers(usersData);
 
       setRegistrationTrends(statsData.registrationTrends);
       setStatusDistribution(statsData.statusDistribution);
-      setPaymentDistribution(statsData.paymentDistribution);
+      // Removed paymentDistribution assignment
     } catch (error) {
-      console.error("Error fetching event registrations/stats:", error);
+      console.error("Error fetching exhibition registrations/stats:", error);
     }
   };
 
   // Table configuration
   const tableColumns = [
     { field: 'userName', label: 'Attendee' },
-    { field: 'eventName', label: 'Event' },
+    { field: 'exhibitionName', label: 'Exhibition' },
     { field: 'confirmation_code', label: 'Confirmation Code' },
     { field: 'registration_status', label: 'Registration Status', align: 'center' },
     { field: 'payment_status', label: 'Payment Status', align: 'center' },
-    { field: 'ticketPrice', label: 'Price', align: 'center' },
+    { field: 'entryFee', label: 'Price', align: 'center' },
     { field: 'registration_date', label: 'Registration Date' },
   ];
 
   // Form fields configuration
   const formFields = [
     { 
-      name: 'event_id', 
-      label: 'Event', 
+      name: 'exhibition_id', 
+      label: 'Exhibition', 
       type: 'select', 
       required: true,
-      options: events.map(event => ({ 
-        value: event._id || event.id, 
-        label: event.title || event.name 
+      options: exhibitions.map(exhibition => ({ 
+        value: exhibition._id || exhibition.id, 
+        label: exhibition.title 
       })),
       gridSize: { xs: 12, md: 6 }
     },
@@ -141,8 +149,8 @@ function AdminEventRegistration() {
   const validateForm = (formData, errors, setErrors) => {
     const newErrors = {};
 
-    if (!formData.event_id) {
-      newErrors.event_id = "Event is required";
+    if (!formData.exhibition_id) {
+      newErrors.exhibition_id = "Exhibition is required";
     }
 
     if (!formData.user_id) {
@@ -164,7 +172,7 @@ function AdminEventRegistration() {
   const validateField = (name, value, formData, setErrors) => {
     let error = "";
 
-    if ((name === "event_id" || name === "user_id" || name === "registration_status" || name === "payment_status") && !value) {
+    if ((name === "exhibition_id" || name === "user_id" || name === "registration_status" || name === "payment_status") && !value) {
       error = `${name.replace('_', ' ')} is required`;
     }
 
@@ -175,11 +183,10 @@ function AdminEventRegistration() {
   const handleFormSubmit = async (formData, isEditMode, selectedItem) => {
     try {
       if (isEditMode) {
-        await editEventRegistration(selectedItem._id, formData, user.token);
+        await updateExhibitionRegistration(selectedItem._id, formData, user.token);
       } else {
-        await createEventRegistration(formData, user.token);
+        await createExhibitionRegistration(formData, user.token);
       }
-       // Refresh data
       await fetchData();
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -192,41 +199,38 @@ function AdminEventRegistration() {
     try {
       switch (action) {
         case 'delete':
-          await deleteEventRegistration(item._id, user.token);
+          await deleteExhibitionRegistration(item._id, user.token);
           break;
         case 'confirm':
-          await confirmEventRegistration(item._id, user.token);
+          await confirmExhibitionRegistration(item._id, user.token);
           break;
         case 'process_payment':
-          await processPayment(item._id, user.token);
+          await processExhibitionPayment(item._id, user.token);
           break;
-        case 'cancel':
-          await cancelEventRegistration(item._id, user.token);
-          break;
+        // Removed redundant 'cancel' case since we're using onCancel prop
         default:
           return;
       }
-      // Refresh data
       await fetchData(); 
     } catch (error) {
       console.error(`Error performing ${action}:`, error);
     }
   };
 
-  // Handle cancel action
+  // Handle cancel action (matching events implementation)
   const handleCancel = async (item) => {
     try {
-      await cancelEventRegistration(item._id, user.token);
+      await cancelExhibitionRegistration(item._id, user.token);
       await fetchData();
     } catch (error) {
       console.error('Error cancelling registration:', error);
     }
   };
 
-  // Handle payment action
+  // Handle payment action (matching events implementation)
   const handlePayment = async (item) => {
     try {
-      await processPayment(item._id, user.token);
+      await processExhibitionPayment(item._id, user.token);
       await fetchData();
     } catch (error) {
       console.error('Error processing payment:', error);
@@ -260,24 +264,24 @@ function AdminEventRegistration() {
           </Box>
         </Box>
       </TableCell>
-      
+
       <TableCell>
         <Box>
           <Typography variant="subtitle2" fontWeight="medium">
-            {registration.eventName || registration.event_id?.title || 'N/A'}
+            {registration.exhibitionName || registration.exhibition_id?.title || 'N/A'}
           </Typography>
           <Typography variant="caption" color="textSecondary">
-            {registration.eventDate ? new Date(registration.eventDate).toLocaleDateString() : 'N/A'}
+            {registration.exhibitionDate ? new Date(registration.exhibitionDate).toLocaleDateString() : 'N/A'}
           </Typography>
         </Box>
       </TableCell>
-      
+
       <TableCell>
         <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 'medium' }}>
           {registration.confirmation_code}
         </Typography>
       </TableCell>
-      
+
       <TableCell align="center">
         <Chip
           label={registration.registration_status}
@@ -285,7 +289,7 @@ function AdminEventRegistration() {
           sx={{ textTransform: 'capitalize' }}
         />
       </TableCell>
-      
+
       <TableCell align="center">
         <Chip
           label={registration.payment_status}
@@ -293,13 +297,13 @@ function AdminEventRegistration() {
           sx={{ textTransform: 'capitalize' }}
         />
       </TableCell>
-      
+
       <TableCell align="center">
         <Typography variant="body2" fontWeight="medium">
-          {registration.ticketPrice ? `$${registration.ticketPrice.toFixed(2)}` : 'N/A'}
+          {registration.entryFee ? `$${registration.entryFee.toFixed(2)}` : 'N/A'}
         </Typography>
       </TableCell>
-      
+
       <TableCell>
         <Typography variant="body2">
           {formatDate(registration.registration_date)}
@@ -308,7 +312,7 @@ function AdminEventRegistration() {
     </>
   );
 
-  // Custom details dialog renderer
+  // Custom details dialog renderer (matching events implementation)
   const renderDetailsDialog = (registration, onClose, onEdit) => (
     <>
       <DialogTitle>
@@ -337,7 +341,7 @@ function AdminEventRegistration() {
               {[
                 { label: "Attendee Name", value: registration.userName || registration.user_id?.username || 'N/A' },
                 { label: "Email", value: registration.userEmail || registration.user_id?.email || 'N/A' },
-                { label: "Event", value: registration.eventName || registration.event_id?.title || 'N/A' },
+                { label: "Exhibition", value: registration.exhibitionName || registration.exhibition_id?.title || 'N/A' },
                 { label: "Confirmation Code", value: registration.confirmation_code },
                 { label: "Registration Date", value: formatDate(registration.registration_date) },
                 { label: "Special Requirements", value: registration.special_requirements || 'None' },
@@ -358,8 +362,8 @@ function AdminEventRegistration() {
               {[
                 { label: "Registration Status", value: registration.registration_status },
                 { label: "Payment Status", value: registration.payment_status },
-                { label: "Ticket Price", value: registration.ticketPrice ? `$${registration.ticketPrice.toFixed(2)}` : 'N/A' },
-                { label: "Event Date", value: registration.eventDate ? new Date(registration.eventDate).toLocaleDateString() : 'N/A' },
+                { label: "Entry Fee", value: registration.entryFee ? `$${registration.entryFee.toFixed(2)}` : 'N/A' },
+                { label: "Exhibition Date", value: registration.exhibitionDate ? new Date(registration.exhibitionDate).toLocaleDateString() : 'N/A' },
                 { label: "Created At", value: formatDate(registration.createdAt) },
                 { label: "Last Updated", value: formatDate(registration.updatedAt) },
               ].map((field, index) => (
@@ -410,8 +414,8 @@ function AdminEventRegistration() {
 
   return (
     <AdminTable
-      title="Event Bookings"
-      subtitle="Manage event registrations and attendee information"
+      title="Exhibition Bookings"
+      subtitle="Manage exhibition registrations and attendee information"
       createButtonText="Manual Registration"
       createButtonIcon={<Ticket size={20} />}
       
@@ -422,7 +426,7 @@ function AdminEventRegistration() {
       chartXAxisKey="date"
       chartTitle="Registration Trends & Revenue"
       
-      //registration status pie chart
+      // Registration status pie chart
       additionalCharts={[
         {
           data: statusDistribution,
@@ -435,7 +439,7 @@ function AdminEventRegistration() {
       statsData={statsData}
       tableColumns={tableColumns}
       tableData={registrations}
-      searchFields={['userName', 'eventName', 'confirmation_code', 'userEmail']}
+      searchFields={['userName', 'exhibitionName', 'confirmation_code', 'userEmail']}
       filterOptions={[
         {
           label: 'Registration Status',
@@ -458,11 +462,11 @@ function AdminEventRegistration() {
       statusColors={REGISTRATION_STATUS_COLORS}
       categoryColors={PAYMENT_STATUS_COLORS}
       onCancel={handleCancel}
-      onPayment={handlePayment}
+      onPayment={handlePayment}  // Added missing onPayment prop
       showCancel={true}
       showPayment={true}
     />
   );
 }
 
-export default AdminEventRegistration;
+export default AdminExhibitionRegistration;

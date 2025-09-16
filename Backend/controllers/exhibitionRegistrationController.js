@@ -92,12 +92,12 @@ export const cancelExhibitionRegistration = async (req, res) => {
         await exhibition.save();
       }
     }
-
     reg.registration_status = "cancelled";
     await reg.save();
 
     res.json({ message: "Registration cancelled", reg });
   } catch (error) {
+    console.log("❌ Error in cancelExhibitionRegistration:", error);
     res.status(500).json({ message: "Error cancelling registration" });
   }
 };
