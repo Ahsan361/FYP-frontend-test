@@ -1,90 +1,85 @@
-import React from 'react';
-import { Typography, Grid, Box, Container, Grow, Slide, useMediaQuery } from '@mui/material';
-import { Event,ArrowForward } from '@mui/icons-material';
+import React, { useState, useContext, useEffect } from 'react';
+import { Typography, Grid, Box, Container, Grow, Slide } from '@mui/material';
+import { Event, ArrowForward } from '@mui/icons-material';
 import { lightTheme, darkTheme } from '../../styles/theme';
 import { useSelector } from 'react-redux';
 
 // Custom components
 import { Card, Button, Badge } from '../../components/ui';
 
+// API services
+import { getExhibitions } from '../../services/ExhibitionService';
+
+// User context
+import { UserContext } from '../../contexts/UserContext';
+
 function ExhibitionsEventsSection() {
+  const [exhibitions, setExhibitions] = useState([]);
   const darkMode = useSelector((state) => state.theme.darkMode);
   const theme = darkMode ? darkTheme : lightTheme;
+  const { user } = useContext(UserContext);
 
-  const exhibitions = [
-    {
-      id: 1,
-      title: "Hiroshige: Artist of the Open Road",
-      type: "Exhibition",
-      dates: "1 May – 7 September 2025",
-      status: "Final weeks",
-      statusColor: "warning",
-      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
-      description: "Discover the masterworks of Japan's landscape artist through this comprehensive exhibition.",
-    },
-    {
-      id: 2,
-      title: "Ancient Civilizations of the Indus Valley",
-      type: "Exhibition",
-      dates: "15 March – 30 August 2025",
-      status: "Now Open",
-      statusColor: "success",
-      image: 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=300&h=200&fit=crop',
-      description: "Explore the mysteries of one of the world's earliest urban civilizations.",
-    },
-    {
-      id: 3,
-      title: "Islamic Art Through the Ages",
-      type: "Exhibition",
-      dates: "10 June – 15 October 2025",
-      status: "Opening Soon",
-      statusColor: "info",
-      image: 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=300&h=200&fit=crop',
-      description: "A journey through centuries of Islamic artistic achievement and cultural heritage.",
-    },
-    {
-      id: 4,
-      title: "Ancient Civilizations of the Indus Valley",
-      type: "Exhibition",
-      dates: "15 March – 30 August 2025",
-      status: "Now Open",
-      statusColor: "success",
-      image: "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=300&fit=crop",
-      description: "Explore the mysteries of one of the world's earliest urban civilizations.",
-    },
-    {
-      id: 5,
-      title: "Ancient Civilizations of the Indus Valley",
-      type: "Exhibition",
-      dates: "15 March – 30 August 2025",
-      status: "Now Open",
-      statusColor: "success",
-      image: "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=300&fit=crop",
-      description: "Explore the mysteries of one of the world's earliest urban civilizations.",
-    },
-  ];
+  // Fetch data on mount
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const exhibitionsData = await getExhibitions(user.token);
+      // Transform backend data to match frontend structure
+      const transformedData = exhibitionsData.map((item, index) => {
+        const startDate = item.start_date ? new Date(item.start_date) : null;
+        const endDate = item.end_date ? new Date(item.end_date) : null;
+        const dates = startDate && endDate 
+          ? `${startDate.toLocaleDateString('en-GB', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+            })} – ${endDate.toLocaleDateString('en-GB', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+            })}`
+          : '';
+
+        return {
+          id: item._id || index + 1, // Use _id or fallback to index
+          title: item.title || 'Untitled Exhibition', // Fallback for missing title
+          type: item.category ? item.category.charAt(0).toUpperCase() + item.category.slice(1) : 'Exhibition', // Capitalize category or default
+          dates: dates || 'Dates TBD', // Fallback for missing dates
+          status: item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : 'Unknown', // Capitalize status or default
+          statusColor: item.status === 'upcoming' ? 'info' : item.is_featured ? 'success' : 'default', // Map status/is_featured to color
+          image: item.banner_image_url || 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=300&h=200&fit=crop', // Use banner_image_url or placeholder
+          description: item.description || (item.category ? `Explore the ${item.category} exhibition${item.curator_id?.username ? ` curated by ${item.curator_id.username}` : ''}.` : 'No description available.'), // Use description or generate fallback
+        };
+      });
+      setExhibitions(transformedData);
+    } catch (error) {
+      console.error('Error fetching exhibitions:', error);
+    }
+  };
 
   return (
-    <Container maxWidth={false}  sx={{ px:{xs: 2, md: 8}, py: { xs: 4, md: 8 } }}>
+    <Container maxWidth={false} sx={{ px: { xs: 2, md: 8 }, py: { xs: 4, md: 8 } }}>
       <Slide direction="up" in={true} timeout={800}>
         <Box sx={{ mb: 6, textAlign: 'center' }}>
           <Typography variant="h2" sx={{ fontWeight: 700, mb: 2 }}>
-            Exhibitions & Events
+            Exhibitions 
           </Typography>
           <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
-            Discover our current exhibitions and upcoming cultural events that bring 
-            history and heritage to life
+            Discover our current and upcoming exhibitions that bring history and heritage to life
           </Typography>
         </Box>
       </Slide>
 
       <Grid container spacing={3}>
         {exhibitions.map((exhibition, index) => (
-          <Grid key={exhibition.id} size={{xs: 12, sm: 6, md: 3 }}>
+          <Grid key={exhibition.id} size={{ xs: 12, sm: 6, md: 3 }}>
             <Grow in={true} timeout={1200 + index * 100}>
               <Card
                 image={exhibition.image}
-                sx={{ 
+                sx={{
                   height: '100%',
                   display: 'flex',
                   flexDirection: 'column',
@@ -93,56 +88,68 @@ function ExhibitionsEventsSection() {
                   transition: 'all 0.3s ease',
                   '&:hover': {
                     transform: 'translateY(-8px)',
-                  }
+                  },
                 }}
               >
-                {/* Status Badge in top right */}
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: 16,
-                    right: 16,
-                    zIndex: 2
-                  }}
-                >
-                  <Badge
-                    label={exhibition.status}
-                    color={exhibition.statusColor}
-                    size="small"
+                {/* Status Badge in top right, shown only if status exists */}
+                {exhibition.status && exhibition.status !== 'Unknown' && (
+                  <Box
                     sx={{
-                      backgroundColor: theme.palette.background,
-                      backdropFilter: 'blur(4px)',
-                      fontWeight: 600
+                      position: 'absolute',
+                      top: 16,
+                      right: 16,
+                      zIndex: 2,
                     }}
-                  />
-                </Box>
+                  >
+                    <Badge
+                      label={exhibition.status}
+                      color={exhibition.statusColor}
+                      size="small"
+                      sx={{
+                        backgroundColor: theme.palette.background,
+                        backdropFilter: 'blur(4px)',
+                        fontWeight: 600,
+                      }}
+                    />
+                  </Box>
+                )}
 
                 {/* Content */}
                 <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 2 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <Event sx={{ fontSize: 18, mr: 1, color: 'primary.main' }} />
-                    <Typography variant="caption" color="primary.main" sx={{ fontWeight: 600 }}>
-                      {exhibition.type.toUpperCase()}
-                    </Typography>
-                  </Box>
+                  {/* Type, shown only if type exists */}
+                  {exhibition.type && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                      <Event sx={{ fontSize: 18, mr: 1, color: 'primary.main' }} />
+                      <Typography variant="caption" color="primary.main" sx={{ fontWeight: 600 }}>
+                        {exhibition.type.toUpperCase()}
+                      </Typography>
+                    </Box>
+                  )}
 
+                  {/* Title, always shown due to fallback */}
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, lineHeight: 1.3 }}>
                     {exhibition.title}
                   </Typography>
 
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontWeight: 500 }}>
-                    {exhibition.dates}
-                  </Typography>
+                  {/* Dates, shown only if not TBD */}
+                  {exhibition.dates && exhibition.dates !== 'Dates TBD' && (
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2, fontWeight: 500 }}>
+                      {exhibition.dates}
+                    </Typography>
+                  )}
 
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3, flexGrow: 1 }}>
-                    {exhibition.description}
-                  </Typography>
+                  {/* Description, shown only if not fallback */}
+                  {exhibition.description && exhibition.description !== 'No description available.' && (
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3, flexGrow: 1 }}>
+                      {exhibition.description}
+                    </Typography>
+                  )}
 
                   {/* Link at bottom */}
-                  <Button 
-                    variant="outlined" 
-                    size="small" 
-                    fullWidth 
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    fullWidth
                     endIcon={<ArrowForward />}
                     sx={{ mt: 1 }}
                   >
@@ -157,13 +164,13 @@ function ExhibitionsEventsSection() {
 
       {/* View All Button */}
       <Box sx={{ textAlign: 'center', mt: 6 }}>
-        <Button 
-          variant="contained" 
-          size="large" 
+        <Button
+          variant="contained"
+          size="large"
           endIcon={<ArrowForward />}
           sx={{ px: 4, py: 1.5 }}
         >
-          View All Exhibitions & Events
+          View All Exhibitions 
         </Button>
       </Box>
     </Container>
