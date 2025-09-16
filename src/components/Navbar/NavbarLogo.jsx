@@ -10,7 +10,7 @@ const NavbarLogo = () => {
   const navigate = useNavigate();
 
   const handleLogoClick = () => {
-    navigate(routes.home); // Navigate to landing page ("/")
+    navigate(routes.home); 
   };
 
   return (

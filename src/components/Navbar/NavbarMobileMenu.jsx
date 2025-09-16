@@ -280,7 +280,7 @@ function MobileMenu({ mobileMenuOpen, handleMobileMenuToggle, navItems, user }) 
                   fontWeight: 600,
                 }}
               >
-                {user.name.charAt(0)}
+                {user?.name ? user.name.charAt(0) : ""}
               </Avatar>
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Typography
