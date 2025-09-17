@@ -99,6 +99,7 @@ function AdminPanel() {
 
   const handleProfileClose = () => {
     setAnchorEl(null);
+    navigate("/profile"); 
   };
 
   const handleLogout = () => {
@@ -321,10 +322,6 @@ function AdminPanel() {
           <MenuItem onClick={handleProfileClose}>
             <User size={16} style={{ marginRight: 8 }} />
              {user?.username || "Profile"}
-          </MenuItem>
-          <MenuItem onClick={handleProfileClose}>
-            <Settings size={16} style={{ marginRight: 8 }} />
-            Settings
           </MenuItem>
           <Divider />
           <MenuItem

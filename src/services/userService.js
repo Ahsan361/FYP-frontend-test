@@ -49,3 +49,17 @@ export const getUserStats = async (token) => {
   });
   return res.data;
 };
+
+//reset user password
+export const resetPassword = async (email) => {
+  const res = await axios.post(`${API_URL}/reset-password`, { email });
+  return res.data;
+};
+
+//get me 
+export const getProfile = async (token) => {
+  const res = await axios.get(`${API_URL}/profile`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+}

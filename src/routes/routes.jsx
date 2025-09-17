@@ -5,6 +5,8 @@ const routes = {
   login: "/login", 
   register: "/register",
   admin: "/adminDashboard",
+  user: "/userDashboard",
+  profile: "/profile",
 
   // Visit pages
   visit: {

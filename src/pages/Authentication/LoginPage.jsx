@@ -163,11 +163,15 @@ function Login({ onLogin }) {
         email,
         password_hash: password,
       });
-
+      
+      const userWithToken = {
+        ...data,
+        token: data.token // Make sure token is part of the user object
+      };
       localStorage.setItem("token", data.token);
-      setUser(data);
+      setUser(userWithToken);
 
-      onLogin?.(data);
+      onLogin?.(userWithToken);
       
       // Navigate based on user role
       if (data.role === "admin") { 

@@ -1,33 +1,78 @@
-import { 
-  Box, 
-  IconButton, 
-  Avatar, 
-  Typography, 
-  Stack, 
-  useTheme, 
-  useMediaQuery, 
-  Tooltip 
-} from "@mui/material";
 import { Menu as MenuIcon, Close as CloseIcon, Login, Logout } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import {
+  Box,
+  IconButton,
+  Avatar,
+  Typography,
+  Stack,
+  useTheme,
+  useMediaQuery,
+  Tooltip,
+  Menu,
+  MenuItem,
+} from "@mui/material";
 
 // Custom components
 import ThemeToggle from "../ui/ThemeToggle";
 import Button from "../ui/Button";
 
+//api service
+import { getProfile, updateUser } from "../../services/userService";
+
 function RightActions({ user, setUser, isMobile, handleMobileMenuToggle, mobileMenuOpen }) {
+  const [userData, setUserData] = useState(null);
   const theme = useTheme();
   const navigate = useNavigate();
-
-  // Responsive checks
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const isMediumScreen = useMediaQuery(theme.breakpoints.between("sm", "md"));
+  // State for profile menu
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleProfileClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleViewProfile = () => {
+    navigate("/profile");
+    handleMenuClose();
+  };
+
+  const handleViewDashboard = () => {
+    if(user.role === "user"){
+      navigate("/userDashboard");
+    } else {
+      navigate("/adminDashboard");
+    }
+    handleMenuClose();
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token"); // remove JWT
     setUser(null); // update state in parent
     navigate("/login"); // redirect to login
+    handleMenuClose();
   };
+
+  useEffect(() => {
+    if (!user.token) return;
+
+    const fetchProfile = async () => {
+      try {
+        const profileData = await getProfile(user.token);
+        setUserData(profileData);
+      } catch (err) {
+        console.error("Failed to load profile", err);
+      }
+    };
+    fetchProfile();
+  }, [user.token]);
 
   return (
     <Stack
@@ -44,23 +89,53 @@ function RightActions({ user, setUser, isMobile, handleMobileMenuToggle, mobileM
       <ThemeToggle />
 
       {user ? (
-        // ✅ Logged-in state
+        // Logged-in state
         <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 0.5, sm: 1 } }}>
           <Tooltip title="Profile">
-            <IconButton aria-label="User profile" sx={{ p: 0 }}>
-              <Avatar src={user.avatar}>
-                {user.username?.charAt(0).toUpperCase()}
+            <IconButton
+              onClick={handleProfileClick}
+              aria-label="User profile"
+              sx={{ p: 0 }}
+              aria-controls={open ? "profile-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? "true" : undefined}
+            >
+              <Avatar src={userData?.profile_picture_url || user.avatar}>
+                {userData?.profile_picture_url? "": user.username?.charAt(0).toUpperCase()}
               </Avatar>
             </IconButton>
           </Tooltip>
-          <Tooltip title="Logout">
-            <IconButton onClick={handleLogout} aria-label="Logout">
-              <Logout />
-            </IconButton>
-          </Tooltip>
+          <Menu
+            id="profile-menu"
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleMenuClose}
+            MenuListProps={{
+              "aria-labelledby": "user-profile-button",
+            }}
+            sx={{
+              "& .MuiPaper-root": {
+                borderRadius: 2,
+                boxShadow: theme.shadows[8],
+                minWidth: 180,
+              },
+            }}
+          >
+            <MenuItem onClick={handleViewProfile}>
+              <Typography variant="body2">View Profile</Typography>
+            </MenuItem>
+            <MenuItem onClick={handleViewDashboard}>
+              <Typography variant="body2">View Dashboard</Typography>
+            </MenuItem>
+            <MenuItem onClick={handleLogout}>
+              <Typography variant="body2" color="error.main">
+                Logout
+              </Typography>
+            </MenuItem>
+          </Menu>
         </Box>
       ) : (
-        // ✅ Logged-out state → Sign In button
+        // Logged-out state → Sign In button
         <Button
           variant="contained"
           startIcon={<Login />}
@@ -79,9 +154,7 @@ function RightActions({ user, setUser, isMobile, handleMobileMenuToggle, mobileM
           aria-expanded={mobileMenuOpen}
           sx={{
             borderRadius: "12px",
-            backgroundColor: mobileMenuOpen
-              ? "rgba(0,0,0,0.08)"
-              : "rgba(0,0,0,0.04)",
+            backgroundColor: mobileMenuOpen ? "rgba(0,0,0,0.08)" : "rgba(0,0,0,0.04)",
             "&:hover": {
               backgroundColor: "rgba(0,0,0,0.12)",
             },

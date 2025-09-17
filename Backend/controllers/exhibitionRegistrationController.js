@@ -3,7 +3,6 @@ import Exhibition from "../models/Exhibition.js";
 
 // Register for an exhibition
 // Updated registerForExhibition function in exhibitionRegistrationController.js
-
 export const registerForExhibition = async (req, res) => {
   try {
     const { exhibition_id, spots_requested = 1, attendees = [] } = req.body;
