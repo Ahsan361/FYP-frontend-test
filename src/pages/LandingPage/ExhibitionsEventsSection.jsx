@@ -24,7 +24,7 @@ function ExhibitionsEventsSection() {
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const [openRegistrationDialog, setOpenRegistrationDialog] = useState(false);
   const [myRegistrations, setMyRegistrations] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [submittingRegistration, setSubmittingRegistration] = useState(false); // Renamed for clarity
   const [errors, setErrors] = useState({});
   const [registrationData, setRegistrationData] = useState({
     special_requirements: '',
@@ -35,15 +35,19 @@ function ExhibitionsEventsSection() {
 
   const darkMode = useSelector((state) => state.theme.darkMode);
   const theme = darkMode ? darkTheme : lightTheme;
-  const { user } = useContext(UserContext);
+  const { user, loading: contextLoading } = useContext(UserContext); // Renamed for clarity
 
-  // Fetch data on mount
-  useEffect(() => {
-    fetchData();
-    if (user) {
-      fetchMyRegistrations();
+  // Fetch data when context finishes loading
+  useEffect(() => {  
+    if (!contextLoading) { // Wait for context to finish loading
+      if (user && user.token) {
+        fetchData();
+        fetchMyRegistrations();
+      } else {
+        console.log('No user or token available');
+      }
     }
-  }, []);
+  }, [user, contextLoading]); // Dependencies are correct
 
   const fetchData = async () => {
     try {
@@ -79,6 +83,13 @@ function ExhibitionsEventsSection() {
       setExhibitions(transformedData);
     } catch (error) {
       console.error('Error fetching exhibitions:', error);
+      if (error.response?.status === 401) {
+        setAlert({
+          show: true,
+          message: 'Please log in to view exhibitions',
+          severity: 'warning'
+        });
+      }
     }
   };
 
@@ -88,6 +99,13 @@ function ExhibitionsEventsSection() {
       setMyRegistrations(registrations);
     } catch (error) {
       console.error('Error fetching my registrations:', error);
+      if (error.response?.status === 401) {
+        setAlert({
+          show: true,
+          message: 'Please log in to view your registrations',
+          severity: 'warning'
+        });
+      }
     }
   };
 
@@ -136,7 +154,7 @@ function ExhibitionsEventsSection() {
       return;
     }
 
-    setLoading(true);
+    setSubmittingRegistration(true); // Use renamed state
     setErrors({});
 
     try {
@@ -151,7 +169,7 @@ function ExhibitionsEventsSection() {
           message: 'You are already registered for this exhibition',
           severity: 'warning'
         });
-        setLoading(false);
+        setSubmittingRegistration(false);
         return;
       }
 
@@ -163,7 +181,7 @@ function ExhibitionsEventsSection() {
           message: `Only ${availableSpots} spots available, you requested ${registrationData.spots_requested}`,
           severity: 'error'
         });
-        setLoading(false);
+        setSubmittingRegistration(false);
         return;
       }
 
@@ -196,7 +214,7 @@ function ExhibitionsEventsSection() {
         severity: 'error'
       });
     } finally {
-      setLoading(false);
+      setSubmittingRegistration(false);
     }
   };
 
@@ -318,6 +336,19 @@ function ExhibitionsEventsSection() {
       if (!exhibition || exhibition.max_capacity == null) return null;
       return exhibition.max_capacity - (exhibition.current_bookings || 0);
   };
+
+  // Show loading state while context is initializing
+  if (contextLoading) {
+    return (
+      <Container maxWidth={false} sx={{ px: { xs: 2, md: 8 }, py: { xs: 4, md: 8 } }}>
+        <Box sx={{ textAlign: 'center', py: 8 }}>
+          <Typography variant="h6" color="text.secondary">
+            Loading exhibitions...
+          </Typography>
+        </Box>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth={false} sx={{ px: { xs: 2, md: 8 }, py: { xs: 4, md: 8 } }}>
@@ -733,17 +764,17 @@ function ExhibitionsEventsSection() {
           <Button 
             variant="outlined" 
             onClick={() => setOpenRegistrationDialog(false)}
-            disabled={loading}
+            disabled={submittingRegistration}
           >
             Cancel
           </Button>
           <Button
             variant="contained"
             onClick={handleRegistrationSubmit}
-            disabled={loading}
+            disabled={submittingRegistration}
             sx={{ minWidth: 120 }}
           >
-            {loading ? 'Registering...' : `Register ${registrationData.spots_requested} Spot${registrationData.spots_requested > 1 ? 's' : ''}`}
+            {submittingRegistration ? 'Registering...' : `Register ${registrationData.spots_requested} Spot${registrationData.spots_requested > 1 ? 's' : ''}`}
           </Button>
         </DialogActions>
       </Dialog>

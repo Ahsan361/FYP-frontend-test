@@ -66,3 +66,12 @@ export const getEventRegistrationStats = async (token) => {
   });
   return res.data;
 };
+
+
+// Get my event registrations
+export const getMyEventRegistrations = async (token) => {
+  const res = await axios.get(`${API_URL}/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};

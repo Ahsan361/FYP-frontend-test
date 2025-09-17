@@ -24,6 +24,8 @@ import EventsAndExibitionsPage from "../pages/EventsAndExibitions/EventsAndExibi
 import Login from "../pages/Authentication/LoginPage";
 import Register from "../pages/Authentication/RegistrationPage";
 import AdminPanel from "../pages/AdminPanel/AdminPanel";
+import UserPanel from "../pages/UserPanel/UserPanel";
+import UserProfile from "../pages/UserProfile/UserProfile"
 
 // map paths to components
 const routesConfig = [
@@ -31,6 +33,8 @@ const routesConfig = [
   { path: routes.login, element: <Login /> },
   { path: routes.register, element: <Register /> },
   { path: routes.admin , element: <AdminPanel /> },
+  { path: routes.user , element: <UserPanel /> },
+  { path: routes.profile, element: <UserProfile />},
 
   // Visit
   { path: routes.visit.base, element: <PlanVisitPage /> },

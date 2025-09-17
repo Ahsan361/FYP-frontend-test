@@ -46,10 +46,9 @@ export const addUser = async (req, res) => {
   }
 };
 
-
 // Get profile
 export const getUserProfile = async (req, res) => {
-  const user = await User.findById(req.user._id);
+  const user = await User.findById(req.user._id).select("-password_hash");;
   if (user) {
     res.json(user);
   } else {
@@ -70,21 +69,28 @@ export const getUserById = async (req, res) => {
   else res.status(404).json({ message: "User not found" });
 };
 
-// Admin: Update user
+// Update user
 export const updateUser = async (req, res) => {
-  const user = await User.findById(req.params.id);
-  if (!user) return res.status(404).json({ message: "User not found" });
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-  user.username = req.body.username || user.username;
-  user.email = req.body.email || user.email;
-  user.first_name = req.body.first_name || user.first_name;
-  user.last_name = req.body.last_name || user.last_name;
-  user.role = req.body.role || user.role;
-  user.is_active = req.body.is_active ?? user.is_active;
+    user.username = req.body.username || user.username;
+    user.email = req.body.email || user.email;
+    user.first_name = req.body.first_name || user.first_name;
+    user.last_name = req.body.last_name || user.last_name;
+    user.profile_picture_url = req.body.avatar || user.profile_picture_url;
+    user.role = req.body.role || user.role;
+    user.is_active = req.body.is_active ?? user.is_active;
 
-  const updatedUser = await user.save();
-  res.json(updatedUser);
+    const updatedUser = await user.save();
+    res.json(updatedUser);
+  } catch (error) {
+    console.log("Error in updateUser:", error);
+    res.status(500).json({ message: error.message });
+  }
 };
+
 
 // Admin: Delete user
 export const deleteUser = async (req, res) => {
