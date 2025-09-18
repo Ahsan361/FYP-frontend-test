@@ -87,17 +87,6 @@ function UserDetailsForm({
               label="Account Active"
             />
           </Grid>
-          {currentUser.createdAt && (
-            <Grid size={{ xs: 12 }}>
-              <Typography variant="body2" color="text.secondary">
-                Account Created: {new Date(currentUser.createdAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </Typography>
-            </Grid>
-          )}
           {currentUser.updatedAt && (
             <Grid size={{ xs: 12 }}>
               <Typography variant="body2" color="text.secondary">
