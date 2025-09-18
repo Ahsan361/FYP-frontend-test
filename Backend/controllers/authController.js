@@ -61,3 +61,31 @@ export const loginUser = async (req, res) => {
     return res.status(500).json({ message: "Server Error" });
   }
 };
+
+// Reset Password (new)
+export const resetPassword = async (req, res) => {
+  const { email, currentPassword, newPassword, confirmPassword } = req.body;
+  
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isMatch = await user.matchPassword(currentPassword);
+    
+    if (!isMatch) return res.status(400).json({ message: "Current password is incorrect" });
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match" });
+    }
+
+    user.password_hash = newPassword;
+    await user.save();
+
+    return res.json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("❌ Error in resetPassword:", error);
+    return res.status(500).json({ message: "Server Error" });
+  }
+};
