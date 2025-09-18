@@ -27,6 +27,7 @@ function RightActions({ user, setUser, isMobile, handleMobileMenuToggle, mobileM
   const navigate = useNavigate();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const isMediumScreen = useMediaQuery(theme.breakpoints.between("sm", "md"));
+
   // State for profile menu
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -45,7 +46,7 @@ function RightActions({ user, setUser, isMobile, handleMobileMenuToggle, mobileM
   };
 
   const handleViewDashboard = () => {
-    if(user.role === "user"){
+    if (user.role === "user") {
       navigate("/userDashboard");
     } else {
       navigate("/adminDashboard");
@@ -61,7 +62,8 @@ function RightActions({ user, setUser, isMobile, handleMobileMenuToggle, mobileM
   };
 
   useEffect(() => {
-    if (!user.token) return;
+    // Check if user exists and has a token before making the API call
+    if (!user || !user.token) return;
 
     const fetchProfile = async () => {
       try {
@@ -71,8 +73,9 @@ function RightActions({ user, setUser, isMobile, handleMobileMenuToggle, mobileM
         console.error("Failed to load profile", err);
       }
     };
+
     fetchProfile();
-  }, [user.token]);
+  }, [user?.token]); // Use optional chaining in dependency array too
 
   return (
     <Stack
@@ -89,7 +92,7 @@ function RightActions({ user, setUser, isMobile, handleMobileMenuToggle, mobileM
       <ThemeToggle />
 
       {user ? (
-        // Logged-in state
+        // Logged-in state (both regular user and guest user)
         <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 0.5, sm: 1 } }}>
           <Tooltip title="Profile">
             <IconButton
@@ -101,10 +104,11 @@ function RightActions({ user, setUser, isMobile, handleMobileMenuToggle, mobileM
               aria-expanded={open ? "true" : undefined}
             >
               <Avatar src={userData?.profile_picture_url || user.avatar}>
-                {userData?.profile_picture_url? "": user.username?.charAt(0).toUpperCase()}
+                {userData?.profile_picture_url ? "" : user.username?.charAt(0).toUpperCase()}
               </Avatar>
             </IconButton>
           </Tooltip>
+
           <Menu
             id="profile-menu"
             anchorEl={anchorEl}
@@ -122,7 +126,7 @@ function RightActions({ user, setUser, isMobile, handleMobileMenuToggle, mobileM
             }}
           >
             <MenuItem onClick={handleViewProfile}>
-              <Typography variant="body2">View Profile</Typography>
+              <Typography variant="body2">Settings</Typography>
             </MenuItem>
             <MenuItem onClick={handleViewDashboard}>
               <Typography variant="body2">View Dashboard</Typography>
