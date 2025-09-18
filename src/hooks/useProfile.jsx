@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { UserContext } from "../contexts/UserContext";
-import { updateUser, getProfile, resetPassword } from "../services/userService";
+import { updateUser, getProfile } from "../services/userService";
+import { resetPassword } from "../services/authService";
 
 export function useProfile() {
   const { user, setUser } = useContext(UserContext);
@@ -106,19 +107,13 @@ export function useProfile() {
   };
 
   const handlePasswordChange = async () => {
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setAlert({
-        show: true,
-        message: "New password and confirm password do not match",
-        severity: "error",
-      });
-      return;
-    }
     try {
-      await resetPassword(token, {
-        currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword,
-      });
+      await resetPassword(
+        user?.email,
+        passwordData.currentPassword,
+        passwordData.newPassword,
+        passwordData.confirmPassword
+      );
       setAlert({
         show: true,
         message: "Password reset successfully",
@@ -134,6 +129,7 @@ export function useProfile() {
       });
     }
   };
+
 
   return {
     user,

@@ -16,6 +16,11 @@ function PasswordDialog({
   setPasswordData,
   handlePasswordChange,
 }) {
+  const passwordsDoNotMatch =
+    passwordData.newPassword &&
+    passwordData.confirmPassword &&
+    passwordData.newPassword !== passwordData.confirmPassword;
+
   return (
     <Dialog
       open={open}
@@ -27,7 +32,7 @@ function PasswordDialog({
       <DialogTitle id="password-dialog-title">Reset Password</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} sx={{ mt: 1 }}>
-          <Grid size={{ xs: 12 }}>
+          <Grid size ={{ xs:12}}>
             <TextField
               fullWidth
               label="Current Password"
@@ -44,7 +49,7 @@ function PasswordDialog({
               size="small"
             />
           </Grid>
-          <Grid size={{ xs: 12 }}>
+          <Grid size ={{ xs:12}}>
             <TextField
               fullWidth
               label="New Password"
@@ -61,7 +66,7 @@ function PasswordDialog({
               size="small"
             />
           </Grid>
-          <Grid size={{ xs: 12 }}>
+          <Grid size ={{ xs:12}}>
             <TextField
               fullWidth
               label="Confirm New Password"
@@ -76,6 +81,8 @@ function PasswordDialog({
               }
               variant="outlined"
               size="small"
+              error={passwordsDoNotMatch}
+              helperText={passwordsDoNotMatch ? "Passwords do not match" : ""}
             />
           </Grid>
         </Grid>
@@ -84,7 +91,12 @@ function PasswordDialog({
         <Button onClick={onClose} variant="outlined">
           Cancel
         </Button>
-        <Button onClick={handlePasswordChange} variant="contained" color="success">
+        <Button
+          onClick={handlePasswordChange}
+          variant="contained"
+          color="success"
+          disabled={passwordsDoNotMatch}
+        >
           Reset Password
         </Button>
       </DialogActions>

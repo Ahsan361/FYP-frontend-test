@@ -30,8 +30,11 @@ function UserStatSection({ currentUser, formData }) {
           <Grid size={{ xs: 6 }}>
             <Typography variant="body1" fontWeight={600}>Member Since</Typography>
             <Typography variant="body2" color="text.secondary">
-              {currentUser.createdAt ? new Date(currentUser.createdAt).getFullYear() : 'N/A'}
+              {currentUser.createdAt
+                ? new Date(currentUser.createdAt).toLocaleString()
+                : "N/A"}
             </Typography>
+
           </Grid>
           <Grid size={{ xs: 6 }}>
             <Typography variant="body1" fontWeight={600}>Status</Typography>
