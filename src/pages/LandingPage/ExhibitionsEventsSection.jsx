@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 import { 
   Typography, Grid, Box, Container, Grow, Slide, Dialog, DialogTitle, 
   DialogContent, DialogActions, TextField, FormHelperText, Alert,
@@ -36,22 +37,21 @@ function ExhibitionsEventsSection() {
   const darkMode = useSelector((state) => state.theme.darkMode);
   const theme = darkMode ? darkTheme : lightTheme;
   const { user, loading: contextLoading } = useContext(UserContext); // Renamed for clarity
+  const navigate = useNavigate();
 
   // Fetch data when context finishes loading
   useEffect(() => {  
-    if (!contextLoading) { // Wait for context to finish loading
-      if (user && user.token) {
+      try {
         fetchData();
         fetchMyRegistrations();
-      } else {
-        console.log('No user or token available');
+      } catch(error) {
+        console.log('Error while fetching exhibitions data', error);
       }
-    }
-  }, [user, contextLoading]); // Dependencies are correct
+  }, []); // Dependencies are correct
 
   const fetchData = async () => {
     try {
-      const exhibitionsData = await getExhibitions(user.token);
+      const exhibitionsData = await getExhibitions();
       // Transform backend data to match frontend structure
       const transformedData = exhibitionsData.map((item, index) => {
         const startDate = item.start_date ? new Date(item.start_date) : null;
@@ -94,6 +94,7 @@ function ExhibitionsEventsSection() {
   };
 
   const fetchMyRegistrations = async () => {
+    if (!user) return;
     try {
       const registrations = await getMyExhibitionRegistrations(user.token);
       setMyRegistrations(registrations);
@@ -115,6 +116,10 @@ function ExhibitionsEventsSection() {
   };
 
   const handleRegisterClick = () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
     // Check if already registered
     const existingRegistration = myRegistrations.find(
       reg => reg.exhibition_id._id === selectedExhibition._id || reg.exhibition_id === selectedExhibition._id
@@ -599,23 +604,26 @@ function ExhibitionsEventsSection() {
                 >
                   Close
                 </Button>
-                {user && (
-                  <Button
-                    variant="contained"
-                    onClick={handleRegisterClick}
-                    disabled={isRegistered(selectedExhibition._id) || isFullyBooked(selectedExhibition)}
-                    sx={{ 
-                      backgroundColor: 'primary.main',
-                      '&:hover': { backgroundColor: 'primary.dark' }
-                    }}
-                  >
-                    {isRegistered(selectedExhibition._id) 
-                      ? 'Already Registered' 
-                      : isFullyBooked(selectedExhibition) 
-                        ? 'Fully Booked' 
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    handleRegisterClick();
+                  }}
+                  disabled={user && (isRegistered(selectedExhibition._id) || isFullyBooked(selectedExhibition))}
+                  sx={{ 
+                    backgroundColor: 'primary.main',
+                    '&:hover': { backgroundColor: 'primary.dark' }
+                  }}
+                >
+                  {!user
+                    ? 'Login to Register'
+                    : isRegistered(selectedExhibition._id)
+                      ? 'Already Registered'
+                      : isFullyBooked(selectedExhibition)
+                        ? 'Fully Booked'
                         : 'Register Now'}
-                  </Button>
-                )}
+                </Button>
+
               </DialogActions>
             </Box>
           </>
