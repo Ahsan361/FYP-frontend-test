@@ -46,7 +46,6 @@ function UserProfile() {
     handleUpdateProfile,
     handlePasswordChange,
   } = useProfile();
-
   const handleMobileMenuToggle = () => setMobileMenuOpen((prev) => !prev);
   const handleAlertClose = () => setAlert({ show: false });
 
@@ -81,8 +80,9 @@ function UserProfile() {
       </Box>
     );
   }
-
-  const currentUser = fetchedUser || user;
+  
+  const currentUser =  fetchedUser || user;
+  
 
   return (
     <ThemeProvider theme={theme}>

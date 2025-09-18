@@ -4,7 +4,6 @@ import { useTheme } from "@mui/material/styles";
 
 function ProfileAvatar({ formData, editMode, handleInputChange }) {
   const theme = useTheme();
-
   return (
     <Grid size={{ xs: 12, md: 4 }} sx={{ textAlign: "center" }}>
       <Avatar
@@ -17,7 +16,7 @@ function ProfileAvatar({ formData, editMode, handleInputChange }) {
           border: `2px solid ${theme.palette.primary.main}`,
         }}
       >
-        {(formData.first_name || formData.username)?.charAt(0).toUpperCase()}
+        {formData?.avatar? "": formData.first_name?.charAt(0).toUpperCase()}
       </Avatar>
       {editMode && (
         <TextField
