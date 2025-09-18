@@ -3,12 +3,11 @@ import axios from "axios";
 const API_URL = "http://localhost:5000/api/exhibitions"; // Adjust if different
 
 // Get all exhibitions
-export const getExhibitions = async (token) => {
-  const res = await axios.get(API_URL, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export const getExhibitions = async () => {
+  const res = await axios.get(API_URL);
   return res.data;
 };
+
 
 // Get single exhibition by ID
 export const getExhibitionById = async (id, token) => {
