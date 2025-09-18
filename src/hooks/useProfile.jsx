@@ -31,11 +31,11 @@ export function useProfile() {
       if (token) {
         try {
           const profileData = await getProfile(token);
-          setFetchedUser(profileData);
           const userWithToken = {
             ...profileData,
             token: token // or user?.token if it exists
           };
+          setFetchedUser(userWithToken);
           setFormData({
             username: profileData.username || "",
             email: profileData.email || "",

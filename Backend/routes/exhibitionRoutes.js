@@ -5,7 +5,7 @@ import { authorize } from "../middleware/rbac.js";
 
 const router = express.Router();
 //user routes
-router.get("/", protect, getExhibitions);                  //user specific route
+router.get("/", getExhibitions);                  //user specific route
 router.post("/", protect, authorize("admin"), createExhibition);          //admin specific route
 router.get("/stats", protect, authorize("admin"), getExhibitionStats)      //admin specific routes
 
