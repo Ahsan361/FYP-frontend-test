@@ -98,7 +98,7 @@ export const registerForExhibition = async (req, res) => {
       spots_requested,
       attendees,
       total_amount,
-      registration_status: "confirmed",
+      registration_status: "pending",
       confirmation_code: Math.random().toString(36).substring(2, 10).toUpperCase()
     });
 
