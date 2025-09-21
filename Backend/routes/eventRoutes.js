@@ -6,7 +6,7 @@ import { authorize } from "../middleware/rbac.js";
 const router = express.Router();
 
 router.post("/", protect, authorize("admin"), createEvent);          // admin specific route
-router.get("/", protect, getEvents);                      // Get all events
+router.get("/", getEvents);                      // Get all events
 router.get("/stats", protect, authorize("admin"), getEventStats);             // Get event stats
 
 router.get("/:id", protect, getEventById);                // Get one

@@ -4,10 +4,8 @@ const API_URL = "http://localhost:5000/api/events"; // Adjust if different
 const REGISTRATION_API_URL = "http://localhost:5000/api/event-registrations"; // Adjust if different
 
 // Get all events
-export const getEvents = async (token) => {
-  const res = await axios.get(API_URL, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+export const getEvents = async () => {
+  const res = await axios.get(API_URL);
   return res.data;
 };
 
