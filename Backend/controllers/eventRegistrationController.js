@@ -4,23 +4,101 @@ import Event from "../models/Event.js";
 // Register for an event
 export const registerForEvent = async (req, res) => {
   try {
-    const { event_id } = req.body;
+    const { event_id, spots_requested = 1, attendees = [] } = req.body;
+
+    // Validate spots_requested
+    if (spots_requested < 1 || spots_requested > 10) {
+      return res.status(400).json({ message: "Spots requested must be between 1 and 10" });
+    }
+
+    // Validate attendees array
+    if (attendees.length !== spots_requested) {
+      return res.status(400).json({ 
+        message: `Number of attendees (${attendees.length}) must match spots requested (${spots_requested})` 
+      });
+    }
+
     const event = await Event.findById(event_id);
     if (!event) return res.status(404).json({ message: "Event not found" });
 
-    if (event.requires_registration && event.max_attendees && event.current_registrations >= event.max_attendees) {
-      return res.status(400).json({ message: "Event is fully booked" });
+    // Check if user meets age restriction
+    if (event.age_restriction) {
+      const minAge = parseInt(event.age_restriction);
+      const underageAttendees = attendees.filter(attendee => attendee.age < minAge);
+      if (underageAttendees.length > 0) {
+        return res.status(400).json({ 
+          message: `All attendees must be at least ${minAge} years old. Found ${underageAttendees.length} underage attendee(s)` 
+        });
+      }
     }
 
+    // Check capacity (considering spots)
+    if (event.requires_registration && event.max_attendees && (event.current_registrations + spots_requested) > event.max_attendees) {
+      const availableSpots = event.max_attendees - event.current_registrations;
+      return res.status(400).json({ 
+        message: `Not enough spots available. Requested: ${spots_requested}, Available: ${availableSpots}` 
+      });
+    }
+
+    // Prevent duplicate registration for same event by the same user
+    const existing = await EventRegistration.findOne({
+      event_id,
+      user_id: req.body.user_id || req.user._id,
+      registration_status: { $ne: 'cancelled' }
+    });
+    if (existing) return res.status(400).json({ message: "Already registered for this event" });
+
+    // Validate CNIC format
+    const cnicRegex = /^\d{5}-\d{7}-\d{1}$/;
+    const invalidCNICs = attendees.filter(attendee => !cnicRegex.test(attendee.cnic));
+    if (invalidCNICs.length > 0) {
+      return res.status(400).json({ message: "Invalid CNIC format. Use format: 12345-1234567-1" });
+    }
+
+    // Check for duplicate CNICs in the same registration
+    const cnics = attendees.map(a => a.cnic);
+    const duplicateCNICs = cnics.filter((cnic, index) => cnics.indexOf(cnic) !== index);
+    if (duplicateCNICs.length > 0) {
+      return res.status(400).json({ message: "Duplicate CNICs found in the same registration" });
+    }
+
+    // Check if any CNIC already registered for this event
+    const existingRegistrations = await EventRegistration.find({
+      event_id,
+      registration_status: { $ne: 'cancelled' },
+      'attendees.cnic': { $in: cnics }
+    });
+
+    if (existingRegistrations.length > 0) {
+      const registeredCNICs = [];
+      existingRegistrations.forEach(reg => {
+        reg.attendees.forEach(attendee => {
+          if (cnics.includes(attendee.cnic)) {
+            registeredCNICs.push(attendee.cnic);
+          }
+        });
+      });
+      return res.status(400).json({ 
+        message: `The following CNICs are already registered for this event: ${[...new Set(registeredCNICs)].join(', ')}` 
+      });
+    }
+
+    // Calculate total amount
+    const total_amount = (event.entry_fee || 0) * spots_requested;
+
+    // Create registration
     const registration = await EventRegistration.create({
       ...req.body,
       user_id: req.body.user_id || req.user._id,
-      registration_status: "confirmed",
+      spots_requested,
+      attendees,
+      total_amount,
+      registration_status: "pending",
       confirmation_code: Math.random().toString(36).substring(2, 10).toUpperCase()
     });
 
-    // Update event registration count
-    event.current_registrations += 1;
+    // Update registrations (considering spots, not just +1)
+    event.current_registrations += spots_requested;
     await event.save();
 
     res.status(201).json(registration);
@@ -29,6 +107,7 @@ export const registerForEvent = async (req, res) => {
     res.status(500).json({ message: "Error registering for event", error: error.message });
   }
 };
+
 
 // Get all registrations for an event
 export const getRegistrationsForEvent = async (req, res) => {

@@ -464,7 +464,19 @@ function GenericSection({
                   )}
 
                   {item.description && item.description !== 'No description available.' && (
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3, flexGrow: 1 }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{
+                        mb: 3,
+                        flexGrow: 1,
+                        display: "-webkit-box",
+                        WebkitLineClamp: 3, // 👈 show only 3 lines
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
                       {item.description}
                     </Typography>
                   )}
