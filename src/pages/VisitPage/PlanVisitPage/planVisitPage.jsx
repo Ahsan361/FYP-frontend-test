@@ -14,7 +14,7 @@ import ExplorationSection from "./ExplorationSection";
 import TicketInfoSection from "./TicketInformationSection";
 import GallerySection from "./GallerySection";
 import ScheduleSection from "./ScheduleSection";
-import ExhibitionsEventsSection from "../../LandingPage/ExhibitionsEventsSection";
+import ExhibitionSection from "../../LandingPage/ExhibitionSection";
 
 function PlanVisitPage(){
     const darkMode = useSelector((state) => state.theme.darkMode);
@@ -52,7 +52,7 @@ function PlanVisitPage(){
             buttonText="Make a Donation"
         />
         {/* {Exhibition and Events Section} */}
-        <ExhibitionsEventsSection/>
+        <ExhibitionSection/>
         {/* {Schedule Section} */}
         <ScheduleSection />
         <Footer />
