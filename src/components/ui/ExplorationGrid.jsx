@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { ArrowForward } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
+import { useNavigate } from "react-router-dom";
 
 // Custom components
 import { lightTheme, darkTheme } from '../../styles/theme';
@@ -20,6 +21,7 @@ function ExplorationGrid({ title, subtitle, items }) {
   const darkMode = useSelector((state) => state.theme.darkMode);
   const theme = darkMode ? darkTheme : lightTheme;
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const navigate = useNavigate();
 
   return (    
     <Container maxWidth={false} sx={{ px: { xs: 2, md: 8 }, py: { xs: 4, md: 8 } }}>
@@ -63,6 +65,7 @@ function ExplorationGrid({ title, subtitle, items }) {
                       size="medium" 
                       fullWidth 
                       endIcon={<ArrowForward />}
+                      onClick={() => navigate(info.path)}
                     >
                       <Typography sx={{fontSize: {xs:"0.9rem", sm:"1rem", md:"1.5rem"}}}>
                         {info.actionText}

@@ -13,7 +13,8 @@ function ExplorationSection() {
       subtitle: "These free Museum Missions will get you and your family talking, laughing and learning as you explore the Museum with your phone or tablet.",
       icon: <EventSeat />,
       image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop",
-      actionText: "View Exibitions and Events"
+      actionText: "View Exibitions and Events",
+      path:"/explore"
     },
     {
       id: 2,
@@ -21,7 +22,8 @@ function ExplorationSection() {
       subtitle: "Take a fascinating journey of discovery around the Museum.",
       icon: <Map />,
       image: "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=250&fit=crop",
-      actionText: "View Gallery"
+      actionText: "View Gallery",
+      path:"/PlanVisitPage/object-trail"
     },
     {
       id: 3,
@@ -29,7 +31,8 @@ function ExplorationSection() {
       subtitle: "Choose an African adventure, Life in ancient Greece, or become an archaeologist. Explore the Museum with a fun-filled activity backpack.",
       icon: <Museum />,
       image: 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=300&h=200&fit=crop',
-      actionText: "Explore Galleries"
+      actionText: "Explore Galleries",
+      path:"/collections/galleries"
     },
     {
       id: 4,
@@ -37,7 +40,8 @@ function ExplorationSection() {
       subtitle: "From ancient armour to mummies, travel back in time on this captivating trail.",
       icon: <FamilyRestroom />,
       image: "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=400&h=250&fit=crop",
-      actionText: "Family Guide"
+      actionText: "Family Guide",
+      path:"/collections/online"
     }
   ];
 

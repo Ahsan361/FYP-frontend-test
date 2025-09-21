@@ -471,7 +471,7 @@ function GenericSection({
                         mb: 3,
                         flexGrow: 1,
                         display: "-webkit-box",
-                        WebkitLineClamp: 3, // 👈 show only 3 lines
+                        WebkitLineClamp: 3, //show only 3 lines for description
                         WebkitBoxOrient: "vertical",
                         overflow: "hidden",
                         textOverflow: "ellipsis",

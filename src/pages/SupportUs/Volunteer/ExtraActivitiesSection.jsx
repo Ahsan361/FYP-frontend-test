@@ -12,7 +12,8 @@ function ExtraActivitiesSection() {
     subtitle: "See every exhibition as many times as you want, and experience the depth and detail of the curators' work.",
     icon: <EventSeat />,
     image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop",
-    actionText: "Explore Exhibitions"
+    actionText: "Explore Exhibitions",
+    path:"/explore"
   },
   {
     id: 2,
@@ -20,7 +21,8 @@ function ExtraActivitiesSection() {
     subtitle: "Enjoy exclusive experiences, from lectures, tours and workshops to film screenings and free events.",
     icon: <Map />,
     image: "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=250&fit=crop",
-    actionText: "View Events"
+    actionText: "View Events",
+    path:"/explore"
   },
   {
     id: 3,
@@ -28,7 +30,8 @@ function ExtraActivitiesSection() {
     subtitle: "Find practical information, highlight trails and a wealth of ideas on what to see and do.",
     icon: <Museum />,
     image: "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=300&h=200&fit=crop",
-    actionText: "Plan Your Visit"
+    actionText: "Plan Your Visit",
+    path:"/PlanVisitPage"
   },
   {
     id: 4,
@@ -36,7 +39,8 @@ function ExtraActivitiesSection() {
     subtitle: "Relax and recharge then explore more of the Museum's collection.",
     icon: <FamilyRestroom />,
     image: "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=400&h=250&fit=crop",
-    actionText: "Visit Members' Room"
+    actionText: "Visit Members' Room",
+    path: "/membership/become-member"
   }
 ];
 
