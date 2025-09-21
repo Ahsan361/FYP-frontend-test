@@ -17,7 +17,8 @@ const themesInfo = [
     subtitle: "The Americas encapsulate the remarkable narratives of cultural achievement and human experience across two continents.",
     icon: <EventSeat />,
     image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop",
-    actionText: "View Exhibitions and Events"
+    actionText: "View Exhibitions and Events",
+    path:"/explore"
   },
   {
     id: 2,
@@ -25,7 +26,8 @@ const themesInfo = [
     subtitle: "Explore the many wild and wonderful depictions of animals found in the Museum's collection.",
     icon: <Map />,
     image: "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=250&fit=crop",
-    actionText: "View Gallery"
+    actionText: "View Gallery",
+    path:"/Collections/galleries"
   },
   {
     id: 3,
@@ -33,7 +35,8 @@ const themesInfo = [
     subtitle: "China is one of the world's oldest civilisations and home to a quarter of the world's population.",
     icon: <Museum />,
     image: "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=300&h=200&fit=crop",
-    actionText: "Explore Galleries"
+    actionText: "Explore Galleries",
+    path:"/Collections/galleries"
   },
   {
     id: 4,
@@ -41,7 +44,8 @@ const themesInfo = [
     subtitle: "Discover the many tales of death and memory from the Museum.",
     icon: <FamilyRestroom />,
     image: "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=400&h=250&fit=crop",
-    actionText: "Family Guide"
+    actionText: "Family Guide",
+    path:"/Collections/galleries"
   },
   {
     id: 5,
@@ -49,7 +53,8 @@ const themesInfo = [
     subtitle: "Delve into the Museum's stories from Africa.",
     icon: <Map />,
     image: "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=400&h=250&fit=crop",
-    actionText: "View Gallery"
+    actionText: "View Gallery",
+    path:"/Collections/galleries"
   }
 ];
 

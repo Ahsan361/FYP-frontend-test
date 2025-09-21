@@ -13,7 +13,9 @@ function ExplorationSection() {
       subtitle: "Discover our latest exhibitions and events, including 'Hiroshige: artist of the open road'.",
       icon: <EventSeat />,
       image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop",
-      actionText: "View Exibitions and Events"
+      actionText: "View Exibitions and Events",
+      path:"/explore"
+
     },
     {
       id: 2,
@@ -21,7 +23,8 @@ function ExplorationSection() {
       subtitle: "Walk through two million years of history and culture across more than 50 galleries.",
       icon: <Map />,
       image: "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=250&fit=crop",
-      actionText: "View Gallery"
+      actionText: "View Gallery",
+      path:"/collections/online"
     },
     {
       id: 3,
@@ -29,7 +32,8 @@ function ExplorationSection() {
       subtitle: "Our Audio app will help you make the most of your visit — available in multiple languages.",
       icon: <Museum />,
       image: 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=300&h=200&fit=crop',
-      actionText: "Explore Galleries"
+      actionText: "Explore Galleries",
+      path:"/galleries"
     },
     {
       id: 4,
@@ -37,7 +41,8 @@ function ExplorationSection() {
       subtitle: "From family facilities to activities and events, discover how to make the most of your day at the Museum.",
       icon: <FamilyRestroom />,
       image: "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=400&h=250&fit=crop",
-      actionText: "Family Guide"
+      actionText: "Family Guide",
+      path:"/PlanVisitPage/family",
     },
     {
       id: 5,
@@ -45,7 +50,8 @@ function ExplorationSection() {
       subtitle: "From ancient Egypt to the Americas, get to know more about the collection on a tour, at a talk or via one of our Hands on desks.",
       icon: <FamilyRestroom />,
       image: "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=400&h=250&fit=crop",
-      actionText: "Family Guide"
+      actionText: "Family Guide",
+      path:"/PlanVisitPage/group"
     },
     {
       id: 6,
@@ -53,7 +59,8 @@ function ExplorationSection() {
       subtitle: "Choose a trail and go on your very own fascinating tour around the Museum. Each tour showcases some of our spectacular objects on display.",
       icon: <FamilyRestroom />,
       image: "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=400&h=250&fit=crop",
-      actionText: "Family Guide"
+      actionText: "Family Guide",
+      path:"/PlanVisitPage/object-trail"
     }
   ];
 

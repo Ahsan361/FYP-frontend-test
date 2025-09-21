@@ -108,7 +108,6 @@ export const registerForEvent = async (req, res) => {
   }
 };
 
-
 // Get all registrations for an event
 export const getRegistrationsForEvent = async (req, res) => {
   try {

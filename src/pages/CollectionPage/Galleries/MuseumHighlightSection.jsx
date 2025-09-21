@@ -12,7 +12,8 @@ function MuseumHighlightSection() {
       subtitle: "Travel back through 3,000 years of history via our timeline and gallery. Discover the Rosetta Stone, Statue of Ramesses II and more.",
       icon: <EventSeat />,
       image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop",
-      actionText: "View Exibitions and Events"
+      actionText: "View Exibitions and Events",
+      path:"/explore"
     },
     {
       id: 2,
@@ -20,7 +21,8 @@ function MuseumHighlightSection() {
       subtitle: "The Sainsbury Africa Galleries reveal the extraordinary cultural, artistic and historical diversity and complexity of the continent.",
       icon: <Map />,
       image: "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=250&fit=crop",
-      actionText: "View Gallery"
+      actionText: "View Gallery",
+      path:"/collections/online"
     },
     {
       id: 3,
@@ -28,7 +30,8 @@ function MuseumHighlightSection() {
       subtitle: "Spanning over 700 years, this Room traces the story ofEurope from 300 AD.",
       icon: <Museum />,
       image: 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=300&h=200&fit=crop',
-      actionText: "Explore Galleries"
+      actionText: "Explore Galleries",
+      path:"/collections/online"
     },
     {
       id: 4,
@@ -36,7 +39,8 @@ function MuseumHighlightSection() {
       subtitle: "The objects in Room 70 illustrate the rise of Rome from a small town to an imperial capital.",
       icon: <FamilyRestroom />,
       image: "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=400&h=250&fit=crop",
-      actionText: "Family Guide"
+      actionText: "Family Guide",
+      path:"/PlanVisitPage/family"
     }
   ];
 
