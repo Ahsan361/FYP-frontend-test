@@ -1,12 +1,13 @@
 import React from 'react';
 import { Typography, Grid, Box, Container, Grow, Slide } from '@mui/material';
 import { EventSeat, Map, Museum, FamilyRestroom, ArrowForward} from '@mui/icons-material';
+import { useNavigate } from "react-router-dom";
 
 // Custom components
 import { Card, Button } from '../../components/ui';
 
 function VisitMuseumSection() {
-
+  const navigate = useNavigate();
   const visitInfo = [
     {
       id: 1,
@@ -14,7 +15,8 @@ function VisitMuseumSection() {
       subtitle: "Book tickets and plan your day including exhibitions, facilities, access, food and travel.",
       icon: <EventSeat />,
       image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop",
-      actionText: "Book Tickets"
+      actionText: "Book Tickets",
+      path:"/PlanVisitPage"
     },
     {
       id: 2,
@@ -22,7 +24,8 @@ function VisitMuseumSection() {
       subtitle: "Navigate the Museum with ease, using our floor-by-floor plan and discover what not to miss.",
       icon: <Map />,
       image: "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=250&fit=crop",
-      actionText: "View Map"
+      actionText: "View Map",
+      path:"/PlanVisitPage/map"
     },
     {
       id: 3,
@@ -30,7 +33,8 @@ function VisitMuseumSection() {
       subtitle: "Walk through two million years of history and culture across more than 50 galleries.",
       icon: <Museum />,
       image: 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=300&h=200&fit=crop',
-      actionText: "Explore Galleries"
+      actionText: "Explore Galleries",
+      path:"/collections/online"      
     },
     {
       id: 4,
@@ -38,7 +42,8 @@ function VisitMuseumSection() {
       subtitle: "From family facilities to activities and events, discover how to make the most of your day at the Museum.",
       icon: <FamilyRestroom />,
       image: "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=400&h=250&fit=crop",
-      actionText: "Family Guide"
+      actionText: "Family Guide",
+      path:"/PlanVisitPage/family"      
     }
   ];
 
@@ -78,6 +83,7 @@ function VisitMuseumSection() {
                       size="small" 
                       fullWidth 
                       endIcon={<ArrowForward />}
+                      onClick={() => navigate(info.path)}
                     >
                       {info.actionText}
                     </Button>
