@@ -11,7 +11,7 @@ import { lightTheme, darkTheme } from '../../styles/theme';
 import LoadingBackground from "../../components/ui/LoadingBackground"
 
 import StaticHeroSection from './StaticHeroSection';
-import ExhibitionsEventsSection from './ExhibitionsEventsSection';
+import ExhibitionSection from './ExhibitionSection';
 import CollectionSection from './CollectionSection';
 import QuickActionsSection from './QuickActionsSection';
 import NewsletterSection from './NewsletterSection';
@@ -66,7 +66,7 @@ function LandingPage() {
       <StatisticsSection/>
 
       {/* {ArtifactsSection} */}
-      <ExhibitionsEventsSection/>
+      <ExhibitionSection/>
       {/* Collections Section */}
       <CollectionSection/>
       {/* {Visit Museum Section} */}

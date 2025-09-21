@@ -19,7 +19,7 @@ import { createExhibitionRegistration, getMyExhibitionRegistrations } from '../.
 // User context
 import { UserContext } from '../../contexts/UserContext';
 
-function ExhibitionsEventsSection() {
+function ExhibitionSection() {
   const [exhibitions, setExhibitions] = useState([]);
   const [selectedExhibition, setSelectedExhibition] = useState(null);
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
@@ -538,13 +538,13 @@ function ExhibitionsEventsSection() {
               
               <DialogContent sx={{ p: 0, color: 'white' }}>
                 <Grid container spacing={3}>
-                  <Grid xs={12} md={8}>
+                  <Grid size={{xs:12, md:8}}>
                     <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.6 }}>
                       {selectedExhibition.description}
                     </Typography>
                   </Grid>
                   
-                  <Grid xs={12} md={4}>
+                  <Grid size={{xs:12, md:4}}>
                     <Box sx={{ space: 2 }}>
                       {selectedExhibition.dates && selectedExhibition.dates !== 'Dates TBD' && (
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -802,4 +802,4 @@ function ExhibitionsEventsSection() {
   );
 }
 
-export default ExhibitionsEventsSection;
+export default ExhibitionSection;
