@@ -14,9 +14,91 @@ const userSchema = new mongoose.Schema(
     is_active: { type: Boolean, default: true },
     email_verified: { type: Boolean, default: false },
     last_login: { type: Date },
+    
+    // Email verification fields
+    verification_otp: { type: String },
+    otp_expires_at: { type: Date },
+    otp_attempts: { type: Number, default: 0 },
+    created_at_unverified: { type: Date }, // Track when unverified user was created
   },
   { timestamps: true }
 );
+
+// Password validation function
+userSchema.statics.validatePassword = function(password) {
+  const errors = [];
+  
+  if (password.length < 8) {
+    errors.push("Password must be at least 8 characters long");
+  }
+  if (!/(?=.*[a-z])/.test(password)) {
+    errors.push("Password must contain at least one lowercase letter");
+  }
+  if (!/(?=.*[A-Z])/.test(password)) {
+    errors.push("Password must contain at least one uppercase letter");
+  }
+  if (!/(?=.*\d)/.test(password)) {
+    errors.push("Password must contain at least one number");
+  }
+  if (!/(?=.*[@$!%*?&])/.test(password)) {
+    errors.push("Password must contain at least one special character (@$!%*?&)");
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+};
+
+// Generate OTP
+userSchema.methods.generateOTP = function() {
+  const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+  this.verification_otp = otp;
+  this.otp_expires_at = new Date(Date.now() + 1 * 60 * 1000); // 15 minutes
+  this.otp_attempts = 0;
+  return otp;
+};
+
+// Verify OTP
+userSchema.methods.verifyOTP = function(inputOtp) {
+  if (!this.verification_otp || !this.otp_expires_at) {
+    return { success: false, message: "No OTP found. Please request a new one." };
+  }
+  
+  if (new Date() > this.otp_expires_at) {
+    return { success: false, message: "OTP has expired. Please request a new one." };
+  }
+  
+  if (this.otp_attempts >= 5) {
+    return { success: false, message: "Too many failed attempts. Please request a new OTP." };
+  }
+  
+  if (this.verification_otp !== inputOtp) {
+    this.otp_attempts += 1;
+    return { 
+      success: false, 
+      message: `Invalid OTP. ${5 - this.otp_attempts} attempts remaining.` 
+    };
+  }
+  
+  // Success - clear OTP fields and verify email
+  this.verification_otp = undefined;
+  this.otp_expires_at = undefined;
+  this.otp_attempts = 0;
+  this.email_verified = true;
+  this.created_at_unverified = undefined;
+  
+  return { success: true, message: "Email verified successfully!" };
+};
+
+// Clear expired OTP
+userSchema.methods.clearExpiredOTP = function() {
+  if (this.otp_expires_at && new Date() > this.otp_expires_at) {
+    this.verification_otp = undefined;
+    this.otp_expires_at = undefined;
+    this.otp_attempts = 0;
+  }
+};
 
 // Hash password before saving
 userSchema.pre("save", async function (next) {
@@ -30,6 +112,18 @@ userSchema.pre("save", async function (next) {
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password_hash);
 };
+
+// Index for cleanup job
+userSchema.index({ 
+  created_at_unverified: 1, 
+  email_verified: 1 
+}, { 
+  expireAfterSeconds: 86400, // 24 hours
+  partialFilterExpression: { 
+    email_verified: false,
+    created_at_unverified: { $exists: true }
+  }
+});
 
 const User = mongoose.model("User", userSchema);
 export default User;

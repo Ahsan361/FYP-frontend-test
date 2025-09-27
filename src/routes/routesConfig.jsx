@@ -26,12 +26,14 @@ import Register from "../pages/Authentication/RegistrationPage";
 import AdminPanel from "../pages/AdminPanel/AdminPanel";
 import UserPanel from "../pages/UserPanel/UserPanel";
 import UserProfile from "../pages/UserProfile/UserProfile"
+import EmailVerification from "../pages/Authentication/EmailVerification"
 
 // map paths to components
 const routesConfig = [
   { path: routes.home, element: <LandingPage /> },
   { path: routes.login, element: <Login /> },
   { path: routes.register, element: <Register /> },
+  { path: routes.verify_email, element: <EmailVerification /> },
   { path: routes.admin , element: <AdminPanel /> },
   { path: routes.user , element: <UserPanel /> },
   { path: routes.profile, element: <UserProfile />},

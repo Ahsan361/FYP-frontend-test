@@ -4,6 +4,7 @@ const routes = {
   home: "/",
   login: "/login", 
   register: "/register",
+  verify_email: "verify-email",
   admin: "/adminDashboard",
   user: "/userDashboard",
   profile: "/profile",

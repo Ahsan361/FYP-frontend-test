@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react"; 
 
-//user context
+import { Eye, EyeOff, CheckCircle, AlertCircle, Info } from "lucide-react";
+//context for user
 import { UserContext } from "../../contexts/UserContext";
 
-// Reuse the animated background class
+ //auth service
+import { registerUser } from "../../services/authService";
+
+// FlowingLines class remains unchanged
 class FlowingLines {
   constructor(canvas) {
     this.canvas = canvas;
@@ -120,7 +122,14 @@ function Register({ onRegister }) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // 👈 Add state for password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordValidation, setPasswordValidation] = useState({
+    minLength: false,
+    hasLower: false,
+    hasUpper: false,
+    hasNumber: false,
+    hasSpecial: false
+  });
 
   const canvasRef = useRef(null);
   const flowingLinesRef = useRef(null);
@@ -134,6 +143,16 @@ function Register({ onRegister }) {
     };
   }, []);
 
+  useEffect(() => {
+    setPasswordValidation({
+      minLength: password.length >= 8,
+      hasLower: /(?=.*[a-z])/.test(password),
+      hasUpper: /(?=.*[A-Z])/.test(password),
+      hasNumber: /(?=.*\d)/.test(password),
+      hasSpecial: /(?=.*[@$!%*?&])/.test(password)
+    });
+  }, [password]);
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
@@ -141,29 +160,47 @@ function Register({ onRegister }) {
     setLoading(true);
 
     try {
-      const { data } = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/register`,
-        {
-          username,
-          email,
-          password_hash: password,
-        }
-      );
+      const data = await registerUser({
+        username,
+        email,
+        password_hash: password,
+      });
 
-      localStorage.setItem("token", data.token);
-      setUser(data);
-      setSuccess("✅ Registration successful! Redirecting...");
-      onRegister?.(data);
-
-      setTimeout(() => navigate("/"), 1500);
+      if (data.requiresVerification) {
+        navigate("/verify-email", {
+          state: {
+            userId: data.userId,
+            email: data.email
+          }
+        });
+      } else {
+        localStorage.setItem("token", data.token);
+        setUser(data);
+        setSuccess("✅ Registration successful! Redirecting...");
+        onRegister?.(data);
+        setTimeout(() => navigate("/"), 1500);
+      }
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
+      if (err.response?.data?.errors) {
+        setError(err.response.data.errors.join(". "));
+      } else if (err.response?.data?.requiresVerification) {
+        navigate("/verify-email", {
+          state: {
+            userId: err.response.data.userId,
+            email: err.response.data.email
+          }
+        });
+      } else {
+        setError(err.response?.data?.message || "Registration failed");
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // --- STYLES (reused from Login) ---
+  const isPasswordValid = Object.values(passwordValidation).every(Boolean);
+
+  // Styles remain unchanged
   const containerStyle = {
     position: "relative",
     minHeight: "100vh",
@@ -181,7 +218,7 @@ function Register({ onRegister }) {
   const canvasStyle = { position: "absolute", width: "100%", height: "100%", opacity: 0.8 };
   const overlayStyle = { position: "absolute", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0, 0, 0, 0.4)", zIndex: 1 };
   const contentStyle = { position: "relative", zIndex: 2, minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", padding: "20px" };
-  const cardStyle = { background: "rgba(255, 255, 255, 0.1)", backdropFilter: "blur(20px)", border: "1px solid rgba(255, 255, 255, 0.2)", borderRadius: "20px", padding: "40px", maxWidth: "450px", width: "100%", boxShadow: "0 25px 45px rgba(0, 0, 0, 0.1)" };
+  const cardStyle = { background: "rgba(255, 255, 255, 0.1)", backdropFilter: "blur(20px)", border: "1px solid rgba(255, 255, 255, 0.2)", borderRadius: "20px", padding: "40px", maxWidth: "480px", width: "100%", boxShadow: "0 25px 45px rgba(0, 0, 0, 0.1)" };
   const titleStyle = { color: "#fff", fontSize: "2.5rem", fontWeight: 700, marginBottom: "10px", textAlign: "center" };
   const subtitleStyle = { color: "rgba(255, 255, 255, 0.8)", fontSize: "1rem", textAlign: "center", marginBottom: "30px" };
   const inputStyle = { 
@@ -194,7 +231,7 @@ function Register({ onRegister }) {
     fontSize: "16px", 
     outline: "none", 
     boxSizing: "border-box",
-    lineHeight: "18px" // 👈 Added from Login for consistency
+    lineHeight: "18px"
   };
   const buttonStyle = { 
     width: "100%", 
@@ -234,6 +271,28 @@ function Register({ onRegister }) {
           border-radius: 4px;
           padding: 2px 4px !important;
         }
+        .password-requirement {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 12px;
+          margin-bottom: 4px;
+          color: rgba(255, 255, 255, 0.7);
+          transition: color 0.3s ease;
+        }
+        .password-requirement.valid {
+          color: #4caf50;
+        }
+        .password-requirement.invalid {
+          color: rgba(255, 255, 255, 0.5);
+        }
+        .requirements-container {
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 8px;
+          padding: 12px;
+          margin-top: 8px;
+          border-left: 3px solid rgba(255, 255, 255, 0.3);
+        }
       `}</style>
       <div style={videoContainerStyle}>
         <canvas ref={canvasRef} style={canvasStyle} />
@@ -246,7 +305,7 @@ function Register({ onRegister }) {
           <p style={subtitleStyle}>Join our cultural heritage community</p>
 
           <form onSubmit={handleRegister}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom:"2rem" }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom:"1.5rem" }}>
               <input 
                 type="text" 
                 placeholder="Username" 
@@ -267,46 +326,83 @@ function Register({ onRegister }) {
                 required 
                 disabled={loading} 
               />
-              <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Password"
-                  style={{ ...inputStyle, paddingRight: "40px" }}
-                  className="form-input"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={loading}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    color: "#fff",
-                    padding: 0,
-                    width: "24px",
-                    height: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    position: "absolute",
-                    right: "12px",
-                  }}
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    style={{ ...inputStyle, paddingRight: "40px" }}
+                    className="form-input"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "#fff",
+                      padding: 0,
+                      width: "24px",
+                      height: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      position: "absolute",
+                      right: "12px",
+                    }}
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+                
+                {password && (
+                  <div className="requirements-container">
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", fontSize: "13px", color: "rgba(255,255,255,0.8)" }}>
+                      <Info size={14} />
+                      <span>Password Requirements:</span>
+                    </div>
+                    <div className={`password-requirement ${passwordValidation.minLength ? 'valid' : 'invalid'}`}>
+                      {passwordValidation.minLength ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
+                      <span>At least 8 characters</span>
+                    </div>
+                    <div className={`password-requirement ${passwordValidation.hasLower ? 'valid' : 'invalid'}`}>
+                      {passwordValidation.hasLower ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
+                      <span>One lowercase letter</span>
+                    </div>
+                    <div className={`password-requirement ${passwordValidation.hasUpper ? 'valid' : 'invalid'}`}>
+                      {passwordValidation.hasUpper ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
+                      <span>One uppercase letter</span>
+                    </div>
+                    <div className={`password-requirement ${passwordValidation.hasNumber ? 'valid' : 'invalid'}`}>
+                      {passwordValidation.hasNumber ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
+                      <span>One number</span>
+                    </div>
+                    <div className={`password-requirement ${passwordValidation.hasSpecial ? 'valid' : 'invalid'}`}>
+                      {passwordValidation.hasSpecial ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
+                      <span>One special character (@$!%*?&)</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
+            
             {error && <div style={errorStyle}>{error}</div>}
             {success && <div style={successStyle}>{success}</div>}
+            
             <button 
               type="submit" 
-              style={buttonStyle} 
+              style={{
+                ...buttonStyle,
+                opacity: !isPasswordValid && password ? 0.6 : 1,
+                cursor: (!isPasswordValid && password) || loading ? "not-allowed" : "pointer"
+              }} 
               className="login-btn"
-              disabled={loading}
+              disabled={loading || (!isPasswordValid && password)}
             >
               {loading ? "Creating Account..." : "Register"}
             </button>

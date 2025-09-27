@@ -1,15 +1,10 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
-import axios from "axios";
 import { Eye, EyeOff } from "lucide-react"; 
 import { useNavigate } from "react-router-dom";
-
-//user context 
 import { UserContext } from "../../contexts/UserContext";
+import { loginUser } from "../../services/authService";
 
-//custom components
-import LoadingBackground from "../../components/ui/LoadingBackground";
-
-// Animated background class
+// FlowingLines class remains unchanged
 class FlowingLines {
   constructor(canvas) {
     this.canvas = canvas;
@@ -39,7 +34,6 @@ class FlowingLines {
     window.addEventListener('resize', handleResize);
     this.canvas.addEventListener('mousemove', handleMouseMove);
     
-    // Store references for cleanup
     this.cleanupFunctions = [
       () => window.removeEventListener('resize', handleResize),
       () => this.canvas.removeEventListener('mousemove', handleMouseMove)
@@ -159,28 +153,39 @@ function Login({ onLogin }) {
     setLoading(true);
 
     try {
-      const { data } = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, {
+      const data = await loginUser({
         email,
         password_hash: password,
       });
       
       const userWithToken = {
         ...data,
-        token: data.token // Make sure token is part of the user object
+        token: data.token
       };
       localStorage.setItem("token", data.token);
       setUser(userWithToken);
 
       onLogin?.(userWithToken);
       
-      // Navigate based on user role
       if (data.role === "admin") { 
         navigate("/adminDashboard");
       } else {
         navigate("/");
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
+      if (err.response?.data?.requiresVerification) {
+        setSuccess(err.response.data.message); // Show the message
+        setTimeout(() => {
+          navigate("/verify-email", {
+            state: {
+              userId: err.response.data.userId,
+              email: err.response.data.email
+            }
+          });
+        }, 2000); // Delay navigation to show the message
+      } else {
+        setError(err.response?.data?.message || "An error occurred during login");
+      }
     } finally {
       setLoading(false);
     }
@@ -208,8 +213,6 @@ function Login({ onLogin }) {
     height: '100%',
     zIndex: -1,
     background: 'linear-gradient(135deg, #0F2920 0%, #2D5A3D 100%)',
-    // background: 'linear-gradient(135deg, #1B4332 0%, #616161 100%)',
-
   };
 
   const canvasStyle = {
@@ -278,28 +281,28 @@ function Login({ onLogin }) {
     marginBottom: '30px',
   };
 
-const inputStyle = {
-  width: '100%',
-  padding: '15px 20px',
-  background: 'rgba(255, 255, 255, 0.1)',
-  border: '1px solid rgba(255, 255, 255, 0.3)',
-  borderRadius: '12px',
-  color: '#fff',
-  fontSize: '16px',
-  transition: 'all 0.3s ease',
-  backdropFilter: 'blur(10px)',
-  outline: 'none',
-  boxSizing: 'border-box',
-  lineHeight: '18px', // 👈 Match content height to reduce internal spacing
-};
+  const inputStyle = {
+    width: '100%',
+    padding: '15px 20px',
+    background: 'rgba(255, 255, 255, 0.1)',
+    border: '1px solid rgba(255, 255, 255, 0.3)',
+    borderRadius: '12px',
+    color: '#fff',
+    fontSize: '16px',
+    transition: 'all 0.3s ease',
+    backdropFilter: 'blur(10px)',
+    outline: 'none',
+    boxSizing: 'border-box',
+    lineHeight: '18px',
+  };
 
   const buttonStyle = {
     width: '100%',
     padding: '15px',
-     background: loading 
-    ? 'rgba(153, 153, 153, 0.6)' 
-    : 'linear-gradient(135deg, #1B4332 0%, #2D5A3D 100%)', // green gradient
-    color: '#FFFFFF', // white text for contrast
+    background: loading 
+      ? 'rgba(153, 153, 153, 0.6)' 
+      : 'linear-gradient(135deg, #1B4332 0%, #2D5A3D 100%)',
+    color: '#FFFFFF',
     border: 'none',
     borderRadius: '12px',
     fontSize: '16px',
@@ -408,12 +411,10 @@ const inputStyle = {
         }
       `}</style>
       
-      {/* Animated Background */}
       <div style={videoContainerStyle}>
         <canvas ref={canvasRef} style={canvasStyle} />
         <div style={overlayStyle} />
         
-        {/* Floating Elements */}
         <div 
           style={{
             ...floatingElementStyle,
@@ -446,7 +447,6 @@ const inputStyle = {
         />
       </div>
 
-      {/* Login Form */}
       <div style={contentStyle}>
         <div style={cardStyle} className="login-card">
           <div>
@@ -508,7 +508,7 @@ const inputStyle = {
             )}
             {success && (
               <div style={successStyle}>
-                <LoadingBackground message="Redirecting..." size={50} />
+                {success}
               </div>
             )}
             <button
