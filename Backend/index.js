@@ -1,7 +1,13 @@
-import express from "express";
+// Load environment variables FIRST - before any other imports that might use them
 import dotenv from "dotenv";
+dotenv.config();
+
+import express from "express";
 import cors from "cors";
 import connectDB from "./config/db.js";
+import CleanupService from "./services/CleanupService.js"; // Add cleanup service
+
+// Import routes
 import artifactRoutes from "./routes/artifactRoutes.js";
 import artifactMediaRoutes from "./routes/artifactMediaRoutes.js";
 import blockchainRoutes from "./routes/blockchainRoutes.js";
@@ -17,18 +23,25 @@ import userRoutes from "./routes/userRoutes.js";
 import EventRegistration from "./routes/eventRegistrationRoutes.js"
 import ExhibitionRegistration from "./routes/exhibitionRegistrationRoutes.js"
 
-dotenv.config();
+// Connect to database
 connectDB();
+
+// Debug: Check if environment variables are loaded
+console.log("🔍 Environment Check:");
+console.log("MONGO_URI:", process.env.MONGO_URI ? "✅ Loaded" : "❌ Missing");
+console.log("JWT_SECRET:", process.env.JWT_SECRET ? "✅ Loaded" : "❌ Missing");
+console.log("EMAIL_USER:", process.env.EMAIL_USER ? "✅ Loaded" : "❌ Missing");
+console.log("EMAIL_APP_PASSWORD:", process.env.EMAIL_APP_PASSWORD ? "✅ Loaded" : "❌ Missing");
 
 const app = express();
 app.use(express.json());
 
 app.use(cors({
   origin: "http://localhost:5173",  // frontend URL
-  credentials: true,                 // if you’re sending cookies or auth headers
+  credentials: true,                 // if you're sending cookies or auth headers
 }));
 
-// Mount your routers after the guard:
+// Mount your routers
 app.use("/api/artifacts", artifactRoutes);
 app.use("/api/artifact-media", artifactMediaRoutes);
 app.use("/api/blockchain", blockchainRoutes);
@@ -44,10 +57,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/event-registrations", EventRegistration)
 app.use("/api/exhibition-registrations", ExhibitionRegistration)
 
-
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
-
