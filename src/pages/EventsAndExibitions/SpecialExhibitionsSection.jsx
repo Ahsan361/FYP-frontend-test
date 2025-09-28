@@ -5,39 +5,42 @@ function SpecialExhibitionsSection() {
   const { filters } = useEventsFilter();
 
  const SpecialExhibitionsInfo = [
-    { 
+    {
       id: 1,
-      title: "Deities, demons and mischief-makers",
-      type: "Performance",
+      title: "Colors of Tradition: Painted Lamps of Pakistan",
+      type: "Exhibition",
       dates: "7 January 2026",
       status: "Book Now",
       statusColor: "success",
-      image: "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=300&fit=crop",
-      description: "Gather the family for storytelling sessions evoking the colourful, sensory and atmospheric world of our current 'Ancient Indial exhibition.",
-      actionText: "Explore More"
+      image: "/assets/pages/e1.jpg",
+      description:
+        "Explore the vibrant artistry of hand-painted lamps, a traditional craft that lights up Pakistan’s cultural heritage with colors, motifs, and stories.",
+      actionText: "Explore More",
     },
-    { 
+    {
       id: 2,
-      title: "Little Feet: teddies on holiday",
+      title: "Heritage in Focus: Crafting Stories",
       type: "Family activity",
       dates: "15 March - 30 August 2025",
       status: "Free",
       statusColor: "success",
-      image: "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=300&fit=crop",
-      description: "Join the Little Feet teddies on their summer holidays through fun experiences and activities in this drop-in session for under-fives.",
-      actionText: "Explore More"
+      image: "/assets/pages/s2.jpg",
+      description:
+        "A hands-on journey for families to experience Pakistani crafts — from pottery to weaving — celebrating creativity and cultural identity.",
+      actionText: "Explore More",
     },
-     { 
+    {
       id: 3,
-      title: "Little Feet: teddies on holiday",
-      type: "Performance",
-      dates: "13 August 2025",
-      status: "Free",
+      title: "Gallery of Heritage: Visual Stories of Pakistan",
+      type: "Exhibition",
+      dates: "10 December 2025 - 20 March 2026",
+      status: "Book Now",
       statusColor: "success",
-      image: "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=300&fit=crop",
-      description: "Join the Little Feet teddies on their summer holidays through fun experiences and activities in this drop-in session for under-fives.",
-      actionText: "Explore More"
-    }
+      image: "/assets/pages/s3.jpg",
+      description:
+        "Step into a curated gallery featuring paintings, photographs, and artifacts that narrate Pakistan’s cultural and historical journey through powerful visuals.",
+      actionText: "Explore More",
+    },
   ];
   // Apply global filter
   const filteredItems = SpecialExhibitionsInfo.filter(event => {
