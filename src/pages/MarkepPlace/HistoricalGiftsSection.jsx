@@ -50,7 +50,10 @@ function HistoricalGiftsSection() {
   return (
     <ThemeProvider theme={theme}>
         <CssBaseline />
-        <CardsGrid categories={historical_gifts_categories} />
+        <CardsGrid 
+          categories={historical_gifts_categories} 
+          title={"The Pakistan Museum Shop - Historical Gifts and Souvenirs"}
+        />
     </ThemeProvider>
   );
 }
