@@ -63,7 +63,7 @@ class EmailService {
             </div>
             
             <p style="color: rgba(255, 255, 255, 0.8); font-size: 0.9rem; text-align: center; margin: 20px 0;">
-              This verification code will expire in <strong>15 minutes</strong>
+              This verification code will expire in <strong>3 minutes</strong>
             </p>
             
             <div style="background: rgba(255, 193, 7, 0.1); border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
