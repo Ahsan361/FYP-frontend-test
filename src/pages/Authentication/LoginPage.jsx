@@ -465,6 +465,7 @@ function Login({ onLogin }) {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
+                pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
               />
               <div style={{ position: "relative" }}>
                 <input

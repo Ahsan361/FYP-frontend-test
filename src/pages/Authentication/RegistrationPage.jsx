@@ -127,9 +127,6 @@ function Register({ onRegister }) {
   const [usernameValidation, setUsernameValidation] = useState({
     minLength: false,
     maxLength: false,
-    validChars: false,
-    noConsecutive: false,
-    noEdgeDots: false
   });
   const [passwordValidation, setPasswordValidation] = useState({
     minLength: false,
@@ -166,16 +163,10 @@ function Register({ onRegister }) {
   useEffect(() => {
     const minLength = username.length >= 3;
     const maxLength = username.length <= 30;
-    const validChars = /^[a-zA-Z0-9._]+$/.test(username);
-    const noConsecutive = !/([._])\1/.test(username); // no consecutive . or _
-    const noEdgeDots = username.length > 0 ? !/^[._]|[._]$/.test(username) : false;
 
     setUsernameValidation({
       minLength,
       maxLength,
-      validChars,
-      noConsecutive,
-      noEdgeDots
     });
   }, [username]);
 
@@ -364,18 +355,6 @@ function Register({ onRegister }) {
                   <div className={`password-requirement ${usernameValidation.maxLength ? 'valid' : 'invalid'}`}>
                     {usernameValidation.maxLength ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
                     <span>At max 30 characters</span>
-                  </div>
-                  <div className={`password-requirement ${usernameValidation.validChars ? 'valid' : 'invalid'}`}>
-                    {usernameValidation.validChars ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
-                    <span>Only letters, numbers, . or _</span>
-                  </div>
-                  <div className={`password-requirement ${usernameValidation.noConsecutive ? 'valid' : 'invalid'}`}>
-                    {usernameValidation.noConsecutive ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
-                    <span>No consecutive . or _</span>
-                  </div>
-                  <div className={`password-requirement ${usernameValidation.noEdgeDots ? 'valid' : 'invalid'}`}>
-                    {usernameValidation.noEdgeDots ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
-                    <span>Cannot start or end with . or _</span>
                   </div>
                 </div>
               )}
