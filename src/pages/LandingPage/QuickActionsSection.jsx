@@ -21,9 +21,9 @@ function QuickActionsSection(){
                   Experience History Like Never Before
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 4, fontSize: '1.1rem', lineHeight: 1.7 }}>
-                  Take virtual tours, access educational resources, and contribute to preserving 
-                  Pakistan's cultural legacy. Our digital platform brings ancient history to life 
-                  with cutting-edge technology.
+                  Explore Pakistan's history and rich history and contribute to
+                  preserving Pakistan's cultural legacy. Our digital platform
+                  brings ancient history to life.
                 </Typography>
                 
                 <Stack direction={isMobile ? "column" : "row"} spacing={2} sx={{ mb: 4 }}>
@@ -33,7 +33,7 @@ function QuickActionsSection(){
                     startIcon={<PlayArrow />}
                     sx={{ flex: isMobile ? 'none' : 1 }}
                   >
-                    Virtual Tour
+                    Watch
                   </Button>
                   <Button 
                     variant="outlined" 
@@ -64,7 +64,7 @@ function QuickActionsSection(){
               >
                 <Box
                   component="img"
-                  src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=400&fit=crop"
+                  src="/assets/landing-page/visit-the-museum/visit-the-museum.jpg"
                   alt="Cultural Heritage"
                   sx={{
                     width: '100%',
