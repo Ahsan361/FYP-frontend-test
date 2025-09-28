@@ -31,6 +31,7 @@ function GenericSection({
   const [myRegistrations, setMyRegistrations] = useState([]);
   const [submittingRegistration, setSubmittingRegistration] = useState(false);
   const [errors, setErrors] = useState({});
+  const [dialogError, setDialogError] = useState('');
   const [registrationData, setRegistrationData] = useState({
     special_requirements: '',
     spots_requested: 1,
@@ -219,11 +220,10 @@ function GenericSection({
       
     } catch (error) {
       console.error('Registration error:', error);
-      setAlert({
-        show: true,
-        message: error.response?.data?.message || 'Registration failed. Please try again.',
-        severity: 'error'
-      });
+       const backendMsg = error.response?.data?.message;
+
+      // Save error for dialog
+      setDialogError(backendMsg || 'Registration failed. Please try again.');
     } finally {
       setSubmittingRegistration(false);
     }
@@ -313,6 +313,8 @@ function GenericSection({
         newErrors[`attendee_${index}_age`] = 'Valid age is required';
       } else if (minAge && attendee.age < minAge) {
         newErrors[`attendee_${index}_age`] = `Age must be at least ${minAge} years`;
+      } else if (attendee.age > 120) {
+        newErrors[`attendee_${index}_age`] = 'Age must not exceed 120 years';
       }
     });
 
@@ -766,7 +768,12 @@ function GenericSection({
                 ))}
               </Box>
             </Grid>
-
+           {dialogError && (
+              <Typography color="error" sx={{ mb: 2 }}>
+                {dialogError}
+              </Typography>
+            )}
+            
             {/* Special Requirements */}
             <Grid size={{xs:12}}>
               <TextField
@@ -786,6 +793,7 @@ function GenericSection({
               />
             </Grid>
           </Grid>
+          
         </DialogContent>
         
         <DialogActions sx={{ p: 3 }}>

@@ -29,12 +29,24 @@ export const createEvent = async (req, res) => {
 export const getEvents = async (req, res) => {
   try {
     const events = await Event.find().populate("organizer_id", "username email");
-    res.json(events);
+
+    // Normalize fields for GenericSection compatibility
+    const formattedEvents = events.map(event => {
+      const obj = event.toObject();
+      return {
+        ...obj,
+        max_capacity: obj.max_attendees,              // align with exhibitions
+        current_bookings: obj.current_registrations,  // align with exhibitions
+      };
+    });
+
+    res.json(formattedEvents);
   } catch (error) {
     console.log("❌ Error in getEvents:", error);
     res.status(500).json({ message: "Error fetching events" });
   }
 };
+
 
 // Get single event
 export const getEventById = async (req, res) => {
