@@ -123,6 +123,14 @@ function Register({ onRegister }) {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [activeField, setActiveField] = useState(null);
+  const [usernameValidation, setUsernameValidation] = useState({
+    minLength: false,
+    maxLength: false,
+    validChars: false,
+    noConsecutive: false,
+    noEdgeDots: false
+  });
   const [passwordValidation, setPasswordValidation] = useState({
     minLength: false,
     maxLength: false,
@@ -154,6 +162,24 @@ function Register({ onRegister }) {
       hasSpecial: /(?=.*[@$!%*?&])/.test(password)
     });
   }, [password]);
+
+  useEffect(() => {
+    const minLength = username.length >= 3;
+    const maxLength = username.length <= 30;
+    const validChars = /^[a-zA-Z0-9._]+$/.test(username);
+    const noConsecutive = !/([._])\1/.test(username); // no consecutive . or _
+    const noEdgeDots = username.length > 0 ? !/^[._]|[._]$/.test(username) : false;
+
+    setUsernameValidation({
+      minLength,
+      maxLength,
+      validChars,
+      noConsecutive,
+      noEdgeDots
+    });
+  }, [username]);
+
+  const isUsernameValid = Object.values(usernameValidation).every(Boolean);
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -261,13 +287,18 @@ function Register({ onRegister }) {
         .form-input::placeholder {
           color: rgba(255, 255, 255, 0.6);
         }
-        .login-btn:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        .login-btn {
+          transition: all 0.3s ease;
         }
-        .login-btn:active:not(:disabled) {
-          transform: translateY(0);
+
+        .login-btn:disabled {
+          background: rgba(120, 120, 120, 0.6) !important;
+          color: rgba(255, 255, 255, 0.6) !important;
+          cursor: not-allowed !important;
+          border: 1px solid rgba(200, 200, 200, 0.5);
+          transform: none !important;
         }
+
         .link-button:hover {
           background: rgba(255, 255, 255, 0.1) !important;
           border-radius: 4px;
@@ -315,9 +346,40 @@ function Register({ onRegister }) {
                 className="form-input"
                 value={username} 
                 onChange={(e) => setUsername(e.target.value)} 
+                onFocus={() => setActiveField("username")}
+                onBlur={() => setActiveField(null)}
                 required 
                 disabled={loading} 
               />
+              {activeField === "username" && username && (
+                <div className="requirements-container">
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", fontSize: "13px", color: "rgba(255,255,255,0.8)" }}>
+                    <Info size={14} />
+                    <span>Username Requirements:</span>
+                  </div>
+                  <div className={`password-requirement ${usernameValidation.minLength ? 'valid' : 'invalid'}`}>
+                    {usernameValidation.minLength ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
+                    <span>At least 3 characters</span>
+                  </div>
+                  <div className={`password-requirement ${usernameValidation.maxLength ? 'valid' : 'invalid'}`}>
+                    {usernameValidation.maxLength ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
+                    <span>At max 30 characters</span>
+                  </div>
+                  <div className={`password-requirement ${usernameValidation.validChars ? 'valid' : 'invalid'}`}>
+                    {usernameValidation.validChars ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
+                    <span>Only letters, numbers, . or _</span>
+                  </div>
+                  <div className={`password-requirement ${usernameValidation.noConsecutive ? 'valid' : 'invalid'}`}>
+                    {usernameValidation.noConsecutive ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
+                    <span>No consecutive . or _</span>
+                  </div>
+                  <div className={`password-requirement ${usernameValidation.noEdgeDots ? 'valid' : 'invalid'}`}>
+                    {usernameValidation.noEdgeDots ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
+                    <span>Cannot start or end with . or _</span>
+                  </div>
+                </div>
+              )}
+
               <input 
                 type="email" 
                 placeholder="Email Address" 
@@ -325,8 +387,11 @@ function Register({ onRegister }) {
                 className="form-input"
                 value={email} 
                 onChange={(e) => setEmail(e.target.value)} 
+                onFocus={() => setActiveField("email")}
+                onBlur={() => setActiveField(null)}
                 required 
                 disabled={loading} 
+                pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
               />
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
@@ -337,6 +402,8 @@ function Register({ onRegister }) {
                     className="form-input"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    onFocus={() => setActiveField("password")}
+                    onBlur={() => setActiveField(null)}
                     required
                     disabled={loading}
                   />
@@ -362,7 +429,7 @@ function Register({ onRegister }) {
                   </button>
                 </div>
                 
-                {password && (
+                {activeField === "password" && password && (
                   <div className="requirements-container">
                     <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", fontSize: "13px", color: "rgba(255,255,255,0.8)" }}>
                       <Info size={14} />
@@ -404,11 +471,16 @@ function Register({ onRegister }) {
               type="submit" 
               style={{
                 ...buttonStyle,
-                opacity: !isPasswordValid && password ? 0.6 : 1,
-                cursor: (!isPasswordValid && password) || loading ? "not-allowed" : "pointer"
+                background: loading 
+                  ? "rgba(153,153,153,0.6)" 
+                  : (isUsernameValid && isPasswordValid 
+                      ? "linear-gradient(135deg, #1B4332 0%, #2D5A3D 100%)" 
+                      : "rgba(120, 120, 120, 0.6)"),
+                color: (isUsernameValid && isPasswordValid) ? "#fff" : "rgba(255,255,255,0.6)",
+                cursor: (loading || !isPasswordValid || !isUsernameValid) ? "not-allowed" : "pointer"
               }} 
               className="login-btn"
-              disabled={loading || (!isPasswordValid && password)}
+              disabled={loading || !isPasswordValid || !isUsernameValid}
             >
               {loading ? "Creating Account..." : "Register"}
             </button>
