@@ -1,9 +1,21 @@
 import React from "react";
 import { Box, Grid, Typography } from "@mui/material";
 
-function CardsGrid({ categories }) {
+function CardsGrid({ categories, title = null }) {
   return (
     <Box sx={{ px: { xs: 2, md: 8 }, py: { xs: 4, md: 6 } }}>
+       {title && (
+        <Typography
+          variant="h1"
+          sx={{
+            textAlign: "left",
+            mb: { xs: 3, md: 5 },
+            fontWeight: 600,
+          }}
+        >
+          {title}
+        </Typography>
+      )}
       <Grid container spacing={4} justifyContent="center">
         {categories.map((item, index) => (
           <Grid size={{xs:12, sm:6, md:4}} key={index}>
