@@ -117,7 +117,7 @@ function AdminExhibitions() {
     { label: 'Total Exhibitions', value: stats.totalExhibitions, icon: Calendar },
     { label: 'Featured Exhibitions', value: stats.featuredExhibitions, icon: Star },
     { label: 'Total Bookings', value: stats.totalBookings, icon: MapPin },
-    { label: 'Revenue Generated', value: `$${stats.revenueGenerated}`, icon: CheckCircle },
+    { label: 'Revenue Generated', value: `Rs. ${stats.revenueGenerated}`, icon: CheckCircle },
   ];
 
   // Format date helper
@@ -282,7 +282,7 @@ function AdminExhibitions() {
       
       <TableCell align="center">
         <Typography variant="body2">
-          {exhibition.entry_fee === 0 ? 'Free' : `$${exhibition.entry_fee}`}
+          {exhibition.entry_fee === 0 ? 'Free' : `Rs. ${exhibition.entry_fee}`}
         </Typography>
       </TableCell>
       
@@ -339,7 +339,7 @@ function AdminExhibitions() {
               {[
                 { label: "Current Bookings", value: exhibition.current_bookings },
                 { label: "Max Capacity", value: exhibition.max_capacity || 'Unlimited' },
-                { label: "Entry Fee", value: exhibition.entry_fee === 0 ? 'Free' : `$${exhibition.entry_fee}` },
+                { label: "Entry Fee", value: exhibition.entry_fee === 0 ? 'Free' : `Rs. ${exhibition.entry_fee}` },
                 { label: "Age Restriction", value: exhibition.age_restriction || 'None' },
                 { label: "Banner Image", value: exhibition.banner_image_url || 'N/A' },
                 { label: "Featured", value: exhibition.is_featured ? 'Yes' : 'No' },
