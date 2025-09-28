@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Mail, RefreshCw, CheckCircle, AlertCircle } from "lucide-react";
-import { UserContext } from "../../contexts/UserContext";
-import { verifyEmail, resendOTP } from "../../services/authService"; // Import auth service
 
-// FlowingLines class remains unchanged
+//user context
+import { UserContext } from "../../contexts/UserContext";
+
+//api services
+import { verifyEmail, resendOTP } from "../../services/authService";
+
+//for background animations
 class FlowingLines {
   constructor(canvas) {
     this.canvas = canvas;
@@ -113,7 +117,7 @@ function EmailVerification() {
   const location = useLocation();
   const { setUser } = useContext(UserContext);
   
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
@@ -121,9 +125,9 @@ function EmailVerification() {
   const [countdown, setCountdown] = useState(0);
   
   const { userId, email } = location.state || {};
-  
   const canvasRef = useRef(null);
   const flowingLinesRef = useRef(null);
+  const inputRefs = useRef([]);
 
   useEffect(() => {
     if (!userId || !email) {
@@ -146,10 +150,53 @@ function EmailVerification() {
     }
   }, [countdown]);
 
+  const handleOtpChange = (index, value) => {
+    if (/^[0-9]?$/.test(value)) {
+      const newOtp = [...otp];
+      newOtp[index] = value;
+      setOtp(newOtp);
+      // Only move focus if a digit is entered and not deleting
+      if (value && index < 5) {
+        setTimeout(() => {
+          if (inputRefs.current[index + 1]) {
+            inputRefs.current[index + 1].focus();
+          }
+        }, 0);
+      }
+    }
+  };
+
+  const handleKeyDown = (index, e) => {
+    // Move to previous input on backspace if empty
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      inputRefs.current[index - 1].focus();
+    }
+  };
+
+  const handlePaste = (e) => {
+    const pastedData = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (pastedData.length) {
+      const newOtp = Array(6).fill("");
+      pastedData.split("").forEach((char, i) => {
+        if (i < 6) newOtp[i] = char;
+      });
+      setOtp(newOtp);
+      // Focus the last filled input or the first empty one
+      const lastFilledIndex = Math.min(pastedData.length - 1, 5);
+      setTimeout(() => {
+        if (inputRefs.current[lastFilledIndex]) {
+          inputRefs.current[lastFilledIndex].focus();
+        }
+      }, 0);
+    }
+    e.preventDefault();
+  };
+
   const handleVerifyOTP = async (e) => {
     e.preventDefault();
-    if (!otp.trim()) {
-      setError("Please enter the verification code");
+    const otpString = otp.join("");
+    if (otpString.length !== 6) {
+      setError("Please enter a 6-digit verification code");
       return;
     }
 
@@ -158,7 +205,7 @@ function EmailVerification() {
     setLoading(true);
 
     try {
-      const data = await verifyEmail({ userId, otp: otp.trim() });
+      const data = await verifyEmail({ userId, otp: otpString });
 
       localStorage.setItem("token", data.token);
       setUser(data);
@@ -173,13 +220,13 @@ function EmailVerification() {
   };
 
   const handleResendOTP = async () => {
+    setOtp(["", "", "", "", "", ""]); // Clear OTP input
     setError("");
     setSuccess("");
     setResendLoading(true);
 
     try {
       await resendOTP(userId);
-
       setSuccess("New verification code sent to your email");
       setCountdown(60);
     } catch (err) {
@@ -209,20 +256,25 @@ function EmailVerification() {
   const cardStyle = { background: "rgba(255, 255, 255, 0.1)", backdropFilter: "blur(20px)", border: "1px solid rgba(255, 255, 255, 0.2)", borderRadius: "20px", padding: "40px", maxWidth: "450px", width: "100%", boxShadow: "0 25px 45px rgba(0, 0, 0, 0.1)" };
   const titleStyle = { color: "#fff", fontSize: "2.5rem", fontWeight: 700, marginBottom: "10px", textAlign: "center" };
   const subtitleStyle = { color: "rgba(255, 255, 255, 0.8)", fontSize: "1rem", textAlign: "center", marginBottom: "30px" };
-  const inputStyle = { 
-    width: "100%", 
-    padding: "15px 20px", 
-    background: "rgba(255, 255, 255, 0.1)", 
-    border: "1px solid rgba(255, 255, 255, 0.3)", 
-    borderRadius: "12px", 
-    color: "#fff", 
-    fontSize: "18px", 
+  const otpContainerStyle = {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: "10px",
+    marginBottom: "20px",
+  };
+  const otpInputStyle = {
+    width: "50px",
+    height: "50px",
+    padding: "10px",
+    background: "rgba(255, 255, 255, 0.1)",
+    border: "1px solid rgba(255, 255, 255, 0.3)",
+    borderRadius: "12px",
+    color: "#fff",
+    fontSize: "18px",
     textAlign: "center",
-    letterSpacing: "8px",
-    outline: "none", 
+    outline: "none",
     boxSizing: "border-box",
-    lineHeight: "18px",
-    fontWeight: "600"
+    fontWeight: "600",
   };
   const buttonStyle = { 
     width: "100%", 
@@ -234,7 +286,7 @@ function EmailVerification() {
     fontSize: "16px", 
     fontWeight: 600, 
     cursor: loading ? "not-allowed" : "pointer",
-    marginBottom: "15px"
+    marginBottom: "15px",
   };
   const resendButtonStyle = {
     width: "100%",
@@ -250,7 +302,7 @@ function EmailVerification() {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    gap: "8px"
+    gap: "8px",
   };
   const errorStyle = { padding: "12px", borderRadius: "8px", textAlign: "center", background: "rgba(255, 82, 82, 0.2)", border: "1px solid rgba(255, 82, 82, 0.5)", color: "#ff5252", marginBottom: "15px" };
   const successStyle = { padding: "12px", borderRadius: "8px", textAlign: "center", background: "rgba(76, 175, 80, 0.2)", border: "1px solid rgba(76, 175, 80, 0.5)", color: "#4caf50", marginBottom: "15px" };
@@ -260,12 +312,12 @@ function EmailVerification() {
   return (
     <div style={containerStyle}>
       <style>{`
-        .form-input:focus {
+        .otp-input:focus {
           border-color: #fff;
           background: rgba(255, 255, 255, 0.15);
-          transform: scale(1.02);
+          transform: scale(1.05);
         }
-        .form-input::placeholder {
+        .otp-input::placeholder {
           color: rgba(255, 255, 255, 0.6);
         }
         .verify-btn:hover:not(:disabled) {
@@ -312,21 +364,23 @@ function EmailVerification() {
           </p>
 
           <form onSubmit={handleVerifyOTP}>
-            <div style={{ marginBottom: "20px" }}>
-              <input 
-                type="text" 
-                placeholder="000000" 
-                style={inputStyle} 
-                className="form-input"
-                value={otp} 
-                onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, '').slice(0, 6);
-                  setOtp(value);
-                }}
-                maxLength={6}
-                required 
-                disabled={loading} 
-              />
+            <div style={otpContainerStyle}>
+              {otp.map((digit, index) => (
+                <input
+                  key={index}
+                  type="text"
+                  style={otpInputStyle}
+                  className="otp-input"
+                  value={digit}
+                  onChange={(e) => handleOtpChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(index, e)}
+                  onPaste={index === 0 ? handlePaste : undefined}
+                  maxLength={1}
+                  ref={(el) => (inputRefs.current[index] = el)}
+                  disabled={loading}
+                  aria-label={`OTP digit ${index + 1}`}
+                />
+              ))}
             </div>
             
             {error && <div style={errorStyle}><AlertCircle size={16} style={{ display: "inline", marginRight: "8px" }} />{error}</div>}
@@ -336,7 +390,7 @@ function EmailVerification() {
               type="submit" 
               style={buttonStyle} 
               className="verify-btn"
-              disabled={loading || otp.length !== 6}
+              disabled={loading || otp.some(digit => !digit)}
             >
               {loading ? "Verifying..." : "Verify Email"}
             </button>
