@@ -13,6 +13,7 @@ export const addUser = async (req, res) => {
       profile_picture_url,
       role,
       is_active,
+      email_verified,
     } = req.body;
 
     // Check if user already exists
@@ -32,6 +33,7 @@ export const addUser = async (req, res) => {
       profile_picture_url,
       role,
       is_active: is_active ?? true,
+      email_verified: email_verified ?? false,
     });
 
     const savedUser = await newUser.save();
@@ -82,6 +84,7 @@ export const updateUser = async (req, res) => {
     user.profile_picture_url = req.body.avatar || user.profile_picture_url;
     user.role = req.body.role || user.role;
     user.is_active = req.body.is_active ?? user.is_active;
+    user.email_verified = req.body.email_verified ?? user.email_verified;
 
     const updatedUser = await user.save();
     res.json(updatedUser);
