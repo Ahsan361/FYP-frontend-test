@@ -54,7 +54,7 @@ userSchema.statics.validatePassword = function(password) {
 userSchema.methods.generateOTP = function() {
   const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
   this.verification_otp = otp;
-  this.otp_expires_at = new Date(Date.now() + 1 * 60 * 1000); // 15 minutes
+  this.otp_expires_at = new Date(Date.now() + 3 * 60 * 1000); // 3 minutes
   this.otp_attempts = 0;
   return otp;
 };
