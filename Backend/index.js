@@ -26,13 +26,6 @@ import ExhibitionRegistration from "./routes/exhibitionRegistrationRoutes.js"
 // Connect to database
 connectDB();
 
-// Debug: Check if environment variables are loaded
-console.log("🔍 Environment Check:");
-console.log("MONGO_URI:", process.env.MONGO_URI ? "✅ Loaded" : "❌ Missing");
-console.log("JWT_SECRET:", process.env.JWT_SECRET ? "✅ Loaded" : "❌ Missing");
-console.log("EMAIL_USER:", process.env.EMAIL_USER ? "✅ Loaded" : "❌ Missing");
-console.log("EMAIL_APP_PASSWORD:", process.env.EMAIL_APP_PASSWORD ? "✅ Loaded" : "❌ Missing");
-
 const app = express();
 app.use(express.json());
 
