@@ -125,6 +125,7 @@ function Register({ onRegister }) {
   const [showPassword, setShowPassword] = useState(false);
   const [passwordValidation, setPasswordValidation] = useState({
     minLength: false,
+    maxLength: false,
     hasLower: false,
     hasUpper: false,
     hasNumber: false,
@@ -146,6 +147,7 @@ function Register({ onRegister }) {
   useEffect(() => {
     setPasswordValidation({
       minLength: password.length >= 8,
+      maxLength: password.length <= 128,
       hasLower: /(?=.*[a-z])/.test(password),
       hasUpper: /(?=.*[A-Z])/.test(password),
       hasNumber: /(?=.*\d)/.test(password),
@@ -369,6 +371,10 @@ function Register({ onRegister }) {
                     <div className={`password-requirement ${passwordValidation.minLength ? 'valid' : 'invalid'}`}>
                       {passwordValidation.minLength ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
                       <span>At least 8 characters</span>
+                    </div>
+                    <div className={`password-requirement ${passwordValidation.maxLength ? 'valid' : 'invalid'}`}>
+                      {passwordValidation.maxLength ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
+                      <span>At max 128 characters</span>
                     </div>
                     <div className={`password-requirement ${passwordValidation.hasLower ? 'valid' : 'invalid'}`}>
                       {passwordValidation.hasLower ? <CheckCircle size={12} /> : <AlertCircle size={12} />}
