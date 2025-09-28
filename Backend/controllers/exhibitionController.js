@@ -1,4 +1,5 @@
 import Exhibition from "../models/Exhibition.js";
+import ExhibitionRegistration from "../models/ExhibitionRegistration.js";
 
 // Create exhibition
 export const createExhibition = async (req, res) => {
@@ -51,7 +52,11 @@ export const deleteExhibition = async (req, res) => {
   try {
     const exhibition = await Exhibition.findByIdAndDelete(req.params.id);
     if (!exhibition) return res.status(404).json({ message: "Exhibition not found" });
-    res.json({ message: "Exhibition deleted successfully" });
+
+    // Also delete all related registrations
+    await ExhibitionRegistration.deleteMany({ exhibition_id: req.params.id });
+
+    res.json({ message: "Exhibition and related registrations deleted successfully" });
   } catch (error) {
     console.log("Error in deleteExhibition:", error);
     res.status(500).json({ message: "Error deleting exhibition" });

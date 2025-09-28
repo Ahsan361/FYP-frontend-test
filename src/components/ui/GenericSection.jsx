@@ -210,7 +210,7 @@ function GenericSection({
       
       setAlert({
         show: true,
-        message: `Successfully registered ${registrationData.spots_requested} spot(s)! Confirmation code: ${result.confirmation_code}${totalAmount > 0 ? `. Total amount: ${totalAmount}` : ''}`,
+        message: `Successfully registered ${registrationData.spots_requested} spot(s)!${totalAmount > 0 ? ` Total amount: ${totalAmount}` : ''}`,
         severity: 'success'
       });
       

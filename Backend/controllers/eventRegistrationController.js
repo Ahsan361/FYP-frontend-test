@@ -161,7 +161,7 @@ export const cancelRegistration = async (req, res) => {
     // Decrease count in event
     const event = await Event.findById(reg.event_id);
     if (event && event.current_registrations > 0) {
-      event.current_registrations -= 1;
+      event.current_registrations = Math.max(0, event.current_registrations - reg.spots_requested);
       await event.save();
     }
 
@@ -179,8 +179,8 @@ export const deleteRegistration = async (req, res) => {
 
     // Decrease event registration count if not already cancelled
     const event = await Event.findById(reg.event_id);
-    if (event && reg.registration_status !== "cancelled" && event.current_registrations > 0) {
-      event.current_registrations -= 1;
+     if (event && reg.registration_status !== "cancelled" && event.current_registrations > 0) {
+      event.current_registrations = Math.max(0, event.current_registrations - reg.spots_requested);
       await event.save();
     }
 

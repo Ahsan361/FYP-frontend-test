@@ -2,7 +2,6 @@ import ExhibitionRegistration from "../models/ExhibitionRegistration.js";
 import Exhibition from "../models/Exhibition.js";
 
 // Register for an exhibition
-// Updated registerForExhibition function in exhibitionRegistrationController.js
 export const registerForExhibition = async (req, res) => {
   try {
     const { exhibition_id, spots_requested = 1, attendees = [] } = req.body;
@@ -159,10 +158,10 @@ export const cancelExhibitionRegistration = async (req, res) => {
     const reg = await ExhibitionRegistration.findById(req.params.id);
     if (!reg) return res.status(404).json({ message: "Registration not found" });
 
-    if (reg.registration_status === "confirmed") {
+    if (reg.registration_status === "confirmed" || reg.registration_status === "pending") {
       const exhibition = await Exhibition.findById(reg.exhibition_id);
       if (exhibition && exhibition.current_bookings > 0) {
-        exhibition.current_bookings -= 1;
+        exhibition.current_bookings = Math.max(0, exhibition.current_bookings - reg.spots_requested);
         await exhibition.save();
       }
     }
@@ -176,16 +175,16 @@ export const cancelExhibitionRegistration = async (req, res) => {
   }
 };
 
-// Delete exhibition registration (admin only)
+// Delete exhibition registration 
 export const deleteExhibitionRegistration = async (req, res) => {
   try {
     const reg = await ExhibitionRegistration.findById(req.params.id);
     if (!reg) return res.status(404).json({ message: "Registration not found" });
 
-    if (reg.registration_status === "confirmed") {
+    if (reg.registration_status === "confirmed" || reg.registration_status === "pending") {
       const exhibition = await Exhibition.findById(reg.exhibition_id);
       if (exhibition && exhibition.current_bookings > 0) {
-        exhibition.current_bookings -= 1;
+        exhibition.current_bookings = Math.max(0, exhibition.current_bookings - reg.spots_requested);
         await exhibition.save();
       }
     }

@@ -1,4 +1,5 @@
 import Event from "../models/Event.js";
+import EventRegistration from "../models/EventRegistration.js";
 
 const EVENT_TYPES = {
   CONFERENCE: "conference",
@@ -77,7 +78,11 @@ export const deleteEvent = async (req, res) => {
   try {
     const event = await Event.findByIdAndDelete(req.params.id);
     if (!event) return res.status(404).json({ message: "Event not found" });
-    res.json({ message: "Event deleted successfully" });
+
+     //delete all related registrations as well
+    await EventRegistration.deleteMany({ event_id: req.params.id });
+
+    res.json({ message: "Event and related registrations deleted successfully" });
   } catch (error) {
     console.log("❌ Error in deleteEvent:", error);
     res.status(500).json({ message: "Error deleting event" });
