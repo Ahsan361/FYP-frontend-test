@@ -5,39 +5,42 @@ function FreeExhibitionsSection() {
   const { filters } = useEventsFilter();
 
  const FreeExhibitionsInfo = [
-    { 
+    {
       id: 1,
-      title: "Deities, demons and mischief-makers",
-      type: "Performance",
+      title: "Through the Lens: A Glimpse into Heritage",
+      type: "Gallery showcase",
       dates: "22 October 2025 ",
       status: "Book Now",
       statusColor: "success",
-      image: "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=300&fit=crop",
-      description: "Gather the family for storytelling sessions evoking the colourful, sensory and atmospheric world of our current 'Ancient Indial exhibition.",
-      actionText: "Explore More"
+      image: "/assets/pages/e.jpg",
+      description:
+        "Step into a gallery of timeless photographs capturing monuments, landscapes, and moments that define Pakistan’s diverse heritage.",
+      actionText: "Explore More",
     },
-    { 
+    {
       id: 2,
-      title: "Little Feet: teddies on holiday",
-      type: "Family activity",
+      title: "Traditional Music",
+      type: "Live Performance",
       dates: "15 August 2025",
-      status: "Free",
+      status: "Book Tickets",
       statusColor: "success",
-      image: "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=300&fit=crop",
-      description: "Join the Little Feet teddies on their summer holidays through fun experiences and activities in this drop-in session for under-fives.",
-      actionText: "Explore More"
+      image: "/assets/pages/f2.JPG",
+      description:
+        "Join the Little Feet teddies on their summer holidays through fun experiences and activities in this drop-in session for under-fives.",
+      actionText: "Explore More",
     },
-     { 
+    {
       id: 3,
-      title: "Little Feet: teddies on holiday",
-      type: "Performance",
+      title: "Mela Chiraghan: Festival of Lights",
+      type: "Cultural Festival",
       dates: "8 March 2025",
       status: "Free",
       statusColor: "success",
-      image: "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=300&fit=crop",
-      description: "Join the Little Feet teddies on their summer holidays through fun experiences and activities in this drop-in session for under-fives.",
-      actionText: "Explore More"
-    }
+      image: "/assets/pages/f3.jpg",
+      description:
+        "Celebrate Lahore's famous Festival of Lights with qawwali, folk performances, and dazzling displays that honor the Sufi saint Shah Hussain.",
+      actionText: "Explore More",
+    },
   ];
   // Apply global filter
   const filteredItems = FreeExhibitionsInfo.filter(event => {

@@ -5,39 +5,42 @@ function InternationalToursSection() {
   const { filters } = useEventsFilter();
 
  const InternationalToursInfo = [
-    { 
+    {
       id: 1,
-      title: "Deities, demons and mischief-makers",
-      type: "Performance",
-      dates: "Various Dates",
+      title: "Pakistani Crafts at the V&A, London",
+      type: "Museum Tour",
+      dates: "10 June - 15 July 2026",
       status: "Book Now",
       statusColor: "success",
-      image: "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=300&fit=crop",
-      description: "Gather the family for storytelling sessions evoking the colourful, sensory and atmospheric world of our current 'Ancient Indial exhibition.",
-      actionText: "Explore More"
+      image: "/assets/pages/e-e/w1I.jpg",
+      description:
+        "Experience a curated exhibition of Pakistani crafts including handwork, textiles at the Victoria & Albert Museum, including handwoven fabrics, embroidery, and traditional patterns.",
+      actionText: "Book Now",
     },
-    { 
+    {
       id: 2,
-      title: "Little Feet: teddies on holiday",
-      type: "Family activity",
-      dates: "2 September 2025",
-      status: "Free",
+      title: "Folk & Sufi Festival, Dubai",
+      type: "Cultural Festival",
+      dates: "5 - 10 March 2026",
+      status: "Open",
       statusColor: "success",
-      image: "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=300&fit=crop",
-      description: "Join the Little Feet teddies on their summer holidays through fun experiences and activities in this drop-in session for under-fives.",
-      actionText: "Explore More"
+      image: "/assets/pages/e-e/wfi2.jpg",
+      description:
+        "Join an immersive festival celebrating Pakistani folk music, Sufi performances, and traditional crafts in the heart of Dubai.",
+      actionText: "Join Now",
     },
-     { 
-      id: 2,
-      title: "Little Feet: teddies on holiday",
-      type: "Performance",
-      dates: "5 October 2025",
-      status: "Free",
+    {
+      id: 3,
+      title: "Gandhara Artifacts Showcase, New York",
+      type: "Gallery Tour",
+      dates: "20 September - 5 October 2025",
+      status: "Book Now",
       statusColor: "success",
-      image: "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=300&fit=crop",
-      description: "Join the Little Feet teddies on their summer holidays through fun experiences and activities in this drop-in session for under-fives.",
-      actionText: "Explore More"
-    }
+      image: "/assets/pages/e-e/wg3i.jpg",
+      description:
+        "Explore the rich Buddhist heritage of Pakistan’s Gandhara civilization through artifacts and sculptures displayed in a curated New York gallery exhibition.",
+      actionText: "Explore More",
+    },
   ];
   // Apply global filter
   const filteredItems = InternationalToursInfo.filter(event => {

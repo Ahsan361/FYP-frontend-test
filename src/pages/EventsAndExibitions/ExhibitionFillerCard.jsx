@@ -12,7 +12,7 @@ function ExhibitionFillerCard() {
             {/* {Left Column} */}
             <Grid size={{xs:12, sm: 12, md:8}}>
                     <img 
-                        src="/filler.png" 
+                        src="/Baltit_fort.jpg" 
                         alt="Loading Image" 
                         style={{
                         width: "100%",
@@ -43,7 +43,7 @@ function ExhibitionFillerCard() {
                         textAlign: 'left',
                     }}
                 >
-                    Marsh Awards
+                    Aga Khan Trust for Culture (AKTC) Recognitions
                 </Typography>
                 <Typography
                     variant="body1"
@@ -53,7 +53,10 @@ function ExhibitionFillerCard() {
                         textAlign: 'left',
                     }}
                     >
-                    Between 2009 and 2024 the contribution of volunteers across the UK was recognised through the IVoIunteers for Museum Learning Award'.
+                    The Aga Khan Trust for Culture (AKTC) gives global awards like the Aga Khan Award for
+                    Architecture and has won multiple UNESCO Asia-Pacific Heritage Awards for restoring sites
+                    such as Shigar Fort, Khaplu Palace, Altit Fort, and Shahi Hammam, making it a key leader in
+                    cultural preservation in Pakistan.
                 </Typography>
                 </Box>
             </Grid>
