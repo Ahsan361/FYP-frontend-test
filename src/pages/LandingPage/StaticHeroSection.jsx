@@ -12,43 +12,49 @@ const StaticHeroSection = () => {
   const slides = [
     {
       id: 1,
-      image:
-        "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&h=600&fit=crop",        
-      title: "Modern Interior Design",
-      subtitle: "Transform your space with our expert design solutions",
+      image: "/assets/landing-page/static-hero-section/cover1.jpg",
+      title: "Preserving Pakistan’s Heritage, Digitally. ",
+      subtitle: "",
       description:
-        "Creating beautiful, functional spaces that reflect your personality and lifestyle.",
+        "Discover artifacts, exhibitions, and stories that celebrate our cultural legacy",
       buttonText: "Explore Our Work",
     },
     {
       id: 2,
-      image:
-        "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=1200&h=600&fit=crop",
-      title: "Luxury Living Spaces",
-      subtitle: "Experience the finest in residential design",
+      image: "/assets/landing-page/static-hero-section/cover5.jpg",
+      title: "Historic Locations of Pakistan",
+      subtitle: "Journey through time with our heritage landmarks",
       description:
-        "From concept to completion, we bring your dream home to life.",
-      buttonText: "Get Started",
+        "Explore iconic sites like Mohenjo-daro, Taxila, Lahore Fort, and Makli Necropolis. Each monument holds the story of civilizations that shaped our land.",
+      buttonText: "Explore Landmarks",
     },
     {
       id: 3,
-      image:
-        "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&h=600&fit=crop",
-      title: "Commercial Excellence",
-      subtitle: "Professional spaces that inspire productivity",
+      image: "/assets/landing-page/static-hero-section/cover3.jpg",
+      title: "Stories Through Textiles",
+      subtitle:
+        "Unraveling Pakistan’s rich cultural identity; the Hard work behind every weave!",
       description:
-        "Designing offices and commercial spaces that enhance business success.",
-      buttonText: "View Projects",
+        "Discover the history of Pakistan’s cultural identity woven into fabrics and patterns",
+      buttonText: "Explore Collections",
     },
     {
       id: 4,
-      image:
-        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&h=600&fit=crop",
-      title: "Architectural Innovation",
-      subtitle: "Where creativity meets functionality",
+      image: "/assets/landing-page/static-hero-section/cover4.jpg",
+      title: "Where culture meets community",
+      subtitle:
+        "A trusted space to discover unique pieces, support local creators, and share stories through exchange.",
+      description: "",
+      buttonText: "Buy & Sell Now",
+    },
+    {
+      id: 5,
+      image: "/assets/landing-page/static-hero-section/cover2.jpg",
+      title: "Heritage Across Pakistan",
+      subtitle: "",
       description:
-        "Innovative architectural solutions for modern living and working.",
-      buttonText: "Learn More",
+        "From ancient cities to hidden cultural treasures. \n\n Explore the stories tied to historic locations and landmarks that define our nation’s identity",
+      buttonText: "Get Started",
     },
   ];
 
@@ -162,8 +168,8 @@ const StaticHeroSection = () => {
                 {slide.description}
               </Typography>
 
-              <Button variant="contained" size="large" startIcon={<Search />}>
-                Explore Artifacts
+              <Button variant="contained" size="large">
+                {slide.buttonText}
               </Button>
             </Box>
           </Box>
