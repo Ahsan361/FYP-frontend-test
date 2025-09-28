@@ -12,39 +12,43 @@ function VisitMuseumSection() {
     {
       id: 1,
       title: "Plan your visit",
-      subtitle: "Book tickets and plan your day including exhibitions, facilities, access, food and travel.",
+      subtitle:
+        "Book tickets and plan your day including exhibitions, facilities, access, food and travel.",
       icon: <EventSeat />,
-      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop",
+      image: "/assets/landing-page/visit-the-museum/visit-the-museum.jpg",
       actionText: "Book Tickets",
-      path:"/PlanVisitPage"
+      path: "/PlanVisitPage",
     },
     {
       id: 2,
       title: "Museum map",
-      subtitle: "Navigate the Museum with ease, using our floor-by-floor plan and discover what not to miss.",
+      subtitle:
+        "Navigate the Museum with ease, using our floor-by-floor plan and discover what not to miss.",
       icon: <Map />,
-      image: "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=250&fit=crop",
+      image: "/assets/landing-page/visit-the-museum/map.jpg",
       actionText: "View Map",
-      path:"/PlanVisitPage/map"
+      path: "/PlanVisitPage/map",
     },
     {
       id: 3,
       title: "Galleries",
-      subtitle: "Walk through two million years of history and culture across more than 50 galleries.",
+      subtitle:
+        "Walk through two million years of history and culture across more than 50 galleries.",
       icon: <Museum />,
-      image: 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=300&h=200&fit=crop',
+      image: "/assets/landing-page/visit-the-museum/galleries.jpg",
       actionText: "Explore Galleries",
-      path:"/collections/online"      
+      path: "/collections/online",
     },
     {
       id: 4,
       title: "Family visits",
-      subtitle: "From family facilities to activities and events, discover how to make the most of your day at the Museum.",
+      subtitle:
+        "From family facilities to activities and events, discover how to make the most of your day at the Museum.",
       icon: <FamilyRestroom />,
-      image: "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=400&h=250&fit=crop",
+      image: "/assets/landing-page/visit-the-museum/family-visits.jpg",
       actionText: "Family Guide",
-      path:"/PlanVisitPage/family"      
-    }
+      path: "/PlanVisitPage/family",
+    },
   ];
 
   return (    
