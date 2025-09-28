@@ -27,6 +27,7 @@ import AdminPanel from "../pages/AdminPanel/AdminPanel";
 import UserPanel from "../pages/UserPanel/UserPanel";
 import UserProfile from "../pages/UserProfile/UserProfile"
 import EmailVerification from "../pages/Authentication/EmailVerification"
+import MarketPlacePage from "../pages/MarkepPlace/MarketPlacePage";
 
 // map paths to components
 const routesConfig = [
@@ -36,7 +37,7 @@ const routesConfig = [
   { path: routes.verify_email, element: <EmailVerification /> },
   { path: routes.admin , element: <AdminPanel /> },
   { path: routes.user , element: <UserPanel /> },
-  { path: routes.profile, element: <UserProfile />},
+  { path: routes.profile, element: <MarketPlacePage />},
 
   // Visit
   { path: routes.visit.base, element: <PlanVisitPage /> },

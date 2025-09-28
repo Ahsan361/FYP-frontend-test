@@ -1,41 +1,77 @@
 import { Typography, Grid, Box, Container, Grow, Slide } from '@mui/material';
 import { Museum, History, Public, People, ArrowForward } from '@mui/icons-material';
+import { Book, Pen, PenBoxIcon } from "lucide-react";
 
 //custom components
 import { Card, Button } from '../../components/ui';
 
 function CollectionSection(){
-    const collections = [
-        {
-          title: 'Ancient Civilizations',
-          count: 3420,
-          icon: <History />,
-          image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=200&fit=crop',
-          description: 'Artifacts from Indus Valley, Gandhara, and other ancient cultures'
-        },
-        {
-          title: 'Islamic Heritage',
-          count: 2890,
-          icon: <Museum />,
-          image: 'https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=300&h=200&fit=crop',
-          description: 'Calligraphy, ceramics, and architectural elements'
-        },
-        {
-          title: 'Colonial Period',
-          count: 1650,
-          icon: <Public />,
-          image: 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=300&h=200&fit=crop',
-          description: 'British colonial era artifacts and documents'
-        },
-        {
-          title: 'Folk Traditions',
-          count: 2240,
-          icon: <People />,
-          image: 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=300&h=200&fit=crop',
-          description: 'Traditional crafts, textiles, and cultural items'
-        }
-    ];
-
+  const collections = [
+    {
+      title: "Historic Landmarks of Pakistan",
+      count: 1985,
+      icon: <Public />,
+      image: "/assets/collections/collection1.jpg",
+      description:
+        "Sites such as Lahore Fort, Makli Necropolis, and tombs, that narrate Pakistan's enduring history. These landmarks reflect the architectural brilliance of past civilizations.",
+    },
+    {
+      title: "Ancient Civilizations",
+      count: 3420,
+      icon: <History />,
+      image: "/assets/collections/collection2.jpg",
+      description:
+        "Discover Pakistan’s earliest civilizations through sites like Mohenjo-Daro, Harappa, and Mehrgarh of the Indus Valley, and Gandhara’s Buddhist heritage at Taxila and Takht-i-Bahi",
+    },
+    {
+      title: "Islamic Heritage",
+      count: 2890,
+      icon: <Museum />,
+      image: "/assets/collections/collection3.jpg",
+      description:
+        "Marvel at intricate calligraphy, glazed tiles, ceramics, and monumental mosques and shrines reflecting centuries of Islamic art and architecture. Each masterpiece embodies spiritual devotion",
+    },
+    {
+      title: "Manuscripts & Literature",
+      count: 920,
+      icon: <Book />,
+      image: "/assets/collections/collection4.jpg",
+      description:
+        "Rare manuscripts, poetry, and historical writings that reflect centuries of intellectual and cultural legacy. They preserve the wisdom, creativity, and scholarly pursuits of generations past.",
+    },
+    {
+      title: "Nothern Wonders",
+      count: 2240,
+      icon: <People />,
+      image: "/assets/collections/collection.jpg",
+      description:
+        "From Fairy Meadows to Hunza’s Baltit Fort and Deosai Plains, experience Pakistan’s breathtaking northern landscapes and their cultural treasures.",
+    },
+    {
+      title: "Handicrafts & Pottery",
+      count: 2240,
+      icon: <People />,
+      image: "/assets/collections/collection6.jpg",
+      description:
+        "Discover handwoven carpets, Multani blue pottery, Sindhi ajrak, intricate embroidery, wood-carved furniture, brass inlay, camel-skin lamps, and other handmade crafts.",
+    },
+    {
+      title: "Cultural Festivals",
+      count: 2240,
+      icon: <People />,
+      image: "/assets/collections/collection7.jpg",
+      description:
+        "Immerse yourself in the colors of Basant, the melodies of Sufi gatherings, and the traditions of folk festivals that celebrate Pakistan’s diversity.",
+    },
+    {
+      title: "Textile Excellence",
+      count: 2240,
+      icon: <People />,
+      image: "/assets/collections/collection8.jpg",
+      description:
+        "Explore Sindhi ralli quilts, Balochi embroidery, Punjabi phulkari, and Kashmiri shawls—textiles that weave together centuries of cultural identity.",
+    },
+  ];
     return(
       <Container maxWidth={false}  sx={{ px:{xs: 2, md: 8}, py: { xs: 4, md: 8 } }}>
         <Slide direction="up" in={true} timeout={800}>
