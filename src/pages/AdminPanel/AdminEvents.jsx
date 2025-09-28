@@ -157,7 +157,7 @@ function AdminEvents() {
     { label: 'Total Events', value: stats.totalEvents, icon: Calendar },
     { label: 'Upcoming Events', value: stats.upcomingEvents, icon: CheckCircle },
     { label: 'Total Registrations', value: stats.totalRegistrations, icon: Users },
-    { label: 'Revenue Generated', value: `$${stats.revenueGenerated}`, icon: DollarSign },
+    { label: 'Revenue Generated', value: `Rs. ${stats.revenueGenerated}`, icon: DollarSign },
   ];
 
   // Validation functions
@@ -326,7 +326,7 @@ function AdminEvents() {
       </TableCell>
       <TableCell align="center">
         <Typography variant="body2">
-          {event.is_free ? 'Free' : `$${event.registration_fee}`}
+          {event.is_free ? 'Free' : `Rs. ${event.registration_fee}`}
         </Typography>
       </TableCell>
     </>
@@ -375,7 +375,7 @@ function AdminEvents() {
               {[
                 { label: "Current Registrations", value: event.current_registrations },
                 { label: "Max Attendees", value: event.max_attendees || 'Unlimited' },
-                { label: "Registration Fee", value: event.is_free ? 'Free' : `$${event.registration_fee}` },
+                { label: "Registration Fee", value: event.is_free ? 'Free' : `Rs. ${event.registration_fee}` },
                 { label: "Requires Registration", value: event.requires_registration ? 'Yes' : 'No' },
                 { label: "Target Audience", value: event.target_audience },
                 { label: "Banner Image", value: event.banner_image_url || 'N/A' },
