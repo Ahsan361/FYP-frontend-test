@@ -607,7 +607,7 @@ function GenericSection({
                       {selectedItem.entry_fee && (
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                           <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                            Entry Fee: ${selectedItem.entry_fee}
+                            Entry Fee: Rs. {selectedItem.entry_fee}
                           </Typography>
                         </Box>
                       )}
