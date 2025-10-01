@@ -37,7 +37,7 @@ const routesConfig = [
   { path: routes.verify_email, element: <EmailVerification /> },
   { path: routes.admin , element: <AdminPanel /> },
   { path: routes.user , element: <UserPanel /> },
-  { path: routes.profile, element: <MarketPlacePage />},
+  { path: routes.profile, element: <UserProfile />},
 
   // Visit
   { path: routes.visit.base, element: <PlanVisitPage /> },

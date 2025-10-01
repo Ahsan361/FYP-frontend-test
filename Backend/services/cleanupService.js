@@ -8,16 +8,17 @@ class CleanupService {
 
   startCleanupJob() {
     // Run cleanup every hour
-    cron.schedule('0 * * * *', async () => {
-      await this.cleanupUnverifiedUsers();
-    });
+     cron.schedule('*/30 * * * * *', async () => {
+      console.log("Cleanup service called.")
+    await this.cleanupUnverifiedUsers();
+  });
 
-    console.log('🧹 Cleanup job started - runs every hour');
+    console.log('Cleanup job started - runs every hour');
   }
 
   async cleanupUnverifiedUsers() {
     try {
-      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const oneDayAgo = new Date(Date.now() -  24 * 60 * 60 * 1000);
       
       const result = await User.deleteMany({
         email_verified: false,
@@ -25,15 +26,16 @@ class CleanupService {
       });
 
       if (result.deletedCount > 0) {
-        console.log(`🗑️  Cleaned up ${result.deletedCount} unverified users older than 24 hours`);
+        console.log(`Cleaned up ${result.deletedCount} unverified users older than 24 hours`);
       }
     } catch (error) {
-      console.error('❌ Error in cleanup job:', error);
+      console.error('Error in cleanup job:', error);
     }
   }
 
   // Manual cleanup method for testing
   async runManualCleanup() {
+    console.log("Cleanup Service Running");
     await this.cleanupUnverifiedUsers();
   }
 }
