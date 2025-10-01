@@ -26,7 +26,7 @@ function FamilyVisitPage(){
         <HeroSection
             heading="Family Visit"
             description="📍 This photo showcases the stunning landscape of the Rocky Mountains at sunrise. Perfect for nature lovers and adventure seekers."
-            imageUrl="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
+            imageUrl="/advertisementCard2.jpg"
             showButton={false}
         />
         <DetailsSection />
@@ -36,6 +36,7 @@ function FamilyVisitPage(){
             heading="Young Friend subscription"
             detail="Sleep in the Museum galleries, discover their secrets and get closer to history as a Young Friend subscriber."
             buttonText="Subscribe now"
+            buttonPath="/membership/young-friends"
         />
         <FamilyEventsSection />
         <FacilitiesSection/>

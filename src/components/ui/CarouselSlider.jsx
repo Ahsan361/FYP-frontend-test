@@ -15,23 +15,23 @@ const CarouselSlider = () => {
   // Sample data - replace with your own images and subtitles
   const slides = [
     {
-      image: 'https://picsum.photos/300/400?random=1',
-      subtitle: 'Beautiful Mountain Landscape'
+      image: '/assets/pages/e1.jpg',
+       subtitle: "Lahore Museum - Architectural Heritage & Artifacts"
     },
     {
-      image: 'https://picsum.photos/300/400?random=2',
-      subtitle: 'Ocean Waves at Sunset'
+      image: '/assets/pages/s2.jpg',
+      subtitle: "Natural History Museum - Flora, Fauna & Fossils"
     },
     {
-      image: 'https://picsum.photos/300/400?random=3',
-      subtitle: 'Forest Path in Autumn'
+      image: '/assets/pages/q-h2.jpg',
+       subtitle: "Pakistan Monument Museum - Symbol of Unity"
     },
     {
-      image: 'https://picsum.photos/300/400?random=4',
-      subtitle: 'City Skyline at Night'
+      image: '/assets/pages/e-e/wg3i.jpg',
+      subtitle: "Islamabad Museum - New Exhibits & Heritage Preserved"
     },
     {
-      image: 'https://picsum.photos/300/400?random=5',
+      image: '/assets/pages/e-e/g1l.jpg',
       subtitle: 'Desert Sand Dunes'
     }
   ];

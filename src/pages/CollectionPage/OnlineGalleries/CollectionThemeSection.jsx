@@ -10,53 +10,53 @@ function CollectionThemeSection() {
   const darkMode = useSelector((state) => state.theme.darkMode);
   const theme = darkMode ? darkTheme : lightTheme;
 
-const themesInfo = [
-  {
-    id: 1,
-    title: "Americas",
-    subtitle: "The Americas encapsulate the remarkable narratives of cultural achievement and human experience across two continents.",
-    icon: <EventSeat />,
-    image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop",
-    actionText: "View Exhibitions and Events",
-    path:"/explore"
-  },
-  {
-    id: 2,
-    title: "Animals",
-    subtitle: "Explore the many wild and wonderful depictions of animals found in the Museum's collection.",
-    icon: <Map />,
-    image: "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=250&fit=crop",
-    actionText: "View Gallery",
-    path:"/Collections/galleries"
-  },
-  {
-    id: 3,
-    title: "China",
-    subtitle: "China is one of the world's oldest civilisations and home to a quarter of the world's population.",
-    icon: <Museum />,
-    image: "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=300&h=200&fit=crop",
-    actionText: "Explore Galleries",
-    path:"/Collections/galleries"
-  },
-  {
-    id: 4,
-    title: "Death and memory",
-    subtitle: "Discover the many tales of death and memory from the Museum.",
-    icon: <FamilyRestroom />,
-    image: "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=400&h=250&fit=crop",
-    actionText: "Family Guide",
-    path:"/Collections/galleries"
-  },
-  {
-    id: 5,
-    title: "Africa",
-    subtitle: "Delve into the Museum's stories from Africa.",
-    icon: <Map />,
-    image: "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=400&h=250&fit=crop",
-    actionText: "View Gallery",
-    path:"/Collections/galleries"
-  }
-];
+  const themesInfo = [
+    {
+      id: 1,
+      title: "Pakistan's Heritage",
+      subtitle: "Explore the ancient Indus Valley Civilization and Gandhara art that shaped the cultural foundations of Pakistan.",
+      icon: <EventSeat />,
+      image: "/assets/pages/e1.jpg",
+      actionText: "View Exhibitions and Events",
+      path: "/explore"
+    },
+    {
+      id: 2,
+      title: "Wildlife of Pakistan",
+      subtitle: "Discover the diverse wildlife of Pakistan, from the snow leopards of the north to the Indus River dolphins.",
+      icon: <Map />,
+      image: "/assets/pages/s2.jpg",
+      actionText: "View Gallery",
+      path: "/Collections/galleries"
+    },
+    {
+      id: 3,
+      title: "Mughal Era",
+      subtitle: "Step into the Mughal Empire's legacy through art, architecture, and artifacts preserved in Pakistan's museums.",
+      icon: <Museum />,
+      image: "/assets/pages/q-h2.jpg",
+      actionText: "Explore Galleries",
+      path: "/Collections/galleries"
+    },
+    {
+      id: 4,
+      title: "Memories of Partition",
+      subtitle: "Experience the stories, struggles, and resilience of 1947 through Pakistan’s Partition Museum collections.",
+      icon: <FamilyRestroom />,
+      image: "/assets/pages/e-e/wg3i.jpg",
+      actionText: "Family Guide",
+      path: "/Collections/galleries"
+    },
+    {
+      id: 5,
+      title: "Art & Culture of Pakistan",
+      subtitle: "Delve into the rich traditions, crafts, and artistic heritage showcased across Pakistan’s cultural museums.",
+      icon: <Map />,
+      image: "/assets/pages/e-e/g1l.jpg",
+      actionText: "View Gallery",
+      path: "/Collections/galleries"
+    }
+  ];
 
   return (
     <ExplorationGrid
