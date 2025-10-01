@@ -22,7 +22,7 @@ function GalleryPage(){
         <HeroSection
             heading="Galleries"
             description="📍 This photo showcases the stunning landscape of the Rocky Mountains at sunrise. Perfect for nature lovers and adventure seekers."
-            imageUrl="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
+            imageUrl="/advertisementImage6.jpg"
             showButton={false}
         />
         <GalleryDetailsSection/>
@@ -46,6 +46,7 @@ function GalleryPage(){
             heading="Sign up to our newsletters"
             detail="Sleep in the Museum galleries, discover their secrets and get closer to history as a Young Friend subscriber."
             buttonText="Subscribe now"
+            buttonPath="/membership/become-member"
         />
         <AdditionalFacilitiesSection/>    
         <Footer />

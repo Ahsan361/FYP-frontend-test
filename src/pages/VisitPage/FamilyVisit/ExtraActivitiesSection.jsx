@@ -12,7 +12,7 @@ function ExtraActivitiesSection() {
       title: "Sleepovers",
       subtitle: "Spend a night at the Museum and sleep in galleries surrounded by ancient monuments.",
       icon: <EventSeat />,
-      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=250&fit=crop",
+      image: "/assets/pages/e-e/g1l.jpg",
       actionText: "View Exibitions and Events",
       path:"/explore"
     },
@@ -21,7 +21,7 @@ function ExtraActivitiesSection() {
       title: "Home Educators",
       subtitle: "Explore our Home Educators offer of presentations and resources alongside our Home Educators Day information.",
       icon: <Map />,
-      image: "https://images.unsplash.com/photo-1578321272176-b7bbc0679853?w=400&h=250&fit=crop",
+      image: "/assets/pages/e-e/wg3i.jpg",
       actionText: "View Gallery",
       path:"/collections/online"
     },
@@ -30,7 +30,7 @@ function ExtraActivitiesSection() {
       title: "Young Friends",
       subtitle: "Discover two million years of history by becoming a Young Friend.",
       icon: <Museum />,
-      image: 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=300&h=200&fit=crop',
+      image: "/assets/pages/e-e/g3h.jpg",
       actionText: "Explore Galleries",
       path:"/collections/galleries"
     },
@@ -39,7 +39,7 @@ function ExtraActivitiesSection() {
       title: "Videos for Young Learners",
       subtitle: "Our YouTube channel includes a playlist of short videos for young learners looking at different historical periods, themes and objects.",
       icon: <FamilyRestroom />,
-      image: "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=400&h=250&fit=crop",
+      image: "/assets/pages/e-e/g2s.jpg",
       actionText: "Family Guide",
       path:"/collections/online"      
     }

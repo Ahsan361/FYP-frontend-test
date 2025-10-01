@@ -2,15 +2,16 @@ import React from "react";
 import { Box, Typography, Grid } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { useSelector } from "react-redux";
+import {useNavigate} from "react-router-dom"
 
 // Custom components
 import Button from "./Button";
 import { lightTheme, darkTheme } from "../../styles/theme";
 
-function AdvertisementSection({ heading, detail, buttonText, showButton = true, AdditionalDetails }) {
+function AdvertisementSection({ heading, detail, buttonText, buttonPath, showButton = true, AdditionalDetails }) {
   const darkMode = useSelector((state) => state.theme.darkMode);
   const theme = darkMode ? darkTheme : lightTheme;
-
+  const navigate = useNavigate();
   return (
     <Box
       sx={{
@@ -63,7 +64,7 @@ function AdvertisementSection({ heading, detail, buttonText, showButton = true, 
 
           {/* Conditionally show button or list */}
           {showButton ? (
-            <Button variant="contained" endIcon={<ArrowForwardIosIcon />}>
+            <Button variant="contained" endIcon={<ArrowForwardIosIcon />} onClick={() => navigate(buttonPath)}>
               <Typography sx={{fontSize: {xs:"0.9rem", sm:"1rem", md:"1.5rem"}}}>
                 {buttonText}
               </Typography>

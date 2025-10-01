@@ -24,7 +24,7 @@ function ExistingPatronPage(){
         <HeroSection
             heading="Existing Patrons"
             description="📍 This photo showcases the stunning landscape of the Rocky Mountains at sunrise. Perfect for nature lovers and adventure seekers."
-            imageUrl="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
+            imageUrl="/assets/landing-page/static-hero-section/cover5.jpg"
             showButton={false}
         />
         <ExistingPatronDetailSection/>

@@ -12,7 +12,7 @@ function Filler() {
             {/* {Left Column} */}
             <Grid size={{xs:12, sm: 12, md:8}}>
                     <img 
-                        src="/filler.png" 
+                        src="/assets/pages/e-e/g4f.jpg" 
                         alt="Loading Image" 
                         style={{
                         width: "100%",
@@ -43,7 +43,7 @@ function Filler() {
                         textAlign: 'left',
                     }}
                 >
-                    Egypt
+                    Faisal Mosque 
                 </Typography>
                 <Typography
                     variant="body1"
@@ -53,7 +53,7 @@ function Filler() {
                         textAlign: 'left',
                     }}
                     >
-                    Some of the British Museum's best-known collection items come from Egypt, each with their own unique story.
+                    An architectural masterpiece in Islamabad, the Faisal Mosque is one of the largest mosques in the world, symbolizing Pakistan’s modern Islamic identity and cultural heritage.
                 </Typography>
                 </Box>
             </Grid>

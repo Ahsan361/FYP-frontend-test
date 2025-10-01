@@ -33,6 +33,7 @@ function OnlineGalleryPage(){
             heading="Sign up to our newsletters"
             detail="Stay connected and receive all our latest news, stories and ways to explore the British Museum from home."
             buttonText="Sign up"
+            buttonPath="/membership/become-member"
         />
         <OnlineFacilitiesSection/>
         <Footer />

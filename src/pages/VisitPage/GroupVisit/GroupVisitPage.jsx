@@ -25,7 +25,7 @@ function GroupVisitPage(){
         <HeroSection
             heading="Group Visit"
             description="📍 This photo showcases the stunning landscape of the Rocky Mountains at sunrise. Perfect for nature lovers and adventure seekers."
-            imageUrl="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
+            imageUrl="/advertisementCard4.jpg"
             showButton={false}
         />
         <Divider
@@ -42,6 +42,7 @@ function GroupVisitPage(){
             heading="School groups"
             detail="If you're from a UK school and are bringing primary or secondary students, plan a visit to the Museum."
             buttonText="Plan a school visit"
+            buttonPath="/membership/young-friends"
         />
         <PrivateTourSection/>
         {/* {travel advertisement} */}
@@ -49,6 +50,7 @@ function GroupVisitPage(){
             heading="Travel trade tours"
             detail="We offer several exclusive out-of-hours tours which can be booked for private groups. "
             buttonText="Find out more"
+            buttonPath="/PlanVisitPage/tours"
         />
         <RefreshmentSection/>
         {/* Souvenir Guide Advertisement */}
@@ -64,10 +66,12 @@ function GroupVisitPage(){
         <FAQSection/>
         {/* {Advertisement} */}
         <AdvertisementSection 
-            heading="The British Museum at your fingertips"
-            detail="Enjoy a self-guided tour whenever and wherever with expert commentaries in five languages on 250 objects and 65 galleries."
-            buttonText="Discover the Audio app"
+            heading="Explore Pakistan's Heritage at Your Fingertips"
+            detail="Discover the treasures of Pakistan's museums online. Browse collections, exhibitions, and cultural heritage from across the country in one place."
+            buttonText="Start Exploring"
+            buttonPath="/PlanVisitPage"
         />
+
         <AdditionalActivitiesSection/>
         <Footer />
     </ThemeProvider>

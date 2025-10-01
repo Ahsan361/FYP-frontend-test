@@ -27,7 +27,7 @@ function PlanVisitPage(){
             heading="Plan Your Visit"
             buttonText="Book Now"
             description="📍 This photo showcases the stunning landscape of the Rocky Mountains at sunrise. Perfect for nature lovers and adventure seekers."
-            imageUrl="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
+            imageUrl="/advertisementCard1.jpg"
         />
         <PlanDetailsSection/>
         <ExplorationSection/>
@@ -36,6 +36,7 @@ function PlanVisitPage(){
             heading="Sign up to our newsletters"
             detail="Stay connected to the British Museum for the latest news, stories, exhibitions, events and visitor information."
             buttonText="Sign up"
+            buttonPath="/support/donate"
         />
         <TicketInfoSection />
         {/* {Passing props for membership card} */}
@@ -43,6 +44,7 @@ function PlanVisitPage(){
             heading="10% off for Members"
             detail="Become a Member and enjoy a 10% discount at all of the Museum's cafés, restaurants and shops. "
             buttonText="Become a Member"
+            buttonPath="/membership/become-member"
         />
         <GallerySection/>
         {/* {Passing props for Museum support card} */}
@@ -50,6 +52,7 @@ function PlanVisitPage(){
             heading="Support the Museum"
             detail="Your support is vital, now more than ever, and helps the Museum to share the collection with the world."
             buttonText="Make a Donation"
+            buttonPath="/support/donate"
         />
         {/* {Exhibition and Events Section} */}
         <ExhibitionSection/>

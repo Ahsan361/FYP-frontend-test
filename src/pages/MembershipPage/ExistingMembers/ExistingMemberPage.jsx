@@ -21,7 +21,7 @@ function ExistingMemberPage(){
         <HeroSection
             heading="Existing Members"
             description="📍 This photo showcases the stunning landscape of the Rocky Mountains at sunrise. Perfect for nature lovers and adventure seekers."
-            imageUrl="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"
+            imageUrl="/advertisementImage3.jpg"
             buttonText="Buy or renew Membership"
         />
         <ExistingMemberDetailSection/>
@@ -39,6 +39,7 @@ function ExistingMemberPage(){
             heading="Upgrade your Membership"
             detail="Share your experience. Bring a guest and enjoy the advantages of being a Member with someone else."
             buttonText="Add more benefits"
+            buttonPath="/membership/become-member"
         />
         <MembershipContactSection/>
         <Footer/>

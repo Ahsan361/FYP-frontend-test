@@ -12,7 +12,7 @@ function FillerCard() {
             {/* {Left Column} */}
             <Grid size={{xs:12, sm: 12, md:8}}>
                     <img 
-                        src="/filler.png" 
+                        src="/assets/landing-page/static-hero-section/cover5.jpg" 
                         alt="Loading Image" 
                         style={{
                         width: "100%",
@@ -43,7 +43,7 @@ function FillerCard() {
                         textAlign: 'left',
                     }}
                 >
-                    Marsh Awards
+                    National Museum of Pakistan
                 </Typography>
                 <Typography
                     variant="body1"
@@ -53,7 +53,7 @@ function FillerCard() {
                         textAlign: 'left',
                     }}
                     >
-                    Between 2009 and 2024 the contribution of volunteers across the UK was recognised through the IVoIunteers for Museum Learning Award'.
+                    Home to ancient Indus Valley treasures and Gandhara art masterpieces.
                 </Typography>
                 </Box>
             </Grid>
