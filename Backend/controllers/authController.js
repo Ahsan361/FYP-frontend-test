@@ -16,7 +16,7 @@ export const registerUser = async (req, res) => {
       });
     }
 
-    // Check for existing users (verified or unverified)
+    // Check for existing users 
     const existingUser = await User.findOne({ 
       $or: [{ username }, { email }]
     });

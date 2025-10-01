@@ -5,7 +5,7 @@ dotenv.config();
 import express from "express";
 import cors from "cors";
 import connectDB from "./config/db.js";
-import CleanupService from "./services/CleanupService.js"; // Add cleanup service
+import CleanupService from "./services/cleanupService.js";
 
 // Import routes
 import artifactRoutes from "./routes/artifactRoutes.js";
@@ -53,5 +53,5 @@ app.use("/api/exhibition-registrations", ExhibitionRegistration)
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });

@@ -12,7 +12,7 @@ function InternationalToursSection() {
       dates: "10 June - 15 July 2026",
       status: "Book Now",
       statusColor: "success",
-      image: "/assets/pages/e-e/w1I.jpg",
+      image: "/assets/pages/e-e/g1l.jpg",
       description:
         "Experience a curated exhibition of Pakistani crafts including handwork, textiles at the Victoria & Albert Museum, including handwoven fabrics, embroidery, and traditional patterns.",
       actionText: "Book Now",
