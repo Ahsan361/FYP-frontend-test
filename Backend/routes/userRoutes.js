@@ -2,11 +2,13 @@ import express from "express";
 import { addUser, getUserProfile, getAllUsers, getUserById, updateUser, deleteUser, getUserStats } from "../controllers/userController.js";
 import protect from "../middleware/authMiddleware.js";
 import { authorize } from "../middleware/rbac.js";
+import { upload } from "../config/cloudinary.js";
+
 const router = express.Router();
 
 //normal user routes
 router.get("/profile", protect, getUserProfile);
-router.put("/:id", protect, updateUser); //update user
+router.put("/:id", upload.single("profileImage"), updateUser); //update user
 
 // ✅ Admin routes (restricted)
 router.get("/", protect, authorize("admin"), getAllUsers);         // Get all users   

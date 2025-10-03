@@ -14,12 +14,15 @@ const userSchema = new mongoose.Schema(
     is_active: { type: Boolean, default: true },
     email_verified: { type: Boolean, default: false },
     last_login: { type: Date },
-    
+    profileImage: {
+      url: { type: String, default: null },
+      publicId: { type: String, default: null }
+    },
     // Email verification fields
     verification_otp: { type: String },
     otp_expires_at: { type: Date },
     otp_attempts: { type: Number, default: 0 },
-    created_at_unverified: { type: Date }, // Track when unverified user was created
+    created_at_unverified: { type: Date },
   },
   { timestamps: true }
 );

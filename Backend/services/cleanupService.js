@@ -12,8 +12,6 @@ class CleanupService {
     console.log("Cleanup service called.");
     await this.cleanupUnverifiedUsers();
   });
-
-
     console.log('Cleanup job started - runs every hour');
   }
 
