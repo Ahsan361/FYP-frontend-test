@@ -9,7 +9,6 @@ const userSchema = new mongoose.Schema(
     first_name: { type: String, maxlength: 50 },
     last_name: { type: String, maxlength: 50 },
     phone_number: { type: String, maxlength: 20 },
-    profile_picture_url: { type: String },
     role: { type: String, enum: ["admin", "user"], default: "user", required: true },
     is_active: { type: Boolean, default: true },
     email_verified: { type: Boolean, default: false },

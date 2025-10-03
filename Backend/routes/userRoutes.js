@@ -12,7 +12,7 @@ router.put("/:id", upload.single("profileImage"), updateUser); //update user
 
 // ✅ Admin routes (restricted)
 router.get("/", protect, authorize("admin"), getAllUsers);         // Get all users   
-router.post("/", protect, authorize("admin"), addUser)      // add user
+router.post("/", protect, authorize("admin"), upload.single("profileImage"), addUser)      // add user
 router.get("/stats", protect, authorize("admin"), getUserStats); // User statistics (example: active count etc.)
 router.get("/:id", protect, authorize("admin"), getUserById);         // Get single user by ID
 router.delete("/:id", protect, authorize("admin"), deleteUser);       // Delete a user

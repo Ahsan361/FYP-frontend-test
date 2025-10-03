@@ -104,7 +104,7 @@ function AdminUsers() {
     { name: 'first_name', label: 'First Name', gridSize: { xs: 12, sm: 6 } },
     { name: 'last_name', label: 'Last Name', gridSize: { xs: 12, sm: 6 } },
     { name: 'phone_number', label: 'Phone Number', gridSize: { xs: 12, sm: 6 } },
-    { name: 'profile_picture_url', label: 'Profile Picture URL', gridSize: { xs: 12, sm: 6 } },
+    { name: 'profileImage', label: 'Profile Picture', type: 'file', gridSize: { xs: 12, sm: 6 } },
     {
       name: 'is_active',
       label: 'Active Account',
@@ -239,7 +239,7 @@ function AdminUsers() {
       <TableCell>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Avatar
-            src={userItem.profile_picture_url || '/api/placeholder/40/40'}
+            src={userItem.profileImage.url || '/api/placeholder/40/40'}
             sx={{ width: 40, height: 40, mr: 2 }}
           />
           <Box>
@@ -296,7 +296,7 @@ function AdminUsers() {
         <Grid container spacing={3} sx={{ mt: 2 }}>
           <Grid size={{ xs: 12, md: 4 }}>
             <Avatar
-              src={userItem.profile_picture_url || '/api/placeholder/200/200'}
+              src={userItem.profileImage.url || '/api/placeholder/200/200'}
               sx={{ width: '100%', height: 200 }}
               variant='rounded'
             />
