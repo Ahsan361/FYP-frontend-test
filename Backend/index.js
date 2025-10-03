@@ -4,10 +4,13 @@ dotenv.config();
 
 import express from "express";
 import cors from "cors";
+import {v2 as cloudinary} from "cloudinary"
 import connectDB from "./config/db.js";
+
+//import service
 import CleanupService from "./services/cleanupService.js";
 
-// Import routes
+//import routes
 import artifactRoutes from "./routes/artifactRoutes.js";
 import artifactMediaRoutes from "./routes/artifactMediaRoutes.js";
 import blockchainRoutes from "./routes/blockchainRoutes.js";
@@ -33,6 +36,12 @@ app.use(cors({
   origin: "http://localhost:5173",  // frontend URL
   credentials: true,                 // if you're sending cookies or auth headers
 }));
+
+cloudinary.config({
+  secure:true
+})
+
+console.log("Cloudinary: ", cloudinary.config());
 
 // Mount your routers
 app.use("/api/artifacts", artifactRoutes);
