@@ -3,7 +3,7 @@ import {
   Box, Typography, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   IconButton, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions,
   TextField, FormControl, InputLabel, Select, MenuItem as SelectMenuItem, FormHelperText, 
-  Switch, FormControlLabel, useMediaQuery, useTheme
+  Switch, FormControlLabel, useMediaQuery, useTheme, CircularProgress 
 } from '@mui/material';
 
 import { MoreVertical, Edit, Trash2, Eye, Search, Calendar, XCircle, CreditCard } from 'lucide-react';
@@ -53,6 +53,7 @@ const AdminTable = ({
   const [isEditMode, setIsEditMode] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [touched, setTouched] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md')); 
 
@@ -112,11 +113,14 @@ const AdminTable = ({
     }
     
     try {
+      setIsSubmitting(true);
       await onFormSubmit(formData, isEditMode, selectedItem);
       handleFormClose();
     } catch (error) {
       console.error('Error submitting form:', error);
-    }
+    } finally {
+      setIsSubmitting(false); 
+  }
   };
 
   // Enhanced handleMenuAction to support cancel and payment
@@ -488,7 +492,31 @@ const AdminTable = ({
                     }
                     label={field.label}
                   />
-                ) : (
+                ) : field.name === "profileImage" ? (
+                  <Button
+                    variant="outlined"
+                    component="label"
+                    fullWidth
+                  >
+                    {formData[field.name] ? "Change Profile Picture" : "Upload Profile Picture"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      hidden
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          const nextFormData = { ...formData, [field.name]: file };
+                          setFormData(nextFormData);
+
+                          if (validateField && (formSubmitted || touched)) {
+                            validateField(field.name, file, nextFormData, setErrors);
+                          }
+                        }
+                      }}
+                    />
+                  </Button>
+              ) : (
                   <TextField
                     label={field.label}
                     type={field.type || 'text'}
@@ -513,14 +541,22 @@ const AdminTable = ({
                 )}
               </Grid>
             ))}
+            
           </Grid>
         </DialogContent>
         <DialogActions>
           <Button variant="outlined" onClick={handleFormClose}>
             Cancel
           </Button>
-          <Button variant="contained" onClick={handleFormSubmit}>
-            {isEditMode ? 'Update' : 'Create'}
+          <Button variant="contained" onClick={handleFormSubmit}  disabled={isSubmitting}>
+            {isSubmitting ? (
+                <>
+                  <CircularProgress size={20} sx={{ mr: 1, color: 'white' }} />
+                  {isEditMode ? 'Updating...' : 'Creating...'}
+                </>
+              ) : (
+                isEditMode ? 'Update' : 'Create'
+            )}
           </Button>
         </DialogActions>
       </Dialog>
