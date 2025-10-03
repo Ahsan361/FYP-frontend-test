@@ -4,7 +4,6 @@ dotenv.config();
 
 import express from "express";
 import cors from "cors";
-import {v2 as cloudinary} from "cloudinary"
 import connectDB from "./config/db.js";
 
 //import service
@@ -25,6 +24,7 @@ import aiProcessingRoutes from "./routes/aiProcessingRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import EventRegistration from "./routes/eventRegistrationRoutes.js"
 import ExhibitionRegistration from "./routes/exhibitionRegistrationRoutes.js"
+import imageRoutes from "./routes/imageRoutes.js";
 
 // Connect to database
 connectDB();
@@ -37,11 +37,6 @@ app.use(cors({
   credentials: true,                 // if you're sending cookies or auth headers
 }));
 
-cloudinary.config({
-  secure:true
-})
-
-console.log("Cloudinary: ", cloudinary.config());
 
 // Mount your routers
 app.use("/api/artifacts", artifactRoutes);
@@ -58,6 +53,7 @@ app.use("/api/ai-processing", aiProcessingRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/event-registrations", EventRegistration)
 app.use("/api/exhibition-registrations", ExhibitionRegistration)
+app.use("/api/image-route", imageRoutes);
 
 const PORT = process.env.PORT || 5000;
 

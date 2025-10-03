@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import { uploadToCloudinary, deleteFromCloudinary } from "../config/cloudinary.js";
 
 // Admin: Add new user
 export const addUser = async (req, res) => {
@@ -35,7 +36,14 @@ export const addUser = async (req, res) => {
       is_active: is_active ?? true,
       email_verified: email_verified ?? false,
     });
-
+    
+    if (req.file) {
+      const uploadResult = await uploadToCloudinary(req.file.buffer, "miraas/users");
+      newUser.profileImage = {
+        url: uploadResult.secure_url,
+        publicId: uploadResult.public_id,
+      };
+    }
     const savedUser = await newUser.save();
 
     // Hide password hash before sending response
@@ -77,6 +85,7 @@ export const updateUser = async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
+
     user.username = req.body.username || user.username;
     user.email = req.body.email || user.email;
     user.first_name = req.body.first_name || user.first_name;
@@ -86,8 +95,24 @@ export const updateUser = async (req, res) => {
     user.is_active = req.body.is_active ?? user.is_active;
     user.email_verified = req.body.email_verified ?? user.email_verified;
 
+    if (req.file) {
+    // If user already has an image, delete old one first
+    if (user.profileImage?.publicId) {
+      await deleteFromCloudinary(user.profileImage.publicId);
+    }
+
+    // Upload new image to Cloudinary under "miraas/users"
+    const uploadResult = await uploadToCloudinary(req.file.buffer, "miraas/users");
+
+    user.profileImage = {
+        url: uploadResult.secure_url,
+        publicId: uploadResult.public_id,
+      };
+    }
+
     const updatedUser = await user.save();
     res.json(updatedUser);
+
   } catch (error) {
     console.log("Error in updateUser:", error);
     res.status(500).json({ message: error.message });
@@ -100,6 +125,11 @@ export const deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) return res.status(404).json({ message: "User not found" });
+
+    //delete related image from cloud too
+    if (user.profileImage?.publicId) {
+      await deleteFromCloudinary(user.profileImage.publicId);
+    }
 
     res.json({ message: "User deleted successfully" });
   } catch (error) {
