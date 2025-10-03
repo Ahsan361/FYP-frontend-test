@@ -45,6 +45,7 @@ function UserProfile() {
     handleInputChange,
     handleUpdateProfile,
     handlePasswordChange,
+    uploading
   } = useProfile();
   const handleMobileMenuToggle = () => setMobileMenuOpen((prev) => !prev);
   const handleAlertClose = () => setAlert({ show: false });
@@ -146,6 +147,7 @@ function UserProfile() {
                 formData={formData}
                 editMode={editMode}
                 handleInputChange={handleInputChange}
+                uploading={uploading}
               />
               <UserDetailsForm
                 formData={formData}
@@ -155,6 +157,7 @@ function UserProfile() {
                 setEditMode={setEditMode}
                 handleUpdateProfile={handleUpdateProfile}
                 setPasswordDialogOpen={setPasswordDialogOpen}
+                uploading={uploading} 
               />
             </Grid>
           </Paper>

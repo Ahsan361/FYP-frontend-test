@@ -6,7 +6,7 @@ import { resetPassword } from "../services/authService";
 export function useProfile() {
   const { user, setUser } = useContext(UserContext);
   const token = localStorage.getItem("token");
-
+  const [uploading, setUploading] = useState(false);
   const [fetchedUser, setFetchedUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
@@ -42,7 +42,7 @@ export function useProfile() {
             email: profileData.email || "",
             first_name: profileData.first_name || "",
             last_name: profileData.last_name || "",
-            avatar: profileData.profile_picture_url || "",
+            avatar: profileData.profileImage.url || "",
             role: profileData.role || "",
             is_active: profileData.is_active ?? true,
           });
@@ -65,15 +65,19 @@ export function useProfile() {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
+    const file = e.file || null;
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
+      //attach file if present
+       ...(file && { file }),
     }));
   };
 
   const handleUpdateProfile = async () => {
     if (!user?._id) return;
     try {
+      setUploading(true); 
       const updatedUser = await updateUser(user._id, formData, token);
       setFetchedUser(updatedUser);
       const userWithToken = {
@@ -85,7 +89,7 @@ export function useProfile() {
         email: updatedUser.email || "",
         first_name: updatedUser.first_name || "",
         last_name: updatedUser.last_name || "",
-        avatar: updatedUser.profile_picture_url || "",
+        avatar: updatedUser.profileImage.url || "",
         role: updatedUser.role || "",
         is_active: updatedUser.is_active ?? true,
       });
@@ -103,6 +107,9 @@ export function useProfile() {
         message: error.response?.data?.message || "Failed to update profile",
         severity: "error",
       });
+    }
+    finally{
+      setUploading(false);
     }
   };
 
@@ -148,5 +155,6 @@ export function useProfile() {
     handleInputChange,
     handleUpdateProfile,
     handlePasswordChange,
+    uploading 
   };
 }

@@ -8,6 +8,7 @@ import {
   Checkbox,
   Button,
 } from "@mui/material";
+
 import { Edit, Lock } from "@mui/icons-material";
 
 function UserDetailsForm({
@@ -18,6 +19,7 @@ function UserDetailsForm({
   setEditMode,
   handleUpdateProfile,
   setPasswordDialogOpen,
+  uploading
 }) {
   return (
     <Grid size={{ xs: 12, md: 8 }}>
@@ -110,14 +112,22 @@ function UserDetailsForm({
           {editMode ? "Cancel" : "Edit Profile"}
         </Button>
         {editMode && (
-          <Button
-            variant="contained"
-            color="success"
-            onClick={handleUpdateProfile}
-            sx={{ borderRadius: 1 }}
-          >
-            Save Changes
-          </Button>
+          // <Button
+          //   variant="contained"
+          //   color="success"
+          //   onClick={handleUpdateProfile}
+          //   sx={{ borderRadius: 1 }}
+          // >
+          //   Save Changes
+          // </Button>
+           <Button
+    onClick={handleUpdateProfile}
+    loading={uploading}   // 👈 now supported on core Button
+    variant="contained"
+    color="success"
+  >
+    Save Changes
+  </Button>
         )}
         <Button
           variant="outlined"

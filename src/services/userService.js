@@ -28,8 +28,25 @@ export const addUser = async (userData, token) => {
 
 // Update user (Admin only)
 export const updateUser = async (id, userData, token) => {
-  const res = await axios.put(`${API_URL}/${id}`, userData, {
-    headers: { Authorization: `Bearer ${token}` },
+  const formData = new FormData();
+
+  // Append all text fields
+  Object.keys(userData).forEach((key) => {
+    if (key !== "file") {
+      formData.append(key, userData[key]);
+    }
+  });
+
+  // Append file if exists
+  if (userData.file) {
+    formData.append("profileImage", userData.file); 
+  }
+
+  const res = await axios.put(`${API_URL}/${id}`, formData, {
+     headers: { 
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    },
   });
   return res.data;
 };
