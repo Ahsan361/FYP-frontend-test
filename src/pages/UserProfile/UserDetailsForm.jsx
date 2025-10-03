@@ -112,22 +112,14 @@ function UserDetailsForm({
           {editMode ? "Cancel" : "Edit Profile"}
         </Button>
         {editMode && (
-          // <Button
-          //   variant="contained"
-          //   color="success"
-          //   onClick={handleUpdateProfile}
-          //   sx={{ borderRadius: 1 }}
-          // >
-          //   Save Changes
-          // </Button>
            <Button
-    onClick={handleUpdateProfile}
-    loading={uploading}   // 👈 now supported on core Button
-    variant="contained"
-    color="success"
-  >
-    Save Changes
-  </Button>
+              onClick={handleUpdateProfile}
+              loading={uploading} 
+              variant="contained"
+              color="success"
+            >
+              Save Changes
+            </Button>
         )}
         <Button
           variant="outlined"

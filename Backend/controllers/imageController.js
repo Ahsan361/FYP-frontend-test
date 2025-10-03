@@ -8,7 +8,9 @@ export const uploadImage = async (req, res) => {
       return res.status(400).json({ success: false, message: "No image file provided" });
     }
 
-    const uploadResult = await uploadToCloudinary(req.file.buffer);
+    const folder = req.query.folder || "miraas";
+
+    const uploadResult = await uploadToCloudinary(req.file.buffer, folder);
 
     res.status(200).json({
       success: true,
