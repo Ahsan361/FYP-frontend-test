@@ -8,10 +8,11 @@ class CleanupService {
 
   startCleanupJob() {
     // Run cleanup every hour
-     cron.schedule('*/30 * * * * *', async () => {
-      console.log("Cleanup service called.")
+     cron.schedule('0 0 * * *', async () => {
+    console.log("Cleanup service called.");
     await this.cleanupUnverifiedUsers();
   });
+
 
     console.log('Cleanup job started - runs every hour');
   }
