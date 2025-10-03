@@ -103,8 +103,8 @@ function RightActions({ user, setUser, isMobile, handleMobileMenuToggle, mobileM
               aria-haspopup="true"
               aria-expanded={open ? "true" : undefined}
             >
-              <Avatar src={userData?.profile_picture_url || user.avatar}>
-                {userData?.profile_picture_url ? "" : user.username?.charAt(0).toUpperCase()}
+              <Avatar src={userData?.profileImage.url || user.avatar}>
+                {userData?.profileImage.url ? "" : user.username?.charAt(0).toUpperCase()}
               </Avatar>
             </IconButton>
           </Tooltip>
