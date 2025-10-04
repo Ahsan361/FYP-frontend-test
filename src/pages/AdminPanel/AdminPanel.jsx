@@ -159,52 +159,51 @@ function AdminPanel() {
       <Box sx={{ flexGrow: 1, overflowY: 'auto', overflowX: "hidden", pt: 2 }}>
         <List>
           {menuItems.map((item) => (
-<ListItem disablePadding key={item.key}>
-  <ListItemButton onClick={() => setActiveSection(item.key)}
-    sx={{
-      mx: 1,
-      borderRadius: 2,
-      mb: 0.5,
-      backgroundColor:
-        activeSection === item.key
-          ? theme.palette.mode === 'dark'
-            ? theme.palette.primary.main + '40'
-            : theme.palette.primary.main + '15'
-          : 'transparent',
-      '&:hover': {
-        backgroundColor:
-          theme.palette.mode === 'dark'
-            ? theme.palette.primary.main + '20'
-            : theme.palette.primary.main + '08',
-      },
-    }}
-  >
-    <ListItemIcon
-      sx={{
-        color:
-          activeSection === item.key
-            ? theme.palette.primary.main
-            : 'inherit',
-        minWidth: 40,
-      }}
-    >
-      <item.icon size={20} />
-    </ListItemIcon>
-    <ListItemText
-      primary={item.text}
-      sx={{
-        '& .MuiTypography-root': {
-          fontWeight: activeSection === item.key ? 600 : 400,
-          color:
-            activeSection === item.key
-              ? theme.palette.primary.main
-              : 'inherit',
-            },
-          }}
-        />
-      </ListItemButton>
-    </ListItem>
-
+            <ListItem disablePadding key={item.key}>
+              <ListItemButton onClick={() => setActiveSection(item.key)}
+                sx={{
+                  mx: 1,
+                  borderRadius: 2,
+                  mb: 0.5,
+                  backgroundColor:
+                    activeSection === item.key
+                      ? theme.palette.mode === 'dark'
+                        ? theme.palette.primary.main + '40'
+                        : theme.palette.primary.main + '15'
+                      : 'transparent',
+                  '&:hover': {
+                    backgroundColor:
+                      theme.palette.mode === 'dark'
+                        ? theme.palette.primary.main + '20'
+                        : theme.palette.primary.main + '08',
+                  },
+                }}
+              >
+              <ListItemIcon
+                sx={{
+                  color:
+                    activeSection === item.key
+                      ? theme.palette.primary.main
+                      : 'inherit',
+                  minWidth: 40,
+                }}
+              >
+                <item.icon size={20} />
+              </ListItemIcon>
+              <ListItemText
+                primary={item.text}
+                sx={{
+                  '& .MuiTypography-root': {
+                    fontWeight: activeSection === item.key ? 600 : 400,
+                    color:
+                      activeSection === item.key
+                        ? theme.palette.primary.main
+                        : 'inherit',
+                      },
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
           ))}
         </List>
       </Box>
@@ -302,8 +301,11 @@ function AdminPanel() {
               <ThemeToggle />
 
               <IconButton onClick={handleProfileClick} sx={{ ml: 1 }}>
-                <Avatar sx={{ width: 32, height: 32 }}>
-                    {user?.username?.[0]?.toUpperCase() || "A"}  
+                <Avatar 
+                  src={user?.profileImage?.url || ""} 
+                  sx={{ width: 32, height: 32 }}
+                >
+                    { user?.username?.[0]?.toUpperCase()}  
                 </Avatar>
               </IconButton>
             </Box>
