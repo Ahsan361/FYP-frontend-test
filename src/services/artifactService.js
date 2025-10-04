@@ -14,17 +14,50 @@ export const getArtifacts = async (token) => {
 
 // Create new artifact
 export const createArtifact = async (artifactData, token) => {
-  const res = await axios.post(API_URL, artifactData, {
-    headers: { Authorization: `Bearer ${token}` },
+  const formData = new FormData();
+
+  Object.keys(artifactData).forEach((key) => {
+    if (key !== "artifactImage") {
+      formData.append(key, artifactData[key]);
+    }
+  });
+
+  if (artifactData.artifactImage instanceof File) {
+    formData.append("artifactImage", artifactData.artifactImage);
+  }
+
+  const res = await axios.post(API_URL, formData, {
+    headers: { 
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    },
   });
   return res.data;
 };
 
 // Edit artifact (NEW)
 export const editArtifact = async (id, artifactData, token) => {
-  const res = await axios.put(`${API_URL}/${id}`, artifactData, {
-    headers: { Authorization: `Bearer ${token}` },
+  const formData = new FormData();
+
+  Object.keys(artifactData).forEach((key) => {
+    if (key === "contributor_id" && typeof artifactData[key] === "object") {
+      formData.append("contributor_id", artifactData[key]._id);
+    } else if (key !== "artifactImage") {
+      formData.append(key, artifactData[key]);
+    }
   });
+
+  if (artifactData.artifactImage instanceof File) {
+    formData.append("artifactImage", artifactData.artifactImage);
+  }
+
+  const res = await axios.put(`${API_URL}/${id}`, formData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
   return res.data;
 };
 

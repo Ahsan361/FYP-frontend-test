@@ -130,7 +130,7 @@ function AdminArtifacts() {
       gridSize: { xs: 12, sm: 6 }
     },
     { name: 'historical_context', label: 'Historical Context', gridSize: { xs: 12, sm: 6 } },
-    { name: 'image', label: 'Image URL', gridSize: { xs: 12, sm: 6 } }
+    { name: 'artifactImage', label: 'Artifact Image', type: 'file', gridSize: { xs: 12, sm: 6 } }
   ];
 
   // Stats data configuration
@@ -285,7 +285,7 @@ function AdminArtifacts() {
         <Grid container spacing={3} sx={{ mt: 2 }}>
           <Grid size={{ xs: 12, md: 4 }}>
             <Avatar
-              src={artifact.image || '/api/placeholder/200/200'}
+              src={artifact.artifactImage?.url || '/api/placeholder/200/200'}
               sx={{ width: '100%', height: 200 }}
               variant="rounded"
             />
