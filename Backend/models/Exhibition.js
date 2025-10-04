@@ -14,8 +14,12 @@ const exhibitionSchema = new mongoose.Schema(
     current_bookings: { type: Number, default: 0 },
     entry_fee: { type: Number, default: 0 },
     age_restriction: { type: String },
-    banner_image_url: { type: String },
-    is_featured: { type: Boolean, default: false }
+    is_featured: { type: Boolean, default: false },
+    exhibitionImage: {
+      url: { type: String, default: null },
+      publicId: { type: String, default: null }
+    },
+    
   },
   { timestamps: true }
 );
