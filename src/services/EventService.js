@@ -19,16 +19,46 @@ export const getEventById = async (id, token) => {
 
 // Create new event
 export const createEvent = async (eventData, token) => {
-  const res = await axios.post(API_URL, eventData, {
-    headers: { Authorization: `Bearer ${token}` },
+  const formData = new FormData();
+
+  Object.keys(eventData).forEach((key) =>{
+    if(key !== "eventImage"){
+      formData.append(key, eventData[key]);
+    }
+  });
+  if(eventData.eventImage instanceof File) {
+    formData.append("eventImage", eventData.eventImage);
+  }
+
+  const res = await axios.post(API_URL, formData, {
+    headers: { 
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    },
   });
   return res.data;
 };
 
 // Update event
 export const updateEvent = async (id, eventData, token) => {
-  const res = await axios.put(`${API_URL}/${id}`, eventData, {
-    headers: { Authorization: `Bearer ${token}` },
+  const formData = new FormData();
+  
+  Object.keys(eventData).forEach((key) => {
+    if(key === "organizer_id" && typeof eventData[key] === "object"){
+      formData.append("organizer_id", eventData[key]._id);
+    } else if(key !== "eventImage"){
+      formData.append(key, eventData[key]);
+    }
+  });
+  if(eventData.eventImage instanceof File){
+    formData.append("eventImage", eventData.eventImage);
+  }
+
+  const res = await axios.put(`${API_URL}/${id}`, formData, {
+    headers: { 
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    },
   });
   return res.data;
 };

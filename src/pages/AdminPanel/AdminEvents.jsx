@@ -132,7 +132,7 @@ function AdminEvents() {
       options: Object.values(TARGET_AUDIENCES).map(audience => ({ value: audience, label: audience })),
       gridSize: { xs: 12, md: 6 }
     },
-    { name: 'banner_image_url', label: 'Banner Image URL', gridSize: { xs: 12, md: 6 } },
+    { name: 'eventImage', label: 'Event Image', type: 'file', gridSize: { xs: 12, sm: 6 } },
     { 
       name: 'is_free', 
       label: 'Is Free', 
@@ -378,7 +378,7 @@ function AdminEvents() {
                 { label: "Registration Fee", value: event.is_free ? 'Free' : `Rs. ${event.registration_fee}` },
                 { label: "Requires Registration", value: event.requires_registration ? 'Yes' : 'No' },
                 { label: "Target Audience", value: event.target_audience },
-                { label: "Banner Image", value: event.banner_image_url || 'N/A' },
+                { label: "Banner Image", value: event.eventImage.url || 'N/A' },
                 { label: "Created At", value: formatDate(event.created_at) },
               ].map((field, index) => (
                 <Box key={index} sx={{ mb: 3 }}>
