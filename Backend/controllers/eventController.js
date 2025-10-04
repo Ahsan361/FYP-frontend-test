@@ -1,5 +1,6 @@
 import Event from "../models/Event.js";
 import EventRegistration from "../models/EventRegistration.js";
+import { uploadToCloudinary, deleteFromCloudinary, upload } from "../config/cloudinary.js";
 
 const EVENT_TYPES = {
   CONFERENCE: "conference",
@@ -18,11 +19,33 @@ const EVENT_STATUSES = {
 // Create event
 export const createEvent = async (req, res) => {
   try {
-    const event = await Event.create({ ...req.body, organizer_id: req.user._id });
-    res.status(201).json(event);
+    let eventData = {
+      ... req.body,
+      organizer_id:req.user._id
+    }
+
+    if(req.file){
+      const uploadResult = await uploadToCloudinary(req.file.buffer, "miraas/events");
+      eventData.eventImage = {
+        url: uploadResult.secure_url,
+        publicId:uploadResult.public_id
+      }
+    }
+
+    const event = await Event.create(eventData);
+
+    res.status(201).json({
+      success: true,
+      message: "Event created successfully",
+      data: event
+    });
   } catch (error) {
-    console.log("❌ Error in createEvent:", error);
-    res.status(500).json({ message: "Error creating event", error: error.message });
+    console.log("Error in createEvent:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error creating event",
+      error: error.message 
+   });
   }
 };
 
@@ -64,12 +87,35 @@ export const getEventById = async (req, res) => {
 // Update event
 export const updateEvent = async (req, res) => {
   try {
-    const event = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    let event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ message: "Event not found" });
-    res.json(event);
+    
+    const updateData = {...req.body };
+    //handle image update 
+    if(req.file){
+      if(event.eventImage?.publicId){
+        await deleteFromCloudinary(event.eventImage.publicId);
+      }
+      const uploadResult = await uploadToCloudinary(req.file.buffer, "miraas/events")
+      updateData.eventImage = {
+        url: uploadResult.secure_url,
+        publicId: uploadResult.public_id,
+      }
+    }
+
+    event = await Event.findByIdAndUpdate(req.params.id, updateData, {new: true});
+    res.json({
+      success: true,
+      message: "Event updated successfully",
+      data: event,
+    });
   } catch (error) {
     console.log("❌ Error in updateEvent:", error);
-    res.status(500).json({ message: "Error updating event" });
+    res.status(500).json({
+      success: false,
+      message: "Error updating event",
+      error: error.message 
+    });
   }
 };
 
@@ -81,6 +127,11 @@ export const deleteEvent = async (req, res) => {
 
      //delete all related registrations as well
     await EventRegistration.deleteMany({ event_id: req.params.id });
+
+    //delete related image from cloud as well
+    if(event.eventImage?.publicId){
+      await deleteFromCloudinary(event.eventImage.publicId)
+    }
 
     res.json({ message: "Event and related registrations deleted successfully" });
   } catch (error) {
