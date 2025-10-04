@@ -20,7 +20,6 @@ export const getUserById = async (id, token) => {
 
 // Add new user (Admin only)
 export const addUser = async (userData, token) => {
-  console.log("User Data", userData);
   const formData = new FormData();
 
   // Append all text fields
@@ -29,13 +28,11 @@ export const addUser = async (userData, token) => {
       formData.append(key, userData[key]);
     }
   });
-  console.log("Form Data-text", formData);
 
   // Append file if exists
   if (userData.profileImage instanceof File) {  // ✅ Check if it's a File object
     formData.append("profileImage", userData.profileImage); 
   }
-  console.log("Form Data-pic", formData);
   
   const res = await axios.post(API_URL, formData, {
     headers: { 

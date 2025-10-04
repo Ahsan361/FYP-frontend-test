@@ -494,29 +494,63 @@ const AdminTable = ({
                   />
                 ) : field.name === "profileImage" || field.name === "artifactImage" || field.name === "eventImage" || field.name === "exhibitionImage" ? (
                   <Button
-                    variant="outlined"
-                    component="label"
-                    fullWidth
-                  >
-                    {formData[field.name] ? "Change Profile Picture" : "Upload Profile Picture"}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      hidden
-                      onChange={(e) => {
-                        const file = e.target.files[0];
-                        if (file) {
-                          const nextFormData = { ...formData, [field.name]: file };
-                          setFormData(nextFormData);
-
-                          if (validateField && (formSubmitted || touched)) {
-                            validateField(field.name, file, nextFormData, setErrors);
-                          }
-                        }
-                      }}
-                    />
-                  </Button>
-              ) : (
+  variant="outlined"
+  component="label"
+  fullWidth
+  sx={{ 
+    height: '56px',
+    textTransform: 'none',
+    borderColor: formData[field.name] ? 'success.main' : undefined,
+    color: formData[field.name] ? 'success.main' : undefined,
+    display: 'flex',
+    justifyContent: formData[field.name] ? 'space-between' : 'center',
+    alignItems: 'center',
+    px: 2,
+  }}
+>
+  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}>
+    <Typography sx={{ textAlign: formData[field.name] ? 'left' : 'center', flex: 1 }}>
+      {formData[field.name] ? "Change Image" : "Upload Image"}
+    </Typography>
+    {formData[field.name] && (
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Typography variant="caption" color="textSecondary">
+          {formData[field.name].name}
+        </Typography>
+        <IconButton
+          size="small"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const nextFormData = { ...formData, [field.name]: null };
+            setFormData(nextFormData);
+            if (validateField && (formSubmitted || touched)) {
+              validateField(field.name, null, nextFormData, setErrors);
+            }
+          }}
+        >
+          <XCircle size={16} color={theme.palette.error.main} />
+        </IconButton>
+      </Box>
+    )}
+  </Box>
+  <input
+    type="file"
+    accept="image/*"
+    hidden
+    onChange={(e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const nextFormData = { ...formData, [field.name]: file };
+        setFormData(nextFormData);
+        if (validateField && (formSubmitted || touched)) {
+          validateField(field.name, file, nextFormData, setErrors);
+        }
+      }
+    }}
+  />
+</Button>
+                ) : (
                   <TextField
                     label={field.label}
                     type={field.type || 'text'}
