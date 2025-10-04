@@ -92,7 +92,6 @@ export const updateArtifact = async (req, res) => {
   }
 };
 
-
 // Delete artifact
 export const deleteArtifact = async (req, res) => {
   try {
