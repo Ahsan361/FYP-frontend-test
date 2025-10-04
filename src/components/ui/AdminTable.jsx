@@ -492,7 +492,7 @@ const AdminTable = ({
                     }
                     label={field.label}
                   />
-                ) : field.name === "profileImage" || field.name === "artifactImage" || field.name === "eventImage" ? (
+                ) : field.name === "profileImage" || field.name === "artifactImage" || field.name === "eventImage" || field.name === "exhibitionImage" ? (
                   <Button
                     variant="outlined"
                     component="label"

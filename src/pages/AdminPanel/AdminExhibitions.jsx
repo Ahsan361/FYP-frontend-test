@@ -102,7 +102,7 @@ function AdminExhibitions() {
     { name: 'max_capacity', label: 'Max Capacity', type: 'number', gridSize: { xs: 12, md: 6 } },
     { name: 'entry_fee', label: 'Entry Fee', type: 'number', gridSize: { xs: 12, md: 6 } },
     { name: 'age_restriction', label: 'Age Restriction', gridSize: { xs: 12, md: 6 } },
-    { name: 'banner_image_url', label: 'Banner Image URL', gridSize: { xs: 12, md: 6 } },
+    { name: 'exhibitionImage', label: 'Exhibition Image', type: 'file', gridSize: { xs: 12, sm: 6 } },
     { 
       name: 'is_featured', 
       label: 'Is Featured', 
@@ -341,7 +341,7 @@ function AdminExhibitions() {
                 { label: "Max Capacity", value: exhibition.max_capacity || 'Unlimited' },
                 { label: "Entry Fee", value: exhibition.entry_fee === 0 ? 'Free' : `Rs. ${exhibition.entry_fee}` },
                 { label: "Age Restriction", value: exhibition.age_restriction || 'None' },
-                { label: "Banner Image", value: exhibition.banner_image_url || 'N/A' },
+                { label: "Banner Image", value: exhibition.exhibitionImage.url || 'N/A' },
                 { label: "Featured", value: exhibition.is_featured ? 'Yes' : 'No' },
                 { label: "Created At", value: formatDate(exhibition.created_at) },
               ].map((field, index) => (

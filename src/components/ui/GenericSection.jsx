@@ -83,7 +83,7 @@ function GenericSection({
           dates: dates || 'Dates TBD',
           status: item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : 'Unknown',
           statusColor: item.status === 'upcoming' ? 'info' : item.is_featured ? 'success' : 'default',
-          image: item.eventImage.url || item.exhibitionImage.url,
+          image: item.exhibitionImage.url || item.exhibitionImage.url  || 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=300&h=200&fit=crop',
           description: item.description || (item.category ? `Explore the ${item.category} ${itemType}${item.curator_id?.username ? ` curated by ${item.curator_id.username}` : ''}.` : 'No description available.'),
         };
       });
