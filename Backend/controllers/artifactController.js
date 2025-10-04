@@ -1,13 +1,36 @@
 import Artifact from "../models/Artifact.js";
+import { uploadToCloudinary, deleteFromCloudinary } from "../config/cloudinary.js";
 
 // Create new artifact
 export const createArtifact = async (req, res) => {
   try {
-    const artifact = await Artifact.create({ ...req.body, contributor_id: req.user._id });
-    res.status(201).json(artifact);
+    let artifactData = { 
+      ...req.body, 
+      contributor_id: req.user._id 
+    };
+
+    if (req.file) {
+      const uploadResult = await uploadToCloudinary(req.file.buffer, "miraas/artifacts");
+      artifactData.artifactImage = {
+        url: uploadResult.secure_url,
+        publicId: uploadResult.public_id,
+      };
+    }
+
+    const artifact = await Artifact.create(artifactData);
+
+    res.status(201).json({
+      success: true,
+      message: "Artifact created successfully",
+      data: artifact
+    });
   } catch (error) {
     console.log("❌ Error in createArtifact:", error);
-    res.status(500).json({ message: "Error creating artifact", error: error.message });
+    res.status(500).json({ 
+      success: false,
+      message: "Error creating artifact", 
+      error: error.message 
+    });
   }
 };
 
@@ -37,20 +60,50 @@ export const getArtifactById = async (req, res) => {
 // Update artifact
 export const updateArtifact = async (req, res) => {
   try {
-    const artifact = await Artifact.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    let artifact = await Artifact.findById(req.params.id);
     if (!artifact) return res.status(404).json({ message: "Artifact not found" });
-    res.json(artifact);
+
+    // Prepare update data dynamically
+    const updateData = { ...req.body };
+
+    // Handle image update
+    if (req.file) {
+      if (artifact.artifactImage?.publicId) {
+        await deleteFromCloudinary(artifact.artifactImage.publicId);
+      }
+      const uploadResult = await uploadToCloudinary(req.file.buffer, "miraas/artifacts");
+      updateData.artifactImage = {
+        url: uploadResult.secure_url,
+        publicId: uploadResult.public_id,
+      };
+    }
+
+    // Update artifact in one go
+    artifact = await Artifact.findByIdAndUpdate(req.params.id, updateData, { new: true });
+
+    res.json({
+      success: true,
+      message: "Artifact updated successfully",
+      data: artifact,
+    });
   } catch (error) {
-    console.log("❌ Error in UpdateArtifacts:", error); 
+    console.log("❌ Error in updateArtifact:", error);
     res.status(500).json({ message: "Error updating artifact" });
   }
 };
+
 
 // Delete artifact
 export const deleteArtifact = async (req, res) => {
   try {
     const artifact = await Artifact.findByIdAndDelete(req.params.id);
     if (!artifact) return res.status(404).json({ message: "Artifact not found" });
+    
+    //delete related image from cloud too
+    if (artifact.artifactImage?.publicId) {
+      await deleteFromCloudinary(artifact.artifactImage.publicId);
+    }
+
     res.json({ message: "Artifact deleted successfully" });
   } catch (error) {
     console.log("❌ Error in DeleteArtifacts:", error); 
