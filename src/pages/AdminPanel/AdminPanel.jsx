@@ -53,7 +53,7 @@ import { ThemeToggle } from '../../components/ui';
 // Import admin sections
 import AdminHome from './AdminHome';
 import AdminArtifacts from './AdminArtifacts';
-import AdminUsers from './UsersManagement';
+import AdminUsers from './AdminUsers';
 import AdminAuctions from './AdminAuctions';
 import AdminBlockchain from './AdminBlockChain';
 import AdminEventRegistration from "./AdminEventRegistration";
