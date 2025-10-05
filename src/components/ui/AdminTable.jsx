@@ -446,11 +446,20 @@ const AdminTable = ({
       <Dialog open={openFormDialog} onClose={handleFormClose} maxWidth="md" fullWidth>
         <DialogTitle>{isEditMode ? 'Edit' : 'Create'} {title.split(' ')[0]}</DialogTitle>
         <DialogContent>
+          {/* Add this new conditional error banner */}
+          {errors?.generalError && (
+            <Box sx={{ mb: 2, p: 2, bgcolor: 'error.lighter', border: '1px solid', borderColor: 'error.main', borderRadius: 1 }}>
+              <Typography variant="body2" color="error.main" sx={{ display: 'flex', alignItems: 'center' }}>
+                <CheckCircle2 size={16} style={{ marginRight: 8, color: 'error.main' }} />  {/* Optional icon */}
+                {errors.generalError}
+              </Typography>
+            </Box>
+          )}
           <Grid container spacing={2} sx={{ mt: 1 }}>
             {formFields.map((field) => (
   <Grid size={field.gridSize || { xs: 12 }} key={field.name}>
     {field.type === 'custom' ? (
-      field.render()
+      field.render(formData, setFormData, errors)
     ) : field.type === 'select' ? (
       <FormControl fullWidth error={formSubmitted && !!errors[field.name]}>
         <InputLabel>{field.label}</InputLabel>
