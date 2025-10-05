@@ -41,7 +41,9 @@ const AdminTable = ({
   showCancel = false,
   showPayment = false,
   additionalCharts,
-  fieldConstraints
+  fieldConstraints,
+  errors, 
+  setErrors 
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilters, setSelectedFilters] = useState({});
@@ -49,7 +51,7 @@ const AdminTable = ({
   const [selectedItem, setSelectedItem] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [openFormDialog, setOpenFormDialog] = useState(false);
-  const [errors, setErrors] = useState({});
+  // const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({});
   const [isEditMode, setIsEditMode] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -446,176 +448,177 @@ const AdminTable = ({
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
             {formFields.map((field) => (
-              <Grid size={field.gridSize || { xs: 12 }} key={field.name}>
-                {field.type === 'select' ? (
-                  <FormControl fullWidth error={formSubmitted && !!errors[field.name]}>
-                    <InputLabel>{field.label}</InputLabel>
-                    <Select
-                      value={formData[field.name] || ''}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setFormData((prev) => ({ ...prev, [field.name]: value }));
-                        setTouched(true);
-                        if (field.onChange) {
-                          field.onChange(value, setFormData, formData);
-                        }
-                        if (validateField) {
-                          validateField(field.name, value, formData, setErrors);
-                        }
-                      }}
-                      onFocus={() => setActiveField(field.name)}
-                      onBlur={() => setActiveField(null)}
-                      label={field.label}
-                    >
-                      {field.options.map((option) => (
-                        <SelectMenuItem key={option.value} value={option.value} sx={{ textTransform: 'capitalize' }}>
-                          {option.label}
-                        </SelectMenuItem>
-                      ))}
-                    </Select>
-                    {formSubmitted && errors[field.name] && (
-                      <FormHelperText sx={{color: 'error.main'}}>
-                        {errors[field.name]}
-                      </FormHelperText>
-                    )}
-                  </FormControl>
-                ) : field.type === 'switch' ? (
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={formData[field.name] ?? field.defaultValue ?? false}
-                        onChange={(e) => {
-                          const value = e.target.checked;
-                          setFormData((prev) => ({ ...prev, [field.name]: value }));
-                          setTouched(true);
-                          if (field.onChange) {
-                            field.onChange(value, setFormData, formData);
-                          }
-                          if (validateField) {
-                            validateField(field.name, value, formData, setErrors);
-                          }
-                        }}
-                        onFocus={() => setActiveField(field.name)}
-                        onBlur={() => setActiveField(null)}
-                      />
-                    }
-                    label={field.label}
-                  />
-                ) : field.name === "profileImage" || field.name === "artifactImage" || field.name === "eventImage" || field.name === "exhibitionImage" ? (
-                  <Button
-                    variant="outlined"
-                    component="label"
-                    fullWidth
-                    sx={{ 
-                      height: '56px',
-                      textTransform: 'none',
-                      borderColor: formData[field.name] ? 'success.main' : undefined,
-                      color: formData[field.name] ? 'success.main' : undefined,
-                      display: 'flex',
-                      justifyContent: formData[field.name] ? 'space-between' : 'center',
-                      alignItems: 'center',
-                      px: 2,
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}>
-                      <Typography sx={{ textAlign: formData[field.name] ? 'left' : 'center', flex: 1 }}>
-                        {formData[field.name] ? "Change Image" : "Upload Image"}
-                      </Typography>
-                      {formData[field.name] && (
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant="caption" color="textSecondary">
-                            {formData[field.name].name}
-                          </Typography>
-                          <IconButton
-                            size="small"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              const nextFormData = { ...formData, [field.name]: null };
-                              setFormData(nextFormData);
-                              if (validateField && (formSubmitted || touched)) {
-                                validateField(field.name, null, nextFormData, setErrors);
-                              }
-                            }}
-                          >
-                            <XCircle size={16} color={theme.palette.error.main} />
-                          </IconButton>
-                        </Box>
-                      )}
-                    </Box>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      hidden
-                      onChange={(e) => {
-                        const file = e.target.files[0];
-                        if (file) {
-                          const nextFormData = { ...formData, [field.name]: file };
-                          setFormData(nextFormData);
-                          if (validateField && (formSubmitted || touched)) {
-                            validateField(field.name, file, nextFormData, setErrors);
-                          }
-                        }
-                      }}
-                    />
-                  </Button>
-                ) : (
-                  <TextField
-                    label={field.label}
-                    type={field.type || 'text'}
-                    value={formData[field.name] || ''}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      const nextFormData = { ...formData, [field.name]: value };
-                      setFormData(nextFormData);
-                      setTouched(true);
-                      if (validateField) {
-                        validateField(field.name, value, nextFormData, setErrors);
-                      }
-                    }}
-                    onFocus={() => setActiveField(field.name)}
-                    onBlur={() => setActiveField(null)}
-                    fullWidth
-                    multiline={field.multiline || false}
-                    rows={field.rows || 1}
-                    required={field.required || false}
-                    error={formSubmitted && !!errors[field.name]}
-                    helperText={formSubmitted && errors[field.name] &&(
-                      <Typography component="span" variant='caption' sx={{color: 'error.main'}}>
-                        {errors[field.name]}
-                      </Typography>
-                    )}
-                    InputLabelProps={field.type === 'datetime-local' ? { shrink: true } : {}}
-                    disabled={field.disabled ? field.disabled(formData) : false}
-                  />
-                )}
-                {/* Render constraints list for active field */}
-                {activeField === field.name && fieldConstraints?.[field.name] && (
-                  <Box sx={{ mt: 1, pl: 2 }}>
-                    {fieldConstraints[field.name].map((constraint, index) => {
-                      const isMet = formData[field.name] ? constraint.check(formData[field.name]) : false;
-                      const IconComponent = isMet ? CheckCircle2 : Circle;
-                      return (
-                        <Box key={index} sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
-                          <IconComponent
-                            size={14}
-                            color={isMet ? theme.palette.success.main : theme.palette.error.main}
-                            style={{ marginRight: 8 }}
-                          />
-                          <Typography
-                            variant="caption"
-                            sx={{ color: isMet ? 'success.main' : 'error.main' }}
-                          >
-                            {constraint.message}
-                          </Typography>
-                        </Box>
-                      );
-                    })}
-                  </Box>
-                )}
-
-              </Grid>
-            ))}
+  <Grid size={field.gridSize || { xs: 12 }} key={field.name}>
+    {field.type === 'custom' ? (
+      field.render()
+    ) : field.type === 'select' ? (
+      <FormControl fullWidth error={formSubmitted && !!errors[field.name]}>
+        <InputLabel>{field.label}</InputLabel>
+        <Select
+          value={formData[field.name] || ''}
+          onChange={(e) => {
+            const value = e.target.value;
+            setFormData((prev) => ({ ...prev, [field.name]: value }));
+            setTouched(true);
+            if (field.onChange) {
+              field.onChange(value, setFormData, formData);
+            }
+            if (validateField) {
+              validateField(field.name, value, formData, setErrors);
+            }
+          }}
+          onFocus={() => setActiveField(field.name)}
+          onBlur={() => setActiveField(null)}
+          label={field.label}
+        >
+          {field.options.map((option) => (
+            <SelectMenuItem key={option.value} value={option.value} sx={{ textTransform: 'capitalize' }}>
+              {option.label}
+            </SelectMenuItem>
+          ))}
+        </Select>
+        {formSubmitted && errors[field.name] && (
+          <FormHelperText sx={{ color: 'error.main' }}>
+            {errors[field.name]}
+          </FormHelperText>
+        )}
+      </FormControl>
+    ) : field.type === 'switch' ? (
+      <FormControlLabel
+        control={
+          <Switch
+            checked={formData[field.name] ?? field.defaultValue ?? false}
+            onChange={(e) => {
+              const value = e.target.checked;
+              setFormData((prev) => ({ ...prev, [field.name]: value }));
+              setTouched(true);
+              if (field.onChange) {
+                field.onChange(value, setFormData, formData);
+              }
+              if (validateField) {
+                validateField(field.name, value, formData, setErrors);
+              }
+            }}
+            onFocus={() => setActiveField(field.name)}
+            onBlur={() => setActiveField(null)}
+          />
+        }
+        label={field.label}
+      />
+    ) : field.name === "profileImage" || field.name === "artifactImage" || field.name === "eventImage" || field.name === "exhibitionImage" ? (
+      <Button
+        variant="outlined"
+        component="label"
+        fullWidth
+        sx={{
+          height: '56px',
+          textTransform: 'none',
+          borderColor: formData[field.name] ? 'success.main' : undefined,
+          color: formData[field.name] ? 'success.main' : undefined,
+          display: 'flex',
+          justifyContent: formData[field.name] ? 'space-between' : 'center',
+          alignItems: 'center',
+          px: 2,
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}>
+          <Typography sx={{ textAlign: formData[field.name] ? 'left' : 'center', flex: 1 }}>
+            {formData[field.name] ? "Change Image" : "Upload Image"}
+          </Typography>
+          {formData[field.name] && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="caption" color="textSecondary">
+                {formData[field.name].name}
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const nextFormData = { ...formData, [field.name]: null };
+                  setFormData(nextFormData);
+                  if (validateField && (formSubmitted || touched)) {
+                    validateField(field.name, null, nextFormData, setErrors);
+                  }
+                }}
+              >
+                <XCircle size={16} color={theme.palette.error.main} />
+              </IconButton>
+            </Box>
+          )}
+        </Box>
+        <input
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={(e) => {
+            const file = e.target.files[0];
+            if (file) {
+              const nextFormData = { ...formData, [field.name]: file };
+              setFormData(nextFormData);
+              if (validateField && (formSubmitted || touched)) {
+                validateField(field.name, file, nextFormData, setErrors);
+              }
+            }
+          }}
+        />
+      </Button>
+    ) : (
+      <TextField
+        label={field.label}
+        type={field.type || 'text'}
+        value={formData[field.name] || ''}
+        onChange={(e) => {
+          const value = e.target.value;
+          const nextFormData = { ...formData, [field.name]: value };
+          setFormData(nextFormData);
+          setTouched(true);
+          if (validateField) {
+            validateField(field.name, value, nextFormData, setErrors);
+          }
+        }}
+        onFocus={() => setActiveField(field.name)}
+        onBlur={() => setActiveField(null)}
+        fullWidth
+        multiline={field.multiline || false}
+        rows={field.rows || 1}
+        required={field.required || false}
+        error={formSubmitted && !!errors[field.name]}
+        helperText={formSubmitted && errors[field.name] && (
+          <Typography component="span" variant='caption' sx={{ color: 'error.main' }}>
+            {errors[field.name]}
+          </Typography>
+        )}
+        InputLabelProps={field.type === 'datetime-local' ? { shrink: true } : {}}
+        disabled={field.disabled ? field.disabled(formData) : false}
+      />
+    )}
+    {/* Render constraints list for active field */}
+    {activeField === field.name && fieldConstraints?.[field.name] && (
+      <Box sx={{ mt: 1, pl: 2 }}>
+        {fieldConstraints[field.name].map((constraint, index) => {
+          const isMet = formData[field.name] ? constraint.check(formData[field.name]) : false;
+          const IconComponent = isMet ? CheckCircle2 : Circle;
+          return (
+            <Box key={index} sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+              <IconComponent
+                size={14}
+                color={isMet ? theme.palette.success.main : theme.palette.error.main}
+                style={{ marginRight: 8 }}
+              />
+              <Typography
+                variant="caption"
+                sx={{ color: isMet ? 'success.main' : 'error.main' }}
+              >
+                {constraint.message}
+              </Typography>
+            </Box>
+          );
+        })}
+      </Box>
+    )}
+  </Grid>
+))}
             
           </Grid>
         </DialogContent>

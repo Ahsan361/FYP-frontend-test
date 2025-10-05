@@ -21,6 +21,7 @@ import { UserContext } from "../../contexts/UserContext";
 
 function AdminEventRegistration() {
   const [registrations, setRegistrations] = useState([]);
+  const [errors, setErrors] = useState({});
   const [stats, setStats] = useState({
     totalBookings: 0,
     confirmed: 0,
@@ -461,6 +462,8 @@ function AdminEventRegistration() {
       onPayment={handlePayment}
       showCancel={true}
       showPayment={true}
+      errors={errors} // Add this
+      setErrors={setErrors}
     />
   );
 }

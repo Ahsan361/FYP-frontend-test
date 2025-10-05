@@ -30,6 +30,7 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Remove this line
 
 function AdminUsers() {
   const [users, setUsers] = useState([]);
+  const [errors, setErrors] = useState({});
   const [stats, setStats] = useState({
     totalUsers: 0,
     activeUsers: 0,
@@ -117,6 +118,19 @@ function AdminUsers() {
       type: 'switch',
       gridSize: { xs: 12 },
       defaultValue: false
+    },
+    {
+      name: 'general',
+      label: '',
+      type: 'custom',
+      gridSize: { xs: 12 },
+      render: () => (
+        errors.general && (
+          <Typography color="error" variant="body2" sx={{ mt: 2 }}>
+            {errors.general}
+          </Typography>
+        )
+      )
     }
   ];
 
@@ -240,6 +254,19 @@ function AdminUsers() {
       });
     } catch (error) {
       console.error('Error saving user:', error);
+      // Handle backend validation errors
+      if (error.response?.data?.message) {
+        const message = error.response.data.message;
+        if (message.includes('User already exists with this email')) {
+          setErrors((prev) => ({ ...prev, email: 'Email is already in use' }));
+        } else if (message.includes('User already exists with this username')) {
+          setErrors((prev) => ({ ...prev, username: 'Username is already taken' }));
+        } else {
+          setErrors((prev) => ({ ...prev, general: 'Failed to save user: ' + message }));
+        }
+      } else {
+        setErrors((prev) => ({ ...prev, general: 'An unexpected error occurred' }));
+      }
       throw error;
     }
   };
@@ -462,6 +489,8 @@ function AdminUsers() {
         user: 'default'
       }}
       fieldConstraints={fieldConstraints}
+      errors={errors} // Add this
+      setErrors={setErrors}
     />
   );
 }

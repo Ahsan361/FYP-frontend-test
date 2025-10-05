@@ -39,6 +39,7 @@ function AdminExhibitionRegistration() {
   const [statusDistribution, setStatusDistribution] = useState([]);
   // Removed unused paymentDistribution
   const [exhibitions, setExhibitions] = useState([]);
+  const [errors, setErrors] = useState({});
   const [users, setUsers] = useState([]);
   const { user } = useContext(UserContext);
 
@@ -462,9 +463,11 @@ function AdminExhibitionRegistration() {
       statusColors={REGISTRATION_STATUS_COLORS}
       categoryColors={PAYMENT_STATUS_COLORS}
       onCancel={handleCancel}
-      onPayment={handlePayment}  // Added missing onPayment prop
+      onPayment={handlePayment} 
       showCancel={true}
       showPayment={true}
+      errors={errors} 
+      setErrors={setErrors}
     />
   );
 }
