@@ -31,6 +31,7 @@ const statusColors = {
 
 function AdminEvents() {
   const [events, setEvents] = useState([]);
+  const [errors, setErrors] = useState({});
   const [stats, setStats] = useState({
     totalEvents: 0,
     upcomingEvents: 0,
@@ -440,6 +441,8 @@ function AdminEvents() {
       validateField={validateField}
       statusColors={statusColors}
       categoryColors={eventTypeColors}
+      errors={errors} // Add this
+      setErrors={setErrors}
     />
   );
 }

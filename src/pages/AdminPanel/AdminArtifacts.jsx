@@ -36,6 +36,7 @@ const statusColors = {
 
 function AdminArtifacts() {
   const [artifacts, setArtifacts] = useState([]);
+  const [errors, setErrors] = useState({});
   const [stats, setStats] = useState({
     total: 0,
     published: 0,
@@ -367,6 +368,8 @@ function AdminArtifacts() {
       validateForm={validateForm}
       validateField={validateField}
       statusColors={statusColors}
+      errors={errors} // Add this
+      setErrors={setErrors}
     />
   );
 }

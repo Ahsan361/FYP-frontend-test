@@ -32,6 +32,7 @@ const statusColors = {
 
 function AdminExhibitions() {
   const [exhibitions, setExhibitions] = useState([]);
+  const [errors, setErrors] = useState({});
   const [stats, setStats] = useState({
     totalExhibitions: 0,
     featuredExhibitions: 0,
@@ -397,6 +398,8 @@ function AdminExhibitions() {
       validateField={validateField}
       statusColors={statusColors}
       categoryColors={categoryColors}
+      errors={errors} // Add this
+      setErrors={setErrors}
     />
   );
 }

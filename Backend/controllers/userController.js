@@ -18,10 +18,16 @@ export const addUser = async (req, res) => {
     } = req.body;
 
     // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
+    const existingEmail = await User.findOne({ email });
+    const existingUsername = await User.findOne({ username});
+    
+    if (existingEmail) {
       return res.status(400).json({ message: "User already exists with this email" });
-    }
+    } 
+
+    if (existingUsername) {
+      return res.status(400).json({ message: "User already exists with this username" });
+    } 
 
     // Create new user (use password_hash here so pre-save hook runs)
     const newUser = new User({
