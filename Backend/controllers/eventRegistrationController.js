@@ -46,7 +46,10 @@ export const registerForEvent = async (req, res) => {
       user_id: req.body.user_id || req.user._id,
       registration_status: { $ne: 'cancelled' }
     });
-    if (existing) return res.status(400).json({ message: "Already registered for this event" });
+    if (existing){
+      console.log("User already registered");
+      return res.status(400).json({ message: "Already registered for this event" });
+    }
 
     // Validate CNIC format
     const cnicRegex = /^\d{5}-\d{7}-\d{1}$/;
