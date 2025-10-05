@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Box, Typography, Chip, Avatar, TableCell, DialogActions, DialogContent, DialogTitle, Grid } from '@mui/material';
-import { UserPlus, Eye, Edit, Users, UserCheck, UserX } from 'lucide-react';
+import { UserPlus, Eye, Edit, Users, UserCheck, UserX, Circle, CheckCircle2 } from 'lucide-react';
 
 // Import the reusable AdminTable component
 import AdminTable from '../../components/ui/AdminTable';
@@ -25,6 +25,8 @@ const userGrowthData = [
 
 // Role options
 const ROLE_OPTIONS = ['All', 'admin', 'user'];
+// Email regex for validation
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Remove this line
 
 function AdminUsers() {
   const [users, setUsers] = useState([]);
@@ -35,9 +37,6 @@ function AdminUsers() {
     adminUsers: 0
   });
   const { user } = useContext(UserContext);
-
-  // Email regex for validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   // Fetch users and stats on mount
   useEffect(() => {
@@ -138,20 +137,38 @@ function AdminUsers() {
   const validateForm = (formData, errors, setErrors) => {
     const newErrors = {};
 
+    // Username validation
     if (!formData.username?.trim()) {
       newErrors.username = 'Username is required';
+    } else {
+      const unmetConstraint = fieldConstraints.username.find(
+        (constraint) => !constraint.check(formData.username)
+      );
+      if (unmetConstraint) {
+        newErrors.username = unmetConstraint.message;
+      }
     }
 
+    // Email validation
     if (!formData.email?.trim()) {
       newErrors.email = 'Email is required';
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address (e.g., user@gmail.com)';
+    } else if(!emailRegex.test(formData.email)){
+      newErrors.email = 'Please eneter a valid email address(e.g. user@gmail.com';
     }
-
+    
+    // Password validation (only for new users)
     if (!formData._id && !formData.password_hash?.trim()) {
       newErrors.password_hash = 'Password is required for new users';
+    } else if (!formData._id && formData.password_hash) {
+      const unmetConstraint = fieldConstraints.password_hash.find(
+        (constraint) => !constraint.check(formData.password_hash)
+      );
+      if (unmetConstraint) {
+        newErrors.password_hash = unmetConstraint.message;
+      }
     }
 
+    // Role validation
     if (!formData.role) {
       newErrors.role = 'Role is required';
     }
@@ -163,20 +180,34 @@ function AdminUsers() {
   const validateField = (name, value, formData, setErrors) => {
     let error = '';
 
-    if (name === 'username' && !value?.trim()) {
-      error = 'Username is required';
+    if (name === 'username') {
+      if (!value?.trim()) {
+        error = 'Username is required';
+      } else {
+        const unmetConstraint = fieldConstraints.username.find(
+          (constraint) => !constraint.check(value)
+        );
+        error = unmetConstraint ? unmetConstraint.message : '';
+      }
     }
 
     if (name === 'email') {
       if (!value?.trim()) {
         error = 'Email is required';
-      } else if (!emailRegex.test(value)) {
-        error = 'Please enter a valid email address (e.g., user@gmail.com)';
+      } else if(!emailRegex.test(value)){
+        error = 'Please eneter a valid email address(e.g. user@gmail.com';
       }
     }
 
-    if (name === 'password_hash' && !formData._id && !value?.trim()) {
-      error = 'Password is required for new users';
+    if (name === 'password_hash' && !formData._id) {
+      if (!value?.trim()) {
+        error = 'Password is required for new users';
+      } else {
+        const unmetConstraint = fieldConstraints.password_hash.find(
+          (constraint) => !constraint.check(value)
+        );
+        error = unmetConstraint ? unmetConstraint.message : '';
+      }
     }
 
     if (name === 'role' && !value) {
@@ -340,6 +371,61 @@ function AdminUsers() {
     </>
   );
 
+  const fieldConstraints = {
+    username: [
+      {
+        check: (value) => value.length >= 3,
+        message: 'At least 3 characters',
+        icon: 'Circle',
+        successIcon: 'CheckCircle2'
+      },
+      {
+        check: (value) =>value.length <= 30,
+        message: 'At most 30 characters',
+        icon: 'Circle',
+        successIcon: 'CheckCircle2'
+      }
+    ],
+    password_hash: [
+      {
+        check: (value) => value.length >= 8,
+        message: 'At least 8 characters',
+        icon: 'Circle',
+        successIcon: 'CheckCircle2'
+      },
+      {
+        check: (value) => value.length <= 128,
+        message: 'At most 128 characters',
+        icon: 'Circle',
+        successIcon: 'CheckCircle2'
+      },
+      {
+        check: (value) => /[a-z]/.test(value),
+        message: 'One lowercase letter',
+        icon: 'Circle',
+        successIcon: 'CheckCircle2'
+      },
+      {
+        check: (value) => /[A-Z]/.test(value),
+        message: 'One uppercase letter',
+        icon: 'Circle',
+        successIcon: 'CheckCircle2'
+      },
+      {
+        check: (value) => /[0-9]/.test(value),
+        message: 'One number',
+        icon: 'Circle',
+        successIcon: 'CheckCircle2'
+      },
+      {
+        check: (value) => /[!@#$%^&*(),.?":{}|<>]/.test(value),
+        message: 'One special character',
+        icon: 'Circle',
+        successIcon: 'CheckCircle2'
+      }
+    ]
+  };
+
   return (
     <AdminTable
       title='User Management'
@@ -375,6 +461,7 @@ function AdminUsers() {
         admin: 'primary',
         user: 'default'
       }}
+      fieldConstraints={fieldConstraints}
     />
   );
 }
