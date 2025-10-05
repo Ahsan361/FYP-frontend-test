@@ -8,11 +8,13 @@ export const registerForExhibition = async (req, res) => {
     
     // Validate spots_requested
     if (spots_requested < 1 || spots_requested > 10) {
+      console.log("spots error in registerForExhibition");
       return res.status(400).json({ message: "Spots requested must be between 1 and 10" });
     }
 
     // Validate attendees array
     if (attendees.length !== spots_requested) {
+      console.log("Attendes error in registerForExhibition");;
       return res.status(400).json({ 
         message: `Number of attendees (${attendees.length}) must match spots requested (${spots_requested})` 
       });
@@ -26,6 +28,7 @@ export const registerForExhibition = async (req, res) => {
       const minAge = parseInt(exhibition.age_restriction);
       const underageAttendees = attendees.filter(attendee => attendee.age < minAge);
       if (underageAttendees.length > 0) {
+        console.log("Age restriction error in registerForExhibition");
         return res.status(400).json({ 
           message: `All attendees must be at least ${minAge} years old. Found ${underageAttendees.length} underage attendee(s)` 
         });
@@ -35,6 +38,7 @@ export const registerForExhibition = async (req, res) => {
     // Check capacity (now considering multiple spots)
     if (exhibition.max_capacity && (exhibition.current_bookings + spots_requested) > exhibition.max_capacity) {
       const availableSpots = exhibition.max_capacity - exhibition.current_bookings;
+      console.log("Not enough spots available error in registerForExhibition");
       return res.status(400).json({ 
         message: `Not enough spots available. Requested: ${spots_requested}, Available: ${availableSpots}` 
       });
@@ -46,12 +50,16 @@ export const registerForExhibition = async (req, res) => {
       user_id: req.body.user_id || req.user._id,
       registration_status: { $ne: 'cancelled' }
     });
-    if (existing) return res.status(400).json({ message: "Already registered for this exhibition" });
+    if (existing) { 
+      console.log("CNIC already registered error in registerForExhibition");
+      return res.status(400).json({ message: "Already registered for this exhibition" });
+    }
 
     // Validate CNIC format for each attendee
     const cnicRegex = /^\d{5}-\d{7}-\d{1}$/;
     const invalidCNICs = attendees.filter(attendee => !cnicRegex.test(attendee.cnic));
     if (invalidCNICs.length > 0) {
+      console.log("Invalid CNIC format error in registerForExhibition");
       return res.status(400).json({ 
         message: "Invalid CNIC format. Use format: 12345-1234567-1" 
       });
@@ -61,6 +69,7 @@ export const registerForExhibition = async (req, res) => {
     const cnics = attendees.map(a => a.cnic);
     const duplicateCNICs = cnics.filter((cnic, index) => cnics.indexOf(cnic) !== index);
     if (duplicateCNICs.length > 0) {
+      console.log("spots error in registerForExhibition");
       return res.status(400).json({ 
         message: "Duplicate CNICs found in the same registration" 
       });

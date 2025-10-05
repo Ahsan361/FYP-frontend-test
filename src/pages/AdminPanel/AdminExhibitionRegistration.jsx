@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Box, Typography, Chip, TableCell, Grid, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-import { Ticket, User, CheckCircle, Clock, CreditCard } from 'lucide-react';
+import { Box, Typography, Chip, TableCell, Grid, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
+import { Ticket, User, CheckCircle, Clock, CreditCard, UserPlus, Trash2, XCircle } from 'lucide-react';
 
 // Import the reusable custom components
 import AdminTable from '../../components/ui/AdminTable';
@@ -37,7 +37,6 @@ function AdminExhibitionRegistration() {
   });
   const [registrationTrends, setRegistrationTrends] = useState([]);
   const [statusDistribution, setStatusDistribution] = useState([]);
-  // Removed unused paymentDistribution
   const [exhibitions, setExhibitions] = useState([]);
   const [errors, setErrors] = useState({});
   const [users, setUsers] = useState([]);
@@ -70,7 +69,6 @@ function AdminExhibitionRegistration() {
 
       setRegistrationTrends(statsData.registrationTrends);
       setStatusDistribution(statsData.statusDistribution);
-      // Removed paymentDistribution assignment
     } catch (error) {
       console.error("Error fetching exhibition registrations/stats:", error);
     }
@@ -78,14 +76,153 @@ function AdminExhibitionRegistration() {
 
   // Table configuration
   const tableColumns = [
-    { field: 'userName', label: 'Attendee' },
+    { field: 'userName', label: 'User' },
     { field: 'exhibitionName', label: 'Exhibition' },
-    { field: 'confirmation_code', label: 'Confirmation Code' },
-    { field: 'registration_status', label: 'Registration Status', align: 'center' },
-    { field: 'payment_status', label: 'Payment Status', align: 'center' },
-    { field: 'entryFee', label: 'Price', align: 'center' },
-    { field: 'registration_date', label: 'Registration Date' },
+    { field: 'spots_requested', label: 'Spots', align: 'center' },
+    { field: 'confirmation_code', label: 'Code' },
+    { field: 'registration_status', label: 'Status', align: 'center' },
+    { field: 'payment_status', label: 'Payment', align: 'center' },
+    { field: 'total_amount', label: 'Total', align: 'center' },
+    { field: 'registration_date', label: 'Date' },
   ];
+
+  // CNIC formatting helper
+  const formatCNIC = (value) => {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 5) return numbers;
+    if (numbers.length <= 12) return `${numbers.slice(0, 5)}-${numbers.slice(5)}`;
+    return `${numbers.slice(0, 5)}-${numbers.slice(5, 12)}-${numbers.slice(12, 13)}`;
+  };
+
+  // Custom attendee fields component
+  const AttendeeFields = ({ formData, setFormData, errors }) => {
+    const spotsRequested = parseInt(formData.spots_requested) || 1;
+    const attendees = formData.attendees || [];
+
+    const addAttendee = () => {
+      if (attendees.length < spotsRequested) {
+        setFormData(prev => ({
+          ...prev,
+          attendees: [...attendees, { name: '', cnic: '', age: '' }]
+        }));
+      }
+    };
+
+    const removeAttendee = (index) => {
+      setFormData(prev => ({
+        ...prev,
+        attendees: attendees.filter((_, i) => i !== index)
+      }));
+    };
+
+    const updateAttendee = (index, field, value) => {
+      const updatedAttendees = [...attendees];
+      if (field === 'cnic') {
+        value = formatCNIC(value);
+      }
+      updatedAttendees[index] = { ...updatedAttendees[index], [field]: value };
+      setFormData(prev => ({ ...prev, attendees: updatedAttendees }));
+    };
+
+    return (
+      <Box sx={{ mt: 2 }}>
+        {/* Add this new conditional error banner for attendees */}
+        {errors?.attendees && (
+          <Box sx={{ mb: 2, p: 2, bgcolor: 'error.lighter', border: '1px solid', borderColor: 'error.main', borderRadius: 1 }}>
+            <Typography variant="body2" color="error.main" sx={{ display: 'flex', alignItems: 'center' }}>
+              <XCircle size={16} style={{ marginRight: 8, color: 'error.main' }} />  {/* Optional icon for "mismatch" */}
+              {errors.attendees}
+            </Typography>
+          </Box>
+        )}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Typography variant="subtitle1" fontWeight="bold">
+            Attendees ({attendees.length}/{spotsRequested})
+          </Typography>
+          {attendees.length < spotsRequested && (
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<UserPlus size={16} />}
+              onClick={addAttendee}
+            >
+              Add Attendee
+            </Button>
+          )}
+        </Box>
+
+        {attendees.map((attendee, index) => (
+          <Box key={index} sx={{ 
+            p: 2, 
+            mb: 2, 
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: 1,
+            position: 'relative'
+          }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+              <Typography variant="subtitle2">Attendee {index + 1}</Typography>
+              <Button
+                variant="text"
+                size="small"
+                color="error"
+                startIcon={<Trash2 size={14} />}
+                onClick={() => removeAttendee(index)}
+              >
+                Remove
+              </Button>
+            </Box>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  label="Full Name"
+                  value={attendee.name || ''}
+                  onChange={(e) => updateAttendee(index, 'name', e.target.value)}
+                  fullWidth
+                  required
+                  error={!!errors[`attendee_${index}_name`]}
+                  helperText={errors[`attendee_${index}_name`]}
+                  inputProps={{ maxLength: 100 }}
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  label="CNIC"
+                  value={attendee.cnic || ''}
+                  onChange={(e) => updateAttendee(index, 'cnic', e.target.value)}
+                  fullWidth
+                  required
+                  placeholder="12345-1234567-1"
+                  error={!!errors[`attendee_${index}_cnic`]}
+                  helperText={errors[`attendee_${index}_cnic`] || "Format: 12345-1234567-1"}
+                  inputProps={{ maxLength: 15 }}
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  label="Age"
+                  type="number"
+                  value={attendee.age || ''}
+                  onChange={(e) => updateAttendee(index, 'age', e.target.value)}
+                  fullWidth
+                  required
+                  error={!!errors[`attendee_${index}_age`]}
+                  helperText={errors[`attendee_${index}_age`]}
+                  inputProps={{ min: 1, max: 120 }}
+                />
+              </Grid>
+            </Grid>
+          </Box>
+        ))}
+
+        {attendees.length === 0 && (
+          <Box sx={{ textAlign: 'center', py: 3, color: 'text.secondary' }}>
+            No attendees added yet. Click "Add Attendee" to begin.
+          </Box>
+        )}
+      </Box>
+    );
+  };
 
   // Form fields configuration
   const formFields = [
@@ -98,7 +235,14 @@ function AdminExhibitionRegistration() {
         value: exhibition._id || exhibition.id, 
         label: exhibition.title 
       })),
-      gridSize: { xs: 12, md: 6 }
+      gridSize: { xs: 12, md: 6 },
+      onChange: (value, setFormData, formData) => {
+        const selectedExhibition = exhibitions.find(e => e._id === value || e.id === value);
+        if (selectedExhibition) {
+          const totalAmount = (selectedExhibition.entry_fee || 0) * (formData.spots_requested || 1);
+          setFormData(prev => ({ ...prev, total_amount: totalAmount }));
+        }
+      }
     },
     { 
       name: 'user_id', 
@@ -110,6 +254,49 @@ function AdminExhibitionRegistration() {
         label: user.username || user.name || user.email 
       })),
       gridSize: { xs: 12, md: 6 }
+    },
+    { 
+      name: 'spots_requested', 
+      label: 'Spots Requested', 
+      type: 'number', 
+      required: true,
+      gridSize: { xs: 12, md: 6 },
+      onChange: (value, setFormData, formData) => {
+        const spots = parseInt(value) || 1;
+        const exhibition = exhibitions.find(e => e._id === formData.exhibition_id || e.id === formData.exhibition_id);
+        const totalAmount = exhibition ? (exhibition.entry_fee || 0) * spots : 0;
+        
+        // Adjust attendees array to match spots
+        const currentAttendees = formData.attendees || [];
+        let newAttendees = [...currentAttendees];
+        
+        if (spots > currentAttendees.length) {
+          // Add empty attendees
+          const toAdd = spots - currentAttendees.length;
+          for (let i = 0; i < toAdd; i++) {
+            newAttendees.push({ name: '', cnic: '', age: '' });
+          }
+        } else if (spots < currentAttendees.length) {
+          // Remove extra attendees
+          newAttendees = newAttendees.slice(0, spots);
+        }
+        
+        setFormData(prev => ({ 
+          ...prev, 
+          spots_requested: spots,
+          attendees: newAttendees,
+          total_amount: totalAmount 
+        }));
+      }
+    },
+    { 
+      name: 'attendees',
+      label: 'Attendees',
+      type: 'custom',
+      render: (formData, setFormData, errors) => (
+        <AttendeeFields formData={formData} setFormData={setFormData} errors={errors} />
+      ),
+      gridSize: { xs: 12 }
     },
     { 
       name: 'registration_status', 
@@ -126,6 +313,13 @@ function AdminExhibitionRegistration() {
       required: true,
       options: PAYMENT_STATUS_OPTIONS.map(status => ({ value: status, label: status })),
       gridSize: { xs: 12, md: 6 }
+    },
+    { 
+      name: 'total_amount', 
+      label: 'Total Amount', 
+      type: 'number', 
+      gridSize: { xs: 12, md: 6 },
+      disabled: () => true // Auto-calculated
     },
     { name: 'special_requirements', label: 'Special Requirements', multiline: true, rows: 3, gridSize: { xs: 12 } },
   ];
@@ -149,7 +343,9 @@ function AdminExhibitionRegistration() {
   // Validation functions
   const validateForm = (formData, errors, setErrors) => {
     const newErrors = {};
+    const cnicRegex = /^\d{5}-\d{7}-\d{1}$/;
 
+    // Required fields
     if (!formData.exhibition_id) {
       newErrors.exhibition_id = "Exhibition is required";
     }
@@ -166,15 +362,90 @@ function AdminExhibitionRegistration() {
       newErrors.payment_status = "Payment status is required";
     }
 
+    // Spots validation
+    const spots = parseInt(formData.spots_requested);
+    if (!spots || spots < 1 || spots > 10) {
+      newErrors.spots_requested = "Spots requested must be between 1 and 10";
+    }
+
+    // Attendees validation
+    const attendees = formData.attendees || [];
+    
+    if (attendees.length !== spots) {
+      newErrors.attendees = `Number of attendees (${attendees.length}) must match spots requested (${spots})`;
+    }
+
+    // Validate each attendee
+    attendees.forEach((attendee, index) => {
+      if (!attendee.name || attendee.name.trim().length === 0) {
+        newErrors[`attendee_${index}_name`] = "Name is required";
+      } else if (attendee.name.length > 100) {
+        newErrors[`attendee_${index}_name`] = "Name must be less than 100 characters";
+      }
+
+      if (!attendee.cnic || !cnicRegex.test(attendee.cnic)) {
+        newErrors[`attendee_${index}_cnic`] = "Invalid CNIC format. Use: 12345-1234567-1";
+      }
+
+      const age = parseInt(attendee.age);
+      if (!age || age < 1 || age > 120) {
+        newErrors[`attendee_${index}_age`] = "Age must be between 1 and 120";
+      }
+
+      // Age restriction check
+      const exhibition = exhibitions.find(e => e._id === formData.exhibition_id || e.id === formData.exhibition_id);
+      if (exhibition?.age_restriction) {
+        const minAge = parseInt(exhibition.age_restriction);
+        if (age < minAge) {
+          newErrors[`attendee_${index}_age`] = `Attendee must be at least ${minAge} years old`;
+        }
+      }
+    });
+
+    // Check for duplicate CNICs
+    const cnics = attendees.map(a => a.cnic).filter(Boolean);
+    const duplicateCNICs = cnics.filter((cnic, index) => cnics.indexOf(cnic) !== index);
+    if (duplicateCNICs.length > 0) {
+      newErrors.attendees = "Duplicate CNICs found in the same registration";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const validateField = (name, value, formData, setErrors) => {
     let error = "";
+    const cnicRegex = /^\d{5}-\d{7}-\d{1}$/;
 
     if ((name === "exhibition_id" || name === "user_id" || name === "registration_status" || name === "payment_status") && !value) {
       error = `${name.replace('_', ' ')} is required`;
+    }
+
+    if (name === "spots_requested") {
+      const spots = parseInt(value);
+      if (!spots || spots < 1 || spots > 10) {
+        error = "Spots must be between 1 and 10";
+      }
+    }
+
+    // Attendee field validation
+    if (name.startsWith('attendee_')) {
+      const parts = name.split('_');
+      const index = parseInt(parts[1]);
+      const field = parts[2];
+      
+      if (field === 'name' && (!value || value.trim().length === 0)) {
+        error = "Name is required";
+      } else if (field === 'name' && value.length > 100) {
+        error = "Name must be less than 100 characters";
+      } else if (field === 'cnic' && !cnicRegex.test(value)) {
+        error = "Invalid CNIC format";
+      } else if (field === 'age') {
+        const age = parseInt(value);
+        if (!age || age < 1 || age > 120) {
+          error = "Age must be between 1 and 120";
+        }
+      }
     }
 
     setErrors((prev) => ({ ...prev, [name]: error }));
@@ -183,19 +454,29 @@ function AdminExhibitionRegistration() {
   // Handle form submission
   const handleFormSubmit = async (formData, isEditMode, selectedItem) => {
     try {
+      const submitData = {
+        ...formData,
+        spots_requested: parseInt(formData.spots_requested) || 1,
+        attendees: formData.attendees || []
+      };
+
       if (isEditMode) {
-        await updateExhibitionRegistration(selectedItem._id, formData, user.token);
+        await updateExhibitionRegistration(selectedItem._id, submitData, user.token);
       } else {
-        await createExhibitionRegistration(formData, user.token);
+        await createExhibitionRegistration(submitData, user.token);
       }
       await fetchData();
     } catch (error) {
       console.error("Error submitting form:", error);
+      // Handle backend errors
+      if (error.response?.data?.message) {
+        setErrors({ generalError: error.response.data.message });
+      }
       throw error;
     }
   };
 
-  // Handle menu actions including cancel and payment
+  // Handle menu actions
   const handleMenuAction = async (action, item) => {
     try {
       switch (action) {
@@ -208,7 +489,6 @@ function AdminExhibitionRegistration() {
         case 'process_payment':
           await processExhibitionPayment(item._id, user.token);
           break;
-        // Removed redundant 'cancel' case since we're using onCancel prop
         default:
           return;
       }
@@ -218,7 +498,7 @@ function AdminExhibitionRegistration() {
     }
   };
 
-  // Handle cancel action (matching events implementation)
+  // Handle cancel action
   const handleCancel = async (item) => {
     try {
       await cancelExhibitionRegistration(item._id, user.token);
@@ -228,7 +508,7 @@ function AdminExhibitionRegistration() {
     }
   };
 
-  // Handle payment action (matching events implementation)
+  // Handle payment action
   const handlePayment = async (item) => {
     try {
       await processExhibitionPayment(item._id, user.token);
@@ -277,6 +557,15 @@ function AdminExhibitionRegistration() {
         </Box>
       </TableCell>
 
+      <TableCell align="center">
+        <Chip
+          label={registration.spots_requested || 1}
+          color="primary"
+          size="small"
+          sx={{ fontWeight: 'bold' }}
+        />
+      </TableCell>
+
       <TableCell>
         <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 'medium' }}>
           {registration.confirmation_code}
@@ -301,7 +590,7 @@ function AdminExhibitionRegistration() {
 
       <TableCell align="center">
         <Typography variant="body2" fontWeight="medium">
-          {registration.entryFee ? `$${registration.entryFee.toFixed(2)}` : 'N/A'}
+          ${registration.total_amount?.toFixed(2) || '0.00'}
         </Typography>
       </TableCell>
 
@@ -313,7 +602,7 @@ function AdminExhibitionRegistration() {
     </>
   );
 
-  // Custom details dialog renderer (matching events implementation)
+  // Custom details dialog renderer
   const renderDetailsDialog = (registration, onClose, onEdit) => (
     <>
       <DialogTitle>
@@ -337,15 +626,15 @@ function AdminExhibitionRegistration() {
       </DialogTitle>
       <DialogContent>
         <Grid container spacing={3} sx={{ mt: 2 }}>
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid item xs={12} md={6}>
             <Box sx={{ space: 3 }}>
               {[
-                { label: "Attendee Name", value: registration.userName || registration.user_id?.username || 'N/A' },
+                { label: "User", value: registration.userName || registration.user_id?.username || 'N/A' },
                 { label: "Email", value: registration.userEmail || registration.user_id?.email || 'N/A' },
                 { label: "Exhibition", value: registration.exhibitionName || registration.exhibition_id?.title || 'N/A' },
+                { label: "Spots Requested", value: registration.spots_requested || 1 },
                 { label: "Confirmation Code", value: registration.confirmation_code },
-                { label: "Registration Date", value: formatDate(registration.registration_date) },
-                { label: "Special Requirements", value: registration.special_requirements || 'None' },
+                { label: "Total Amount", value: `$${registration.total_amount?.toFixed(2) || '0.00'}` },
               ].map((field, index) => (
                 <Box key={index} sx={{ mb: 3 }}>
                   <Typography variant="subtitle2" color="textSecondary" gutterBottom>
@@ -358,13 +647,13 @@ function AdminExhibitionRegistration() {
               ))}
             </Box>
           </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid item xs={12} md={6}>
             <Box sx={{ space: 3 }}>
               {[
                 { label: "Registration Status", value: registration.registration_status },
                 { label: "Payment Status", value: registration.payment_status },
-                { label: "Entry Fee", value: registration.entryFee ? `$${registration.entryFee.toFixed(2)}` : 'N/A' },
-                { label: "Exhibition Date", value: registration.exhibitionDate ? new Date(registration.exhibitionDate).toLocaleDateString() : 'N/A' },
+                { label: "Registration Date", value: formatDate(registration.registration_date) },
+                { label: "Special Requirements", value: registration.special_requirements || 'None' },
                 { label: "Created At", value: formatDate(registration.createdAt) },
                 { label: "Last Updated", value: formatDate(registration.updatedAt) },
               ].map((field, index) => (
@@ -378,6 +667,37 @@ function AdminExhibitionRegistration() {
                 </Box>
               ))}
             </Box>
+          </Grid>
+
+          {/* Attendees Section */}
+          <Grid item xs={12}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mt: 2 }}>
+              Attendees
+            </Typography>
+            {registration.attendees?.map((attendee, index) => (
+              <Box key={index} sx={{ 
+                p: 2, 
+                mb: 2, 
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: 1 
+              }}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={4}>
+                    <Typography variant="caption" color="textSecondary">Name</Typography>
+                    <Typography variant="body2" fontWeight="medium">{attendee.name}</Typography>
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <Typography variant="caption" color="textSecondary">CNIC</Typography>
+                    <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>{attendee.cnic}</Typography>
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <Typography variant="caption" color="textSecondary">Age</Typography>
+                    <Typography variant="body2">{attendee.age} years</Typography>
+                  </Grid>
+                </Grid>
+              </Box>
+            ))}
           </Grid>
         </Grid>
       </DialogContent>
@@ -420,14 +740,12 @@ function AdminExhibitionRegistration() {
       createButtonText="Manual Registration"
       createButtonIcon={<Ticket size={20} />}
       
-      // Chart data
       chartData={registrationTrends}
       chartType="area"
       chartDataKey="registrations"
       chartXAxisKey="date"
       chartTitle="Registration Trends & Revenue"
       
-      // Registration status pie chart
       additionalCharts={[
         {
           data: statusDistribution,
