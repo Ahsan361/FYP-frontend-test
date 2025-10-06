@@ -517,7 +517,7 @@ function AdminExhibitionRegistration() {
       console.error('Error processing payment:', error);
     }
   };
-
+  
   // Custom table row renderer
   const renderTableRow = (registration) => (
     <>
