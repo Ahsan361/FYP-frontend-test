@@ -15,11 +15,12 @@ const exhibitionSchema = new mongoose.Schema(
     entry_fee: { type: Number, default: 0 },
     age_restriction: { type: String },
     is_featured: { type: Boolean, default: false },
-    exhibitionImage: {
-      url: { type: String, default: null },
-      publicId: { type: String, default: null }
-    },
-    
+    exhibitionImage: [
+      {
+        url: { type: String, default: null },
+        publicId: { type: String, default: null }
+      }
+    ],
   },
   { timestamps: true }
 );

@@ -16,11 +16,12 @@ const eventSchema = new mongoose.Schema(
     is_free: { type: Boolean, default: false },
     requires_registration: { type: Boolean, default: true },
     target_audience: { type: String, enum: ["students", "researchers", "public", "professionals", "all"], default: "all" },
-    eventImage: {
-      url: { type: String, default: null },
-      publicId: { type: String, default: null }
-    },
-    
+    eventImage: [
+      {
+        url: { type: String, default: null },
+        publicId: { type: String, default: null }
+      }
+    ],
   },
   { timestamps: true }
 );

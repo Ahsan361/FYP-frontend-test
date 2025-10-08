@@ -42,41 +42,52 @@ export const upload = multer({
   }
 });
 
-// Helper function to upload buffer to Cloudinary
-export const uploadToCloudinary = (buffer, folder = "miraas") => {
-  return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      {
-        folder,
-        transformation: [
-          { width: 500, height: 500, crop: 'limit' },
-          { quality: 'auto' },
-          { fetch_format: 'auto' }
-        ],
-        resource_type: 'auto'
-      },
-      (error, result) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(result);
-        }
-      }
-    );
+// Helper function to upload buffer(s) to Cloudinary
+export const uploadToCloudinary = (buffers, folder = "miraas") => {
+  // Handle both single buffer and array of buffers
+  const bufferArray = Array.isArray(buffers) ? buffers : [buffers];
+  
+  return Promise.all(
+    bufferArray.map(buffer => {
+      return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder,
+            transformation: [
+              { width: 500, height: 500, crop: 'limit' },
+              { quality: 'auto' },
+              { fetch_format: 'auto' }
+            ],
+            resource_type: 'auto'
+          },
+          (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result);
+            }
+          }
+        );
 
-    // Create a readable stream from buffer and pipe to Cloudinary
-    const readableStream = Readable.from(buffer);
-    readableStream.pipe(uploadStream);
-  });
+        // Create a readable stream from buffer and pipe to Cloudinary
+        const readableStream = Readable.from(buffer);
+        readableStream.pipe(uploadStream);
+      });
+    })
+  );
 };
 
-// Helper function to delete image from Cloudinary
-export const deleteFromCloudinary = async (publicId) => {
+// Helper function to delete image(s) from Cloudinary
+export const deleteFromCloudinary = async (publicIds) => {
   try {
-    const result = await cloudinary.uploader.destroy(publicId, {
-      invalidate: true
-    });
-    return result;
+    // Handle both single publicId and array of publicIds
+    const publicIdArray = Array.isArray(publicIds) ? publicIds : [publicIds];
+    const results = await Promise.all(
+      publicIdArray.map(publicId =>
+        cloudinary.uploader.destroy(publicId, { invalidate: true })
+      )
+    );
+    return results;
   } catch (error) {
     console.error('Error deleting from Cloudinary:', error);
     throw error;
