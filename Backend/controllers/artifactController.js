@@ -9,12 +9,22 @@ export const createArtifact = async (req, res) => {
       contributor_id: req.user._id 
     };
 
-    if (req.file) {
+    if (req.files && req.files.length > 0) {
+      const uploadResults = await uploadToCloudinary(
+        req.files.map(file => file.buffer),
+        "miraas/artifacts"
+      );
+      artifactData.artifactImage = uploadResults.map(result => ({
+        url: result.secure_url,
+        publicId: result.public_id
+      }));
+    } else if (req.file) {
+      // Fallback for single file upload to maintain compatibility
       const uploadResult = await uploadToCloudinary(req.file.buffer, "miraas/artifacts");
-      artifactData.artifactImage = {
+      artifactData.artifactImage = [{
         url: uploadResult.secure_url,
-        publicId: uploadResult.public_id,
-      };
+        publicId: uploadResult.public_id
+      }];
     }
 
     const artifact = await Artifact.create(artifactData);
@@ -67,15 +77,32 @@ export const updateArtifact = async (req, res) => {
     const updateData = { ...req.body };
 
     // Handle image update
-    if (req.file) {
-      if (artifact.artifactImage?.publicId) {
-        await deleteFromCloudinary(artifact.artifactImage.publicId);
+    if (req.files && req.files.length > 0) {
+      // Delete existing images if they exist
+      if (artifact.artifactImage && artifact.artifactImage.length > 0) {
+        const publicIds = artifact.artifactImage.map(img => img.publicId).filter(id => id);
+        await deleteFromCloudinary(publicIds);
+      }
+      // Upload new images
+      const uploadResults = await uploadToCloudinary(
+        req.files.map(file => file.buffer),
+        "miraas/artifacts"
+      );
+      updateData.artifactImage = uploadResults.map(result => ({
+        url: result.secure_url,
+        publicId: result.public_id
+      }));
+    } else if (req.file) {
+      // Fallback for single file upload
+      if (artifact.artifactImage && artifact.artifactImage.length > 0) {
+        const publicIds = artifact.artifactImage.map(img => img.publicId).filter(id => id);
+        await deleteFromCloudinary(publicIds);
       }
       const uploadResult = await uploadToCloudinary(req.file.buffer, "miraas/artifacts");
-      updateData.artifactImage = {
+      updateData.artifactImage = [{
         url: uploadResult.secure_url,
-        publicId: uploadResult.public_id,
-      };
+        publicId: uploadResult.public_id
+      }];
     }
 
     // Update artifact in one go
@@ -98,9 +125,10 @@ export const deleteArtifact = async (req, res) => {
     const artifact = await Artifact.findByIdAndDelete(req.params.id);
     if (!artifact) return res.status(404).json({ message: "Artifact not found" });
     
-    //delete related image from cloud too
-    if (artifact.artifactImage?.publicId) {
-      await deleteFromCloudinary(artifact.artifactImage.publicId);
+    // Delete related images from Cloudinary
+    if (artifact.artifactImage && artifact.artifactImage.length > 0) {
+      const publicIds = artifact.artifactImage.map(img => img.publicId).filter(id => id);
+      await deleteFromCloudinary(publicIds);
     }
 
     res.json({ message: "Artifact deleted successfully" });
@@ -110,7 +138,7 @@ export const deleteArtifact = async (req, res) => {
   }
 };
 
-//get artifacts stats
+// Get artifacts stats
 export const getArtifactStats = async (req, res) => {
   try {
     const total = await Artifact.countDocuments();

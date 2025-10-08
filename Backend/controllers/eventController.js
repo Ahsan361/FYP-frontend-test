@@ -20,16 +20,26 @@ const EVENT_STATUSES = {
 export const createEvent = async (req, res) => {
   try {
     let eventData = {
-      ... req.body,
-      organizer_id:req.user._id
-    }
+      ...req.body,
+      organizer_id: req.user._id
+    };
 
-    if(req.file){
+    if (req.files && req.files.length > 0) {
+      const uploadResults = await uploadToCloudinary(
+        req.files.map(file => file.buffer),
+        "miraas/events"
+      );
+      eventData.eventImage = uploadResults.map(result => ({
+        url: result.secure_url,
+        publicId: result.public_id
+      }));
+    } else if (req.file) {
+      // Fallback for single file upload
       const uploadResult = await uploadToCloudinary(req.file.buffer, "miraas/events");
-      eventData.eventImage = {
+      eventData.eventImage = [{
         url: uploadResult.secure_url,
-        publicId:uploadResult.public_id
-      }
+        publicId: uploadResult.public_id
+      }];
     }
 
     const event = await Event.create(eventData);
@@ -44,8 +54,8 @@ export const createEvent = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error creating event",
-      error: error.message 
-   });
+      error: error.message
+    });
   }
 };
 
@@ -71,7 +81,6 @@ export const getEvents = async (req, res) => {
   }
 };
 
-
 // Get single event
 export const getEventById = async (req, res) => {
   try {
@@ -89,21 +98,39 @@ export const updateEvent = async (req, res) => {
   try {
     let event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ message: "Event not found" });
-    
-    const updateData = {...req.body };
-    //handle image update 
-    if(req.file){
-      if(event.eventImage?.publicId){
-        await deleteFromCloudinary(event.eventImage.publicId);
+
+    const updateData = { ...req.body };
+
+    // Handle image update
+    if (req.files && req.files.length > 0) {
+      // Delete existing images if they exist
+      if (event.eventImage && event.eventImage.length > 0) {
+        const publicIds = event.eventImage.map(img => img.publicId).filter(id => id);
+        await deleteFromCloudinary(publicIds);
       }
-      const uploadResult = await uploadToCloudinary(req.file.buffer, "miraas/events")
-      updateData.eventImage = {
+      // Upload new images
+      const uploadResults = await uploadToCloudinary(
+        req.files.map(file => file.buffer),
+        "miraas/events"
+      );
+      updateData.eventImage = uploadResults.map(result => ({
+        url: result.secure_url,
+        publicId: result.public_id
+      }));
+    } else if (req.file) {
+      // Fallback for single file upload
+      if (event.eventImage && event.eventImage.length > 0) {
+        const publicIds = event.eventImage.map(img => img.publicId).filter(id => id);
+        await deleteFromCloudinary(publicIds);
+      }
+      const uploadResult = await uploadToCloudinary(req.file.buffer, "miraas/events");
+      updateData.eventImage = [{
         url: uploadResult.secure_url,
-        publicId: uploadResult.public_id,
-      }
+        publicId: uploadResult.public_id
+      }];
     }
 
-    event = await Event.findByIdAndUpdate(req.params.id, updateData, {new: true});
+    event = await Event.findByIdAndUpdate(req.params.id, updateData, { new: true });
     res.json({
       success: true,
       message: "Event updated successfully",
@@ -114,7 +141,7 @@ export const updateEvent = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error updating event",
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -125,12 +152,13 @@ export const deleteEvent = async (req, res) => {
     const event = await Event.findByIdAndDelete(req.params.id);
     if (!event) return res.status(404).json({ message: "Event not found" });
 
-     //delete all related registrations as well
+    // Delete all related registrations
     await EventRegistration.deleteMany({ event_id: req.params.id });
 
-    //delete related image from cloud as well
-    if(event.eventImage?.publicId){
-      await deleteFromCloudinary(event.eventImage.publicId)
+    // Delete related images from Cloudinary
+    if (event.eventImage && event.eventImage.length > 0) {
+      const publicIds = event.eventImage.map(img => img.publicId).filter(id => id);
+      await deleteFromCloudinary(publicIds);
     }
 
     res.json({ message: "Event and related registrations deleted successfully" });

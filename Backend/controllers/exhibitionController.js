@@ -1,36 +1,46 @@
 import Exhibition from "../models/Exhibition.js";
 import ExhibitionRegistration from "../models/ExhibitionRegistration.js";
-import {uploadToCloudinary, deleteFromCloudinary, upload} from "../config/cloudinary.js"
+import { uploadToCloudinary, deleteFromCloudinary, upload } from "../config/cloudinary.js";
 
 // Create exhibition
 export const createExhibition = async (req, res) => {
   try {
     let exhibitionData = {
       ...req.body,
-      curator_id:req.user.id
-    }
-    if(req.file){
-      const uploadData = await uploadToCloudinary(req.file.buffer, "miraas/exhibitions");
-      exhibitionData.exhibitionImage = {
-        url:uploadData.secure_url,
-        publicId:uploadData.public_id
-      }
+      curator_id: req.user.id
+    };
+
+    if (req.files && req.files.length > 0) {
+      const uploadResults = await uploadToCloudinary(
+        req.files.map(file => file.buffer),
+        "miraas/exhibitions"
+      );
+      exhibitionData.exhibitionImage = uploadResults.map(result => ({
+        url: result.secure_url,
+        publicId: result.public_id
+      }));
+    } else if (req.file) {
+      // Fallback for single file upload
+      const uploadResult = await uploadToCloudinary(req.file.buffer, "miraas/exhibitions");
+      exhibitionData.exhibitionImage = [{
+        url: uploadResult.secure_url,
+        publicId: uploadResult.public_id
+      }];
     }
 
     const exhibition = await Exhibition.create(exhibitionData);
 
     res.status(201).json({
       success: true,
-      message:"Exhibition created succesfully",
+      message: "Exhibition created successfully",
       data: exhibition
     });
-
   } catch (error) {
     console.log("Error in createExhibition:", error);
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
       message: "Error creating exhibition",
-      error: error.message 
+      error: error.message
     });
   }
 };
@@ -65,21 +75,39 @@ export const updateExhibition = async (req, res) => {
     if (!exhibition) return res.status(404).json({ message: "Exhibition not found" });
 
     const updateData = { ...req.body };
-    //handle image update
-    if(req.file){
-      if(exhibition.exhibitionImage?.publicId){
-        await deleteFromCloudinary(exhibition.exhibitionImage.publicId);
+
+    // Handle image update
+    if (req.files && req.files.length > 0) {
+      // Delete existing images if they exist
+      if (exhibition.exhibitionImage && exhibition.exhibitionImage.length > 0) {
+        const publicIds = exhibition.exhibitionImage.map(img => img.publicId).filter(id => id);
+        await deleteFromCloudinary(publicIds);
       }
-      const uploadData = await uploadToCloudinary(req.file.buffer, "miraas/exhibitions");
-      updateData.exhibitionImage = {
-        url: uploadData.secure_url,
-        publicId:uploadData.public_id,
+      // Upload new images
+      const uploadResults = await uploadToCloudinary(
+        req.files.map(file => file.buffer),
+        "miraas/exhibitions"
+      );
+      updateData.exhibitionImage = uploadResults.map(result => ({
+        url: result.secure_url,
+        publicId: result.public_id
+      }));
+    } else if (req.file) {
+      // Fallback for single file upload
+      if (exhibition.exhibitionImage && exhibition.exhibitionImage.length > 0) {
+        const publicIds = exhibition.exhibitionImage.map(img => img.publicId).filter(id => id);
+        await deleteFromCloudinary(publicIds);
       }
+      const uploadResult = await uploadToCloudinary(req.file.buffer, "miraas/exhibitions");
+      updateData.exhibitionImage = [{
+        url: uploadResult.secure_url,
+        publicId: uploadResult.public_id
+      }];
     }
 
-    exhibition = await Exhibition.findByIdAndUpdate(req.params.id, updateData, {new: true});
+    exhibition = await Exhibition.findByIdAndUpdate(req.params.id, updateData, { new: true });
     res.json({
-      success:true,
+      success: true,
       message: "Exhibition updated successfully",
       data: exhibition
     });
@@ -89,7 +117,7 @@ export const updateExhibition = async (req, res) => {
       success: false,
       message: "Error updating exhibition",
       error: error.message
-    });;
+    });
   }
 };
 
@@ -99,23 +127,23 @@ export const deleteExhibition = async (req, res) => {
     const exhibition = await Exhibition.findByIdAndDelete(req.params.id);
     if (!exhibition) return res.status(404).json({ message: "Exhibition not found" });
 
-    //delete all related registrations
+    // Delete all related registrations
     await ExhibitionRegistration.deleteMany({ exhibition_id: req.params.id });
 
-    //delete related image
-    if(exhibition.exhibitionImage?.publicId){
-      await deleteFromCloudinary(exhibition.exhibitionImage.publicId);
+    // Delete related images
+    if (exhibition.exhibitionImage && exhibition.exhibitionImage.length > 0) {
+      const publicIds = exhibition.exhibitionImage.map(img => img.publicId).filter(id => id);
+      await deleteFromCloudinary(publicIds);
     }
 
     res.json({ message: "Exhibition and related registrations deleted successfully" });
-    
   } catch (error) {
     console.log("Error in deleteExhibition:", error);
     res.status(500).json({ message: "Error deleting exhibition" });
   }
 };
 
-//get stats for exhibitions
+// Get stats for exhibitions
 export const getExhibitionStats = async (req, res) => {
   try {
     const exhibitions = await Exhibition.find();
@@ -169,7 +197,6 @@ export const getExhibitionStats = async (req, res) => {
       revenueGenerated,
       categoryData
     });
-
   } catch (error) {
     console.error("❌ Error in getExhibitionStats:", error);
     res.status(500).json({ message: "Error fetching exhibition stats", error: error.message });

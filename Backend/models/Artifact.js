@@ -22,10 +22,12 @@ const artifactSchema = new mongoose.Schema(
     contributor_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     curator_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     published_at: { type: Date },
-    artifactImage: {
-      url: { type: String, default: null },
-      publicId: { type: String, default: null }
-    },
+    artifactImage: [
+      {
+        url: { type: String, default: null },
+        publicId: { type: String, default: null }
+      }
+    ], 
   },
   { timestamps: true }
 );
