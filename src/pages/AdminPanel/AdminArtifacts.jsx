@@ -131,7 +131,6 @@ function AdminArtifacts() {
     { label: 'Drafts', value: stats.drafts, icon: Edit }
   ];
 
-  // --- VALIDATION (same as original) ---
   const validateForm = (formData, errors, setErrors) => {
     const newErrors = {};
     if (!formData.title?.trim()) newErrors.title = 'Title is required';
@@ -151,7 +150,6 @@ function AdminArtifacts() {
     setErrors(prev => ({ ...prev, [name]: error }));
   };
 
-  // --- FORM SUBMIT / DELETE ---
   const handleFormSubmit = async (formData, isEditMode, selectedItem) => {
     try {
       if (isEditMode) {
@@ -183,7 +181,6 @@ function AdminArtifacts() {
     }
   };
 
-  // --- UPDATED: Add thumbnail + count chip in table ---
   const renderTableRow = (artifact) => (
     <>
       <TableCell>
@@ -215,7 +212,7 @@ function AdminArtifacts() {
     </>
   );
 
-  // --- UPDATED: Add multiple image gallery in details view ---
+
   const renderDetailsDialog = (artifact, onClose, onEdit) => {
     const hasImages = artifact.artifactImage && artifact.artifactImage.length > 0;
     const imageCount = hasImages ? artifact.artifactImage.length : 0;
@@ -262,29 +259,40 @@ function AdminArtifacts() {
                 </ImageList>
               </Grid>
             )}
-            <Grid size={{xs:12}} sx={{ mt: 2 }}>
-              {[
-                { label: 'Description', value: artifact.description || '-' },
-                { label: 'Category', value: artifact.category },
-                { label: 'Material', value: artifact.material || '-' },
-                { label: 'Time Period', value: artifact.time_period || '-' },
-                { label: 'Origin', value: artifact.geographical_origin || '-' },
-                { label: 'Artistic Style', value: artifact.artistic_style || '-' },
-                { label: 'Condition', value: artifact.condition_status },
-                {
-                  label: 'Dimensions',
-                  value: `${artifact.dimensions_length || 0} x ${artifact.dimensions_width || 0} x ${artifact.dimensions_height || 0} cm`
-                },
-                { label: 'Weight', value: artifact.weight ? `${artifact.weight} kg` : '-' },
-                { label: 'Cultural Significance', value: artifact.cultural_significance || '-' },
-                { label: 'Historical Context', value: artifact.historical_context || '-' },
-                { label: 'Contributor', value: artifact.contributor_id?.username || 'Unknown' }
-              ].map((field) => (
-                <Box key={field.label} sx={{ mb: 1.5 }}>
-                  <Typography variant="caption" color="textSecondary">{field.label}</Typography>
-                  <Typography variant="body2">{field.value}</Typography>
-                </Box>
-              ))}
+            <Grid size ={{ xs:12, md:6}}>
+              <Box>
+                {[
+                  { label: "Description", value: artifact.description || 'N/A' },
+                  { label: "Category", value: artifact.category },
+                  { label: "Material", value: artifact.material || 'N/A' },
+                  { label: "Time Period", value: artifact.time_period || 'N/A' },
+                  { label: "Origin", value: artifact.geographical_origin || 'N/A' },
+                  { label: "Artistic Style", value: artifact.artistic_style || 'N/A' },
+                ].map((field) => (
+                  <Box key={field.label} sx={{ mb: 2 }}>
+                    <Typography variant="subtitle2" color="textSecondary" gutterBottom>{field.label}</Typography>
+                    <Typography variant="body1" fontWeight="medium">{field.value}</Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Grid>
+
+            <Grid size ={{ xs:12, md:6}}>
+              <Box>
+                {[
+                  { label: "Condition", value: artifact.condition_status },
+                  { label: "Dimensions", value: `${artifact.dimensions_length || 0} x ${artifact.dimensions_width || 0} x ${artifact.dimensions_height || 0} cm` },
+                  { label: "Weight", value: artifact.weight ? `${artifact.weight} kg` : 'N/A' },
+                  { label: "Cultural Significance", value: artifact.cultural_significance || 'N/A' },
+                  { label: "Historical Context", value: artifact.historical_context || 'N/A' },
+                  { label: "Contributor", value: artifact.contributor_id?.username || 'Unknown' },
+                ].map((field) => (
+                  <Box key={field.label} sx={{ mb: 2 }}>
+                    <Typography variant="subtitle2" color="textSecondary" gutterBottom>{field.label}</Typography>
+                    <Typography variant="body1" fontWeight="medium">{field.value}</Typography>
+                  </Box>
+                ))}
+              </Box>
             </Grid>
           </Grid>
         </DialogContent>
