@@ -60,6 +60,7 @@ const AdminTable = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md')); 
   const [activeField, setActiveField] = useState(null);
+  
   // Initialize selectedFilters based on filterOptions
   useEffect(() => {
     if (Array.isArray(filterOptions)) {
@@ -82,12 +83,21 @@ const AdminTable = ({
     setAnchorEl(null);
   };
 
+  // UPDATED handleFormOpen function
   const handleFormOpen = (item = null) => {
     if (item) {
       const formattedItem = { ...item };
       formFields.forEach(field => {
         if (field.type === 'datetime-local' && item[field.name]) {
           formattedItem[field.name] = new Date(item[field.name]).toISOString().slice(0, 16);
+        }
+        
+        // Handle existing images (don't convert to File objects, keep as-is for display)
+        if ((field.name === 'exhibitionImage' || field.name === 'eventImage' || 
+             field.name === 'artifactImage' || field.name === 'profileImage') && 
+            item[field.name]) {
+          // Keep existing image structure (array of {url, publicId} objects)
+          formattedItem[field.name] = item[field.name];
         }
       });
       setFormData(formattedItem);
@@ -450,185 +460,334 @@ const AdminTable = ({
           {errors?.generalError && (
             <Box sx={{ mb: 2, p: 2, bgcolor: 'error.lighter', border: '1px solid', borderColor: 'error.main', borderRadius: 1 }}>
               <Typography variant="body2" color="error.main" sx={{ display: 'flex', alignItems: 'center' }}>
-                <CheckCircle2 size={16} style={{ marginRight: 8, color: 'error.main' }} />  {/* Optional icon */}
+                <CheckCircle2 size={16} style={{ marginRight: 8, color: 'error.main' }} />
                 {errors.generalError}
               </Typography>
             </Box>
           )}
           <Grid container spacing={2} sx={{ mt: 1 }}>
             {formFields.map((field) => (
-  <Grid size={field.gridSize || { xs: 12 }} key={field.name}>
-    {field.type === 'custom' ? (
-      field.render(formData, setFormData, errors)
-    ) : field.type === 'select' ? (
-      <FormControl fullWidth error={formSubmitted && !!errors[field.name]}>
-        <InputLabel>{field.label}</InputLabel>
-        <Select
-          value={formData[field.name] || ''}
-          onChange={(e) => {
-            const value = e.target.value;
-            setFormData((prev) => ({ ...prev, [field.name]: value }));
-            setTouched(true);
-            if (field.onChange) {
-              field.onChange(value, setFormData, formData);
-            }
-            if (validateField) {
-              validateField(field.name, value, formData, setErrors);
-            }
-          }}
-          onFocus={() => setActiveField(field.name)}
-          onBlur={() => setActiveField(null)}
-          label={field.label}
-        >
-          {field.options.map((option) => (
-            <SelectMenuItem key={option.value} value={option.value} sx={{ textTransform: 'capitalize' }}>
-              {option.label}
-            </SelectMenuItem>
-          ))}
-        </Select>
-        {formSubmitted && errors[field.name] && (
-          <FormHelperText sx={{ color: 'error.main' }}>
-            {errors[field.name]}
-          </FormHelperText>
-        )}
-      </FormControl>
-    ) : field.type === 'switch' ? (
-      <FormControlLabel
-        control={
-          <Switch
-            checked={formData[field.name] ?? field.defaultValue ?? false}
-            onChange={(e) => {
-              const value = e.target.checked;
-              setFormData((prev) => ({ ...prev, [field.name]: value }));
-              setTouched(true);
-              if (field.onChange) {
-                field.onChange(value, setFormData, formData);
-              }
-              if (validateField) {
-                validateField(field.name, value, formData, setErrors);
-              }
-            }}
-            onFocus={() => setActiveField(field.name)}
-            onBlur={() => setActiveField(null)}
-          />
-        }
-        label={field.label}
-      />
-    ) : field.name === "profileImage" || field.name === "artifactImage" || field.name === "eventImage" || field.name === "exhibitionImage" ? (
-      <Button
-        variant="outlined"
-        component="label"
-        fullWidth
-        sx={{
-          height: '56px',
-          textTransform: 'none',
-          borderColor: formData[field.name] ? 'success.main' : undefined,
-          color: formData[field.name] ? 'success.main' : undefined,
-          display: 'flex',
-          justifyContent: formData[field.name] ? 'space-between' : 'center',
-          alignItems: 'center',
-          px: 2,
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}>
-          <Typography sx={{ textAlign: formData[field.name] ? 'left' : 'center', flex: 1 }}>
-            {formData[field.name] ? "Change Image" : "Upload Image"}
-          </Typography>
-          {formData[field.name] && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="caption" color="textSecondary">
-                {formData[field.name].name}
-              </Typography>
-              <IconButton
-                size="small"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const nextFormData = { ...formData, [field.name]: null };
-                  setFormData(nextFormData);
-                  if (validateField && (formSubmitted || touched)) {
-                    validateField(field.name, null, nextFormData, setErrors);
-                  }
-                }}
-              >
-                <XCircle size={16} color={theme.palette.error.main} />
-              </IconButton>
-            </Box>
-          )}
-        </Box>
-        <input
-          type="file"
-          accept="image/*"
-          hidden
-          onChange={(e) => {
-            const file = e.target.files[0];
-            if (file) {
-              const nextFormData = { ...formData, [field.name]: file };
-              setFormData(nextFormData);
-              if (validateField && (formSubmitted || touched)) {
-                validateField(field.name, file, nextFormData, setErrors);
-              }
-            }
-          }}
-        />
-      </Button>
-    ) : (
-      <TextField
-        label={field.label}
-        type={field.type || 'text'}
-        value={formData[field.name] || ''}
-        onChange={(e) => {
-          const value = e.target.value;
-          const nextFormData = { ...formData, [field.name]: value };
-          setFormData(nextFormData);
-          setTouched(true);
-          if (validateField) {
-            validateField(field.name, value, nextFormData, setErrors);
-          }
-        }}
-        onFocus={() => setActiveField(field.name)}
-        onBlur={() => setActiveField(null)}
-        fullWidth
-        multiline={field.multiline || false}
-        rows={field.rows || 1}
-        required={field.required || false}
-        error={formSubmitted && !!errors[field.name]}
-        helperText={formSubmitted && errors[field.name] && (
-          <Typography component="span" variant='caption' sx={{ color: 'error.main' }}>
-            {errors[field.name]}
-          </Typography>
-        )}
-        InputLabelProps={field.type === 'datetime-local' ? { shrink: true } : {}}
-        disabled={field.disabled ? field.disabled(formData) : false}
-      />
-    )}
-    {/* Render constraints list for active field */}
-    {activeField === field.name && fieldConstraints?.[field.name] && (
-      <Box sx={{ mt: 1, pl: 2 }}>
-        {fieldConstraints[field.name].map((constraint, index) => {
-          const isMet = formData[field.name] ? constraint.check(formData[field.name]) : false;
-          const IconComponent = isMet ? CheckCircle2 : Circle;
-          return (
-            <Box key={index} sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
-              <IconComponent
-                size={14}
-                color={isMet ? theme.palette.success.main : theme.palette.error.main}
-                style={{ marginRight: 8 }}
-              />
-              <Typography
-                variant="caption"
-                sx={{ color: isMet ? 'success.main' : 'error.main' }}
-              >
-                {constraint.message}
-              </Typography>
-            </Box>
-          );
-        })}
-      </Box>
-    )}
-  </Grid>
-))}
-            
+              <Grid size={field.gridSize || { xs: 12 }} key={field.name}>
+                {field.type === 'custom' ? (
+                  field.render(formData, setFormData, errors)
+                ) : field.type === 'select' ? (
+                  <FormControl fullWidth error={formSubmitted && !!errors[field.name]}>
+                    <InputLabel>{field.label}</InputLabel>
+                    <Select
+                      value={formData[field.name] || ''}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setFormData((prev) => ({ ...prev, [field.name]: value }));
+                        setTouched(true);
+                        if (field.onChange) {
+                          field.onChange(value, setFormData, formData);
+                        }
+                        if (validateField) {
+                          validateField(field.name, value, formData, setErrors);
+                        }
+                      }}
+                      onFocus={() => setActiveField(field.name)}
+                      onBlur={() => setActiveField(null)}
+                      label={field.label}
+                    >
+                      {field.options.map((option) => (
+                        <SelectMenuItem key={option.value} value={option.value} sx={{ textTransform: 'capitalize' }}>
+                          {option.label}
+                        </SelectMenuItem>
+                      ))}
+                    </Select>
+                    {formSubmitted && errors[field.name] && (
+                      <FormHelperText sx={{ color: 'error.main' }}>
+                        {errors[field.name]}
+                      </FormHelperText>
+                    )}
+                  </FormControl>
+                ) : field.type === 'switch' ? (
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={formData[field.name] ?? field.defaultValue ?? false}
+                        onChange={(e) => {
+                          const value = e.target.checked;
+                          setFormData((prev) => ({ ...prev, [field.name]: value }));
+                          setTouched(true);
+                          if (field.onChange) {
+                            field.onChange(value, setFormData, formData);
+                          }
+                          if (validateField) {
+                            validateField(field.name, value, formData, setErrors);
+                          }
+                        }}
+                        onFocus={() => setActiveField(field.name)}
+                        onBlur={() => setActiveField(null)}
+                      />
+                    }
+                    label={field.label}
+                  />
+                ) : field.name === "profileImage" || field.name === "artifactImage" || field.name === "eventImage" || field.name === "exhibitionImage" ? (
+                  <Box>
+                    <Button
+                      variant="outlined"
+                      component="label"
+                      fullWidth
+                      sx={{
+                        height: '56px',
+                        textTransform: 'none',
+                        borderColor: formData[field.name] ? 'success.main' : undefined,
+                        color: formData[field.name] ? 'success.main' : undefined,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        px: 2,
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography>
+                          {formData[field.name] 
+                            ? (field.multiple 
+                                ? `${Array.isArray(formData[field.name]) ? formData[field.name].length : 1} image(s) selected` 
+                                : "Change Image")
+                            : (field.multiple ? "Upload Images (Max 10)" : "Upload Image")}
+                        </Typography>
+                      </Box>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        hidden
+                        multiple={field.multiple || false}
+                        onChange={(e) => {
+                          const files = Array.from(e.target.files);
+                          if (files.length > 0) {
+                            if (field.multiple) {
+                              // Handle multiple files
+                              if (files.length > 10) {
+                                setErrors((prev) => ({ 
+                                  ...prev, 
+                                  [field.name]: "Maximum 10 images allowed" 
+                                }));
+                                return;
+                              }
+                              const nextFormData = { ...formData, [field.name]: files };
+                              setFormData(nextFormData);
+                              if (validateField && (formSubmitted || touched)) {
+                                validateField(field.name, files, nextFormData, setErrors);
+                              }
+                            } else {
+                              // Handle single file
+                              const file = files[0];
+                              const nextFormData = { ...formData, [field.name]: file };
+                              setFormData(nextFormData);
+                              if (validateField && (formSubmitted || touched)) {
+                                validateField(field.name, file, nextFormData, setErrors);
+                              }
+                            }
+                          }
+                        }}
+                      />
+                    </Button>
+                    
+                    {/* Display selected files preview */}
+                    {formData[field.name] && (
+                      <Box sx={{ mt: 2 }}>
+                        {field.multiple && Array.isArray(formData[field.name]) ? (
+                          // Multiple files preview
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                            {formData[field.name].map((item, index) => {
+                              // Check if it's a File object or existing image object
+                              const isFile = item instanceof File;
+                              const imageUrl = isFile ? URL.createObjectURL(item) : item.url;
+                              const imageName = isFile ? item.name : `Image ${index + 1}`;
+                              
+                              return (
+                                <Box
+                                  key={index}
+                                  sx={{
+                                    position: 'relative',
+                                    width: 80,
+                                    height: 80,
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    borderRadius: 1,
+                                    overflow: 'hidden'
+                                  }}
+                                >
+                                  <Box
+                                    component="img"
+                                    src={imageUrl}
+                                    alt={`Preview ${index + 1}`}
+                                    sx={{
+                                      width: '100%',
+                                      height: '100%',
+                                      objectFit: 'cover'
+                                    }}
+                                  />
+                                  <IconButton
+                                    size="small"
+                                    sx={{
+                                      position: 'absolute',
+                                      top: 2,
+                                      right: 2,
+                                      backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                                      '&:hover': {
+                                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                      }
+                                    }}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      const newFiles = formData[field.name].filter((_, i) => i !== index);
+                                      const nextFormData = { 
+                                        ...formData, 
+                                        [field.name]: newFiles.length > 0 ? newFiles : null 
+                                      };
+                                      setFormData(nextFormData);
+                                      if (validateField && (formSubmitted || touched)) {
+                                        validateField(field.name, newFiles.length > 0 ? newFiles : null, nextFormData, setErrors);
+                                      }
+                                    }}
+                                  >
+                                    <XCircle size={14} color={theme.palette.error.main} />
+                                  </IconButton>
+                                  <Typography
+                                    variant="caption"
+                                    sx={{
+                                      position: 'absolute',
+                                      bottom: 0,
+                                      left: 0,
+                                      right: 0,
+                                      backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                                      color: 'white',
+                                      px: 0.5,
+                                      py: 0.25,
+                                      fontSize: '0.65rem',
+                                      textAlign: 'center',
+                                      overflow: 'hidden',
+                                      textOverflow: 'ellipsis',
+                                      whiteSpace: 'nowrap'
+                                    }}
+                                  >
+                                    {imageName}
+                                  </Typography>
+                                </Box>
+                              );
+                            })}
+                          </Box>
+                        ) : (
+                          // Single file preview with thumbnail
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Box
+                              sx={{
+                                position: 'relative',
+                                width: 80,
+                                height: 80,
+                                border: '1px solid',
+                                borderColor: 'divider',
+                                borderRadius: 1,
+                                overflow: 'hidden'
+                              }}
+                            >
+                              <Box
+                                component="img"
+                                src={formData[field.name] instanceof File 
+                                  ? URL.createObjectURL(formData[field.name]) 
+                                  : formData[field.name].url}
+                                alt="Preview"
+                                sx={{
+                                  width: '100%',
+                                  height: '100%',
+                                  objectFit: 'cover'
+                                }}
+                              />
+                            </Box>
+                            <Box sx={{ flex: 1 }}>
+                              <Typography variant="caption" color="textSecondary">
+                                {formData[field.name] instanceof File 
+                                  ? formData[field.name].name 
+                                  : 'Current Image'}
+                              </Typography>
+                            </Box>
+                            <IconButton
+                              size="small"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const nextFormData = { ...formData, [field.name]: null };
+                                setFormData(nextFormData);
+                                if (validateField && (formSubmitted || touched)) {
+                                  validateField(field.name, null, nextFormData, setErrors);
+                                }
+                              }}
+                            >
+                              <XCircle size={16} color={theme.palette.error.main} />
+                            </IconButton>
+                          </Box>
+                        )}
+                      </Box>
+                    )}
+                    
+                    {formSubmitted && errors[field.name] && (
+                      <FormHelperText sx={{ color: 'error.main', mt: 1 }}>
+                        {errors[field.name]}
+                      </FormHelperText>
+                    )}
+                  </Box>
+                ) : (
+                  <TextField
+                    label={field.label}
+                    type={field.type || 'text'}
+                    value={formData[field.name] || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const nextFormData = { ...formData, [field.name]: value };
+                      setFormData(nextFormData);
+                      setTouched(true);
+                      if (validateField) {
+                        validateField(field.name, value, nextFormData, setErrors);
+                      }
+                    }}
+                    onFocus={() => setActiveField(field.name)}
+                    onBlur={() => setActiveField(null)}
+                    fullWidth
+                    multiline={field.multiline || false}
+                    rows={field.rows || 1}
+                    required={field.required || false}
+                    error={formSubmitted && !!errors[field.name]}
+                    helperText={formSubmitted && errors[field.name] && (
+                      <Typography component="span" variant='caption' sx={{ color: 'error.main' }}>
+                        {errors[field.name]}
+                      </Typography>
+                    )}
+                    InputLabelProps={field.type === 'datetime-local' ? { shrink: true } : {}}
+                    disabled={field.disabled ? field.disabled(formData) : false}
+                  />
+                )}
+                {/* Render constraints list for active field */}
+                {activeField === field.name && fieldConstraints?.[field.name] && (
+                  <Box sx={{ mt: 1, pl: 2 }}>
+                    {fieldConstraints[field.name].map((constraint, index) => {
+                      const isMet = formData[field.name] ? constraint.check(formData[field.name]) : false;
+                      const IconComponent = isMet ? CheckCircle2 : Circle;
+                      return (
+                        <Box key={index} sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+                          <IconComponent
+                            size={14}
+                            color={isMet ? theme.palette.success.main : theme.palette.error.main}
+                            style={{ marginRight: 8 }}
+                          />
+                          <Typography
+                            variant="caption"
+                            sx={{ color: isMet ? 'success.main' : 'error.main' }}
+                          >
+                            {constraint.message}
+                          </Typography>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                )}
+              </Grid>
+            ))}
+                        
           </Grid>
         </DialogContent>
         <DialogActions>
