@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Box, Typography, Chip, TableCell, Grid, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Box, Typography, Chip, TableCell, Grid, DialogTitle, DialogContent, DialogActions, ImageList, ImageListItem } from '@mui/material';
 import { Calendar, MapPin, Star, CheckCircle, Edit } from 'lucide-react';
-
 
 // Import the reusable custom components
 import AdminTable from '../../components/ui/AdminTable';
@@ -77,7 +76,7 @@ function AdminExhibitions() {
     { field: 'featured', label: 'Featured', align: 'center' },
   ];
 
-  // Form fields configuration
+  // Form fields configuration with multiple images
   const formFields = [
     { name: 'title', label: 'Title', required: true, gridSize: { xs: 12 } },
     { name: 'description', label: 'Description', multiline: true, rows: 4, gridSize: { xs: 12 } },
@@ -103,7 +102,13 @@ function AdminExhibitions() {
     { name: 'max_capacity', label: 'Max Capacity', type: 'number', gridSize: { xs: 12, md: 6 } },
     { name: 'entry_fee', label: 'Entry Fee', type: 'number', gridSize: { xs: 12, md: 6 } },
     { name: 'age_restriction', label: 'Age Restriction', gridSize: { xs: 12, md: 6 } },
-    { name: 'exhibitionImage', label: 'Exhibition Image', type: 'file', gridSize: { xs: 12, sm: 6 } },
+    { 
+      name: 'exhibitionImage', 
+      label: 'Exhibition Images (Max 10)', 
+      type: 'file', 
+      multiple: true,
+      gridSize: { xs: 12 } 
+    },
     { 
       name: 'is_featured', 
       label: 'Is Featured', 
@@ -235,13 +240,37 @@ function AdminExhibitions() {
   const renderTableRow = (exhibition) => (
     <>
       <TableCell>
-        <Box>
-          <Typography variant="subtitle2" fontWeight="medium">
-            {exhibition.title}
-          </Typography>
-          <Typography variant="caption" color="textSecondary">
-            {exhibition.description?.substring(0, 50) || 'N/A'}...
-          </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          {exhibition.exhibitionImage && exhibition.exhibitionImage.length > 0 && (
+            <Box
+              component="img"
+              src={exhibition.exhibitionImage[0].url}
+              alt={exhibition.title}
+              sx={{
+                width: 50,
+                height: 50,
+                objectFit: 'cover',
+                borderRadius: 1,
+                border: '1px solid',
+                borderColor: 'divider'
+              }}
+            />
+          )}
+          <Box>
+            <Typography variant="subtitle2" fontWeight="medium">
+              {exhibition.title}
+            </Typography>
+            <Typography variant="caption" color="textSecondary">
+              {exhibition.description?.substring(0, 50) || 'N/A'}...
+            </Typography>
+            {exhibition.exhibitionImage && exhibition.exhibitionImage.length > 1 && (
+              <Chip 
+                label={`+${exhibition.exhibitionImage.length - 1} more`} 
+                size="small" 
+                sx={{ ml: 1, height: 18 }}
+              />
+            )}
+          </Box>
         </Box>
       </TableCell>
       
@@ -297,78 +326,153 @@ function AdminExhibitions() {
     </>
   );
 
-  // Custom details dialog renderer
-  const renderDetailsDialog = (exhibition, onClose, onEdit) => (
-    <>
-      <DialogTitle>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h6" fontWeight="bold">
-            Exhibition Details
-          </Typography>
-          <Chip
-            label={exhibition.category}
-            color={categoryColors[exhibition.category]}
-            sx={{ textTransform: 'capitalize' }}
-          />
-        </Box>
-      </DialogTitle>
-      <DialogContent>
-        <Grid container spacing={3} sx={{ mt: 2 }}>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Box sx={{ space: 3 }}>
-              {[
-                { label: "Title", value: exhibition.title },
-                { label: "Description", value: exhibition.description || 'N/A' },
-                { label: "Curator", value: exhibition.curator_id?.username || exhibition.curator_id || 'N/A' },
-                { label: "Start Date", value: formatDate(exhibition.start_date) },
-                { label: "End Date", value: formatDate(exhibition.end_date) },
-                { label: "Location", value: exhibition.location || 'N/A' },
-              ].map((field, index) => (
-                <Box key={index} sx={{ mb: 3 }}>
-                  <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                    {field.label}
-                  </Typography>
-                  <Typography variant="body1" fontWeight="medium">
-                    {field.value}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
+  // Custom details dialog renderer with image gallery
+  const renderDetailsDialog = (exhibition, onClose, onEdit) => {
+    const hasImages = exhibition.exhibitionImage && exhibition.exhibitionImage.length > 0;
+    const imageCount = hasImages ? exhibition.exhibitionImage.length : 0;
+
+    return (
+      <>
+        <DialogTitle>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h6" fontWeight="bold">
+              Exhibition Details
+            </Typography>
+            <Chip
+              label={exhibition.category}
+              color={categoryColors[exhibition.category]}
+              sx={{ textTransform: 'capitalize' }}
+            />
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Grid container spacing={3} sx={{ mt: 1 }}>
+            {/* Image Gallery Section */}
+            {hasImages && (
+              <Grid size={{ xs: 12 }}>
+                <Typography variant="subtitle2" color="textSecondary" gutterBottom>
+                  Exhibition Images ({imageCount})
+                </Typography>
+                {imageCount === 1 ? (
+                  // Single image - full width display
+                  <Box
+                    sx={{
+                      width: '100%',
+                      height: 300,
+                      borderRadius: 2,
+                      overflow: 'hidden',
+                      border: '1px solid',
+                      borderColor: 'divider'
+                    }}
+                  >
+                    <Box
+                      component="img"
+                      src={exhibition.exhibitionImage[0].url}
+                      alt={exhibition.title}
+                      sx={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover'
+                      }}
+                    />
+                  </Box>
+                ) : (
+                  // Multiple images - grid layout
+                  <ImageList 
+                    sx={{ 
+                      width: '100%', 
+                      maxHeight: 400,
+                      borderRadius: 2,
+                      overflow: 'hidden'
+                    }} 
+                    cols={imageCount === 2 ? 2 : 3}
+                    rowHeight={200}
+                    gap={8}
+                  >
+                    {exhibition.exhibitionImage.map((image, index) => (
+                      <ImageListItem 
+                        key={index}
+                        sx={{
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          borderRadius: 1,
+                          overflow: 'hidden'
+                        }}
+                      >
+                        <img
+                          src={image.url}
+                          alt={`${exhibition.title} - Image ${index + 1}`}
+                          loading="lazy"
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover'
+                          }}
+                        />
+                      </ImageListItem>
+                    ))}
+                  </ImageList>
+                )}
+              </Grid>
+            )}
+
+            {/* Details Section */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Box sx={{ space: 3 }}>
+                {[
+                  { label: "Title", value: exhibition.title },
+                  { label: "Description", value: exhibition.description || 'N/A' },
+                  { label: "Curator", value: exhibition.curator_id?.username || exhibition.curator_id || 'N/A' },
+                  { label: "Start Date", value: formatDate(exhibition.start_date) },
+                  { label: "End Date", value: formatDate(exhibition.end_date) },
+                  { label: "Location", value: exhibition.location || 'N/A' },
+                ].map((field, index) => (
+                  <Box key={index} sx={{ mb: 3 }}>
+                    <Typography variant="subtitle2" color="textSecondary" gutterBottom>
+                      {field.label}
+                    </Typography>
+                    <Typography variant="body1" fontWeight="medium">
+                      {field.value}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Box sx={{ space: 3 }}>
+                {[
+                  { label: "Current Bookings", value: exhibition.current_bookings },
+                  { label: "Max Capacity", value: exhibition.max_capacity || 'Unlimited' },
+                  { label: "Entry Fee", value: exhibition.entry_fee === 0 ? 'Free' : `Rs. ${exhibition.entry_fee}` },
+                  { label: "Age Restriction", value: exhibition.age_restriction || 'None' },
+                  { label: "Featured", value: exhibition.is_featured ? 'Yes' : 'No' },
+                  { label: "Status", value: exhibition.status },
+                  { label: "Created At", value: formatDate(exhibition.createdAt) },
+                ].map((field, index) => (
+                  <Box key={index} sx={{ mb: 3 }}>
+                    <Typography variant="subtitle2" color="textSecondary" gutterBottom>
+                      {field.label}
+                    </Typography>
+                    <Typography variant="body2">
+                      {field.value}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Grid>
           </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Box sx={{ space: 3 }}>
-              {[
-                { label: "Current Bookings", value: exhibition.current_bookings },
-                { label: "Max Capacity", value: exhibition.max_capacity || 'Unlimited' },
-                { label: "Entry Fee", value: exhibition.entry_fee === 0 ? 'Free' : `Rs. ${exhibition.entry_fee}` },
-                { label: "Age Restriction", value: exhibition.age_restriction || 'None' },
-                { label: "Banner Image", value: exhibition.exhibitionImage.url || 'N/A' },
-                { label: "Featured", value: exhibition.is_featured ? 'Yes' : 'No' },
-                { label: "Created At", value: formatDate(exhibition.created_at) },
-              ].map((field, index) => (
-                <Box key={index} sx={{ mb: 3 }}>
-                  <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-                    {field.label}
-                  </Typography>
-                  <Typography variant="body2">
-                    {field.value}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
-          </Grid>
-        </Grid>
-      </DialogContent>
-      <DialogActions>
-        <Button variant="outlined" onClick={onClose}>
-          Close
-        </Button>
-        <Button variant="contained" startIcon={<Edit size={16} />} onClick={onEdit}>
-          Edit Exhibition
-        </Button>
-      </DialogActions>
-    </>
-  );
+        </DialogContent>
+        <DialogActions>
+          <Button variant="outlined" onClick={onClose}>
+            Close
+          </Button>
+          <Button variant="contained" startIcon={<Edit size={16} />} onClick={onEdit}>
+            Edit Exhibition
+          </Button>
+        </DialogActions>
+      </>
+    );
+  };
 
   return (
     <AdminTable
@@ -398,7 +502,7 @@ function AdminExhibitions() {
       validateField={validateField}
       statusColors={statusColors}
       categoryColors={categoryColors}
-      errors={errors} // Add this
+      errors={errors}
       setErrors={setErrors}
     />
   );
