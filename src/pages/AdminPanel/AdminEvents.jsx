@@ -1,23 +1,20 @@
 import React, { useState, useEffect, useContext } from 'react';
-// --- MODIFIED: Added ImageList and ImageListItem for the gallery ---
 import { Box, Typography, Chip, Grid, TableCell, DialogTitle, DialogContent, DialogActions, ImageList, ImageListItem } from '@mui/material';
 import { Calendar, MapPin, Users, DollarSign, CheckCircle, Edit } from 'lucide-react';
 
-// Import the reusable AdminTable component
+//import custom components
 import AdminTable from '../../components/ui/AdminTable';
-// --- MODIFIED: Imported the custom Button component for consistency ---
 import { Button } from '../../components/ui';
 
-// Import services
+//import services 
 import { getEvents, createEvent, updateEvent, deleteEvent, getEventStats } from '../../services/EventService';
 
-// Import constants
+//import constants
 import { EVENT_TYPES, EVENT_STATUSES, TARGET_AUDIENCES } from '../../constants/enum';
 
-// Import context
+//import context for user
 import { UserContext } from "../../contexts/UserContext";
 
-// Colors for event types and statuses
 const eventTypeColors = {
   [EVENT_TYPES.CONFERENCE]: 'primary',
   [EVENT_TYPES.WORKSHOP]: 'success',
@@ -44,7 +41,6 @@ function AdminEvents() {
   const [eventTypeData, setEventTypeData] = useState([]);
   const { user } = useContext(UserContext);
 
-  // --- MODIFIED: Renamed 'fetchData' and call it inside useEffect ---
   useEffect(() => {
     fetchEventData();
   }, []);
@@ -67,7 +63,6 @@ function AdminEvents() {
     }
   };
 
-  // Format date helper
   const formatDate = (date) => {
     return new Date(date).toLocaleString('en-US', {
       dateStyle: 'medium',
@@ -75,7 +70,7 @@ function AdminEvents() {
     });
   };
 
-  // Table columns configuration (no changes needed here)
+  //table columns configuration 
   const tableColumns = [
     { field: 'title', label: 'Title' },
     { field: 'event_type', label: 'Event Type' },
@@ -86,7 +81,6 @@ function AdminEvents() {
     { field: 'registration_fee', label: 'Fee', align: 'center' },
   ];
 
-  // --- MODIFIED: Updated formFields for multiple image support ---
   const formFields = [
     { name: 'title', label: 'Title', required: true, gridSize: { xs: 12 } },
     { name: 'description', label: 'Description', multiline: true, rows: 4, gridSize: { xs: 12 } },
@@ -108,7 +102,7 @@ function AdminEvents() {
     },
     { name: 'start_datetime', label: 'Start Date & Time', type: 'datetime-local', required: true, gridSize: { xs: 12, md: 6 } },
     { name: 'end_datetime', label: 'End Date & Time', type: 'datetime-local', required: true, gridSize: { xs: 12, md: 6 } },
-    { name: 'location', label: 'Location', gridSize: { xs: 12 } },
+    { name: 'location', label: 'Location', gridSize: { xs: 12, md: 6 } },
     { name: 'max_attendees', label: 'Max Attendees', type: 'number', gridSize: { xs: 12, md: 6 } },
     { name: 'registration_fee', label: 'Registration Fee', type: 'number', gridSize: { xs: 12, md: 6 } },
     { 
@@ -117,13 +111,6 @@ function AdminEvents() {
       type: 'select',
       options: Object.values(TARGET_AUDIENCES).map(audience => ({ value: audience, label: audience })),
       gridSize: { xs: 12, md: 6 }
-    },
-    { 
-      name: 'eventImage', 
-      label: 'Event Images (Max 10)', // Updated label
-      type: 'file', 
-      multiple: true, // Allow multiple files
-      gridSize: { xs: 12 } 
     },
     { 
       name: 'is_free', 
@@ -139,9 +126,15 @@ function AdminEvents() {
       options: [{ value: true, label: 'Yes' }, { value: false, label: 'No' }],
       gridSize: { xs: 12, md: 6 }
     },
+    { 
+      name: 'eventImage', 
+      label: 'Event Images (Max 10)', 
+      type: 'file', 
+      multiple: true, 
+      gridSize: { xs: 12 } 
+    },
   ];
 
-  // Stats data configuration (no changes needed)
   const statsData = [
     { label: 'Total Events', value: stats.totalEvents, icon: Calendar },
     { label: 'Upcoming Events', value: stats.upcomingEvents, icon: CheckCircle },
@@ -149,17 +142,80 @@ function AdminEvents() {
     { label: 'Revenue Generated', value: `Rs. ${stats.revenueGenerated}`, icon: DollarSign },
   ];
 
-  // Validation functions (no changes needed)
-  const validateForm = (formData, errors, setErrors) => {
-    // ... same validation logic ...
-    return true; // Placeholder for your logic
+   const validateForm = (formData, errors, setErrors) => {
+    const newErrors = {};
+    const now = new Date();
+
+    if (!formData.title?.trim()) {
+      newErrors.title = "Title is required";
+    }
+
+    if (!formData.start_datetime) {
+      newErrors.start_datetime = "Start date & time is required";
+    } else {
+      const startDate = new Date(formData.start_datetime);
+      if (isNaN(startDate.getTime())) {
+        newErrors.start_datetime = "Invalid start date & time";
+      } else if (startDate <= now) {
+        newErrors.start_datetime = "Start date must be in the future";
+      }
+    }
+
+    if (!formData.end_datetime) {
+      newErrors.end_datetime = "End date & time is required";
+    } else {
+      const endDate = new Date(formData.end_datetime);
+      const startDate = new Date(formData.start_datetime);
+
+      if (isNaN(endDate.getTime())) {
+        newErrors.end_datetime = "Invalid end date & time";
+      } else if (formData.start_datetime && endDate <= startDate) {
+        newErrors.end_datetime = "End date must be after start date";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const validateField = (name, value, formData, setErrors) => {
-    // ... same validation logic ...
+    let error = "";
+
+    if (name === "title" && !value?.trim()) {
+      error = "Title is required";
+    }
+
+    if (name === "start_datetime") {
+      if (!value) {
+        error = "Start date & time is required";
+      } else {
+        const now = new Date();
+        const startDate = new Date(value);
+        if (isNaN(startDate.getTime())) {
+          error = "Invalid start date & time";
+        } else if (startDate <= now) {
+          error = "Start date must be in the future";
+        }
+      }
+    }
+
+    if (name === "end_datetime") {
+      if (!value) {
+        error = "End date & time is required";
+      } else {
+        const endDate = new Date(value);
+        const startDate = new Date(formData.start_datetime);
+        if (isNaN(endDate.getTime())) {
+          error = "Invalid end date & time";
+        } else if (formData.start_datetime && endDate <= startDate) {
+          error = "End date must be after start date";
+        }
+      }
+    }
+
+    setErrors((prev) => ({ ...prev, [name]: error }));
   };
 
-  // --- MODIFIED: Simplified form submission to always refetch data ---
   const handleFormSubmit = async (formData, isEditMode, selectedItem) => {
     try {
       if (isEditMode) {
@@ -167,26 +223,24 @@ function AdminEvents() {
       } else {
         await createEvent(formData, user.token);
       }
-      await fetchEventData(); // Refresh all data from the server
+      await fetchEventData(); 
     } catch (error) {
       console.error('Error submitting form:', error);
       throw error;
     }
   };
 
-  // --- MODIFIED: Simplified menu actions to always refetch data ---
   const handleMenuAction = async (action, item) => {
     if (action === 'delete') {
       try {
         await deleteEvent(item._id, user.token);
-        await fetchEventData(); // Refresh all data from the server
+        await fetchEventData();
       } catch (error) {
         console.error('Error deleting event:', error);
       }
     }
   };
 
-  // --- MODIFIED: Complete overhaul of renderTableRow to match AdminExhibitions ---
   const renderTableRow = (event) => (
     <>
       <TableCell>
@@ -240,7 +294,6 @@ function AdminEvents() {
     </>
   );
 
-  // --- MODIFIED: Complete overhaul of renderDetailsDialog to include an image gallery ---
   const renderDetailsDialog = (event, onClose, onEdit) => {
     const hasImages = event.eventImage && event.eventImage.length > 0;
     const imageCount = hasImages ? event.eventImage.length : 0;
