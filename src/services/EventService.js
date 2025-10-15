@@ -19,49 +19,82 @@ export const getEventById = async (id, token) => {
 
 // Create new event
 export const createEvent = async (eventData, token) => {
-  const formData = new FormData();
+  try {
+    const formData = new FormData();
 
-  Object.keys(eventData).forEach((key) =>{
-    if(key !== "eventImage"){
-      formData.append(key, eventData[key]);
+    // Append all text fields except images
+    Object.keys(eventData).forEach(key => {
+      if (key !== 'eventImage') {
+        formData.append(key, eventData[key]);
+      }
+    });
+
+    // Append multiple images if they exist
+    if (eventData.eventImage) {
+      if (Array.isArray(eventData.eventImage)) {
+        eventData.eventImage.forEach(file => formData.append('eventImage', file));
+      } else {
+        formData.append('eventImage', eventData.eventImage);
+      }
     }
-  });
-  if(eventData.eventImage instanceof File) {
-    formData.append("eventImage", eventData.eventImage);
-  }
 
-  const res = await axios.post(API_URL, formData, {
-    headers: { 
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "multipart/form-data",
-    },
-  });
-  return res.data;
+    const response = await axios.post(`${API_URL}`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error creating event:', error);
+    throw error;
+  }
 };
+
 
 // Update event
 export const updateEvent = async (id, eventData, token) => {
-  const formData = new FormData();
-  
-  Object.keys(eventData).forEach((key) => {
-    if(key === "organizer_id" && typeof eventData[key] === "object"){
-      formData.append("organizer_id", eventData[key]._id);
-    } else if(key !== "eventImage"){
-      formData.append(key, eventData[key]);
-    }
-  });
-  if(eventData.eventImage instanceof File){
-    formData.append("eventImage", eventData.eventImage);
-  }
+  try {
+    const formData = new FormData();
+    const excludeFields = ['eventImage', '_id', 'createdAt', 'updatedAt', '__v'];
 
-  const res = await axios.put(`${API_URL}/${id}`, formData, {
-    headers: { 
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "multipart/form-data",
-    },
-  });
-  return res.data;
+    Object.keys(eventData).forEach(key => {
+      if (!excludeFields.includes(key)) {
+        const value = eventData[key];
+        if (typeof value !== 'object' || value instanceof Date) {
+          formData.append(key, value);
+        }
+      }
+    });
+
+    // Handle image uploads
+    if (eventData.eventImage) {
+      const isNewUpload = eventData.eventImage[0] instanceof File;
+
+      if (isNewUpload) {
+        if (Array.isArray(eventData.eventImage)) {
+          eventData.eventImage.forEach(file => formData.append('eventImage', file));
+        } else if (eventData.eventImage instanceof File) {
+          formData.append('eventImage', eventData.eventImage);
+        }
+      }
+    }
+
+    const response = await axios.put(`${API_URL}/${id}`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error updating event:', error);
+    throw error;
+  }
 };
+
 
 // Delete event
 export const deleteEvent = async (id, token) => {
