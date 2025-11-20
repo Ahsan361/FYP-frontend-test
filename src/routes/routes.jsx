@@ -8,6 +8,7 @@ const routes = {
   admin: "/adminDashboard",
   user: "/userDashboard",
   profile: "/profile",
+  
 
   // Visit pages
   visit: {
@@ -46,6 +47,22 @@ const routes = {
     volunteer: "/support/volunteer",
   },
   explore: "/explore",
+
+  // Marketplace (NEW)
+  marketplace: {
+    base: "/marketplace",
+    listing: "/marketplace/listing/:id",
+    create: "/marketplace/create",
+    cart: "/cart",
+    orders: "/marketplace/my-orders",
+    paymentSuccess: "/payment-success",
+    paymentCancel: "/payment-cancel",
+    sellerOnboarding: "/marketplace/seller/onboarding",
+    onboardingComplete: "/onboard/complete",
+    onboardingRefresh: "/onboard/refresh",
+    walletSetup: "/wallet-setup",
+  },
+
 };
 
 export default routes;

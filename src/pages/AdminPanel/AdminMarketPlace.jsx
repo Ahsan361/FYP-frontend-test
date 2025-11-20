@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Box, Typography, Chip, TableCell, DialogActions, DialogContent, DialogTitle, Grid } from '@mui/material';
-import { Gavel, Edit, DollarSign, Star, EyeIcon } from 'lucide-react';
+import { Gavel, Edit, DollarSign, Star, EyeIcon, Package } from 'lucide-react';
 
 // Import the reusable AdminTable component
 import AdminTable from '../../components/ui/AdminTable';
@@ -10,7 +10,7 @@ import { Button } from '../../components/ui';
 import { UserContext } from '../../contexts/UserContext';
 
 // Services
-import { getAllListings, createListing, updateListing, deleteListing, getMarketplaceStats } from '../../services/marketPlaceService';
+import { getListings, createListing, updateListing, deleteListing, getListingStats } from '../../services/listingService';
 import { getArtifacts } from '../../services/artifactService';
 
 // Sample chart data for listing revenue over time
@@ -24,28 +24,23 @@ const revenueData = [
   { date: '02/26', revenue: 2950 }
 ];
 
-// Colors for listing types and statuses
-const listingTypeColors = {
-  auction: 'primary',
-  fixed: 'success',
-  reserve: 'warning',
-};
-
+// Status colors
 const statusColors = {
-  active: 'primary',
-  sold: 'success',
+  active: 'success',
+  sold: 'primary',
   cancelled: 'error',
-  expired: 'default'
 };
 
 function AdminMarketplace() {
   const [listings, setListings] = useState([]);
   const [artifacts, setArtifacts] = useState([]);
+  const [errors, setErrors] = useState({});
   const [stats, setStats] = useState({
     totalListings: 0,
-    featuredListings: 0,
-    totalViews: 0,
-    revenueGenerated: 0
+    activeListings: 0,
+    soldListings: 0,
+    cancelledListings: 0,
+    totalRevenue: 0
   });
   const { user } = useContext(UserContext);
 
@@ -54,17 +49,18 @@ function AdminMarketplace() {
     const fetchData = async () => {
       try {
         const [listingsData, artifactsData, statsData] = await Promise.all([
-          getAllListings(user.token),
+          getListings(),
           getArtifacts(user.token),
-          getMarketplaceStats(user.token)
+          getListingStats(user.token)
         ]);
         setListings(listingsData || []);
         setArtifacts(artifactsData || []);
         setStats(statsData || {
-            activeListings: statsData?.activeListings || 0,
-            soldListings: statsData?.soldListings || 0,
-            cancelledListings: statsData?.cancelledListings || 0,
-            totalRevenue: statsData?.totalRevenue || 0
+          activeListings: 0,
+          soldListings: 0,
+          cancelledListings: 0,
+          totalRevenue: 0,
+          totalListings: 0
         });
       } catch (error) {
         console.error('Error fetching marketplace data:', error);
@@ -76,12 +72,11 @@ function AdminMarketplace() {
   // Table columns configuration
   const tableColumns = [
     { field: 'title', label: 'Title' },
-    { field: 'listing_type', label: 'Type' },
+    { field: 'tokenId', label: 'Token ID' },
     { field: 'status', label: 'Status' },
-    { field: 'current_price', label: 'Current Price' },
-    { field: 'auction_end_time', label: 'End Date' },
-    { field: 'view_count', label: 'Views', align: 'center' },
-    { field: 'is_featured', label: 'Featured', align: 'center' }
+    { field: 'price', label: 'Price (PKR)' },
+    { field: 'seller', label: 'Seller' },
+    { field: 'createdAt', label: 'Created' }
   ];
 
   // Form fields configuration
@@ -103,86 +98,37 @@ function AdminMarketplace() {
             ...prev,
             artifact_id: value,
             title: selectedArtifact.title,
-            description: selectedArtifact.description || ''
+            description: selectedArtifact.description || '',
+            image: selectedArtifact.image || ''
           }));
         }
       }
     },
-    {
-      name: 'listing_type',
-      label: 'Listing Type',
-      type: 'select',
+    { 
+      name: 'title', 
+      label: 'Title', 
       required: true,
-      options: [
-        { value: 'fixed', label: 'Fixed Price' },
-        { value: 'auction', label: 'Auction' },
-        { value: 'reserve', label: 'Reserve Auction' }
-      ],
-      gridSize: { xs: 12, sm: 6 }
+      gridSize: { xs: 12 }
     },
     { 
       name: 'description', 
       label: 'Description', 
       multiline: true,
       rows: 3,
+      required: true,
       gridSize: { xs: 12 }
     },
     {
-      name: 'starting_price',
-      label: 'Starting Price ($)',
+      name: 'price',
+      label: 'Price (PKR)',
       type: 'number',
       required: true,
       gridSize: { xs: 12, sm: 6 }
     },
     {
-      name: 'reserve_price',
-      label: 'Reserve Price ($)',
-      type: 'number',
-      gridSize: { xs: 12, sm: 6 },
-      disabled: (formData) => formData.listing_type !== 'reserve'
-    },
-    {
-      name: 'buy_now_price',
-      label: 'Buy Now Price ($)',
-      type: 'number',
-      gridSize: { xs: 12, sm: 6 }
-    },
-    {
-      name: 'shipping_cost',
-      label: 'Shipping Cost ($)',
-      type: 'number',
-      gridSize: { xs: 12, sm: 6 }
-    },
-    {
-      name: 'auction_start_time',
-      label: 'Auction Start Time',
-      type: 'datetime-local',
-      gridSize: { xs: 12, sm: 6 },
-      disabled: (formData) => formData.listing_type === 'fixed'
-    },
-    {
-      name: 'auction_end_time',
-      label: 'Auction End Time',
-      type: 'datetime-local',
-      gridSize: { xs: 12, sm: 6 },
-      disabled: (formData) => formData.listing_type === 'fixed'
-    },
-    {
-      name: 'auto_extend_minutes',
-      label: 'Auto Extend (minutes)',
-      type: 'number',
-      gridSize: { xs: 12, sm: 6 },
-      disabled: (formData) => formData.listing_type === 'fixed'
-    },
-    {
-      name: 'currency',
-      label: 'Currency',
-      type: 'select',
-      options: [
-        { value: 'USD', label: 'USD' },
-        { value: 'EUR', label: 'EUR' },
-        { value: 'GBP', label: 'GBP' }
-      ],
+      name: 'image',
+      label: 'Image URL (IPFS or Web URL)',
+      required: true,
       gridSize: { xs: 12, sm: 6 }
     },
     {
@@ -192,25 +138,19 @@ function AdminMarketplace() {
       options: [
         { value: 'active', label: 'Active' },
         { value: 'sold', label: 'Sold' },
-        { value: 'cancelled', label: 'Cancelled' },
-        { value: 'expired', label: 'Expired' }
+        { value: 'cancelled', label: 'Cancelled' }
       ],
-      gridSize: { xs: 12, sm: 6 }
-    },
-    {
-      name: 'is_featured',
-      label: 'Featured Listing',
-      type: 'switch',
-      gridSize: { xs: 12, sm: 6 }
+      gridSize: { xs: 12, sm: 6 },
+      renderCondition: (isEditMode) => isEditMode
     }
   ];
 
   // Stats data configuration
   const statsData = [
+    { label: 'Total Listings', value: stats.totalListings || 0, icon: Package },
     { label: 'Active Listings', value: stats.activeListings || 0, icon: Gavel },
-    { label: 'Sold Listings',  value: stats.soldListings || 0, icon: Star },
-    { label: 'Cancelled Listings', value: stats.cancelledListings || 0, icon: EyeIcon },
-    { label: 'Revenue Generated',  value: `$${stats.totalRevenue?.toLocaleString() || '0'}`, icon: DollarSign }
+    { label: 'Sold Listings', value: stats.soldListings || 0, icon: Star },
+    { label: 'Total Revenue', value: `${stats.totalRevenue?.toLocaleString() || '0'} PKR`, icon: DollarSign }
   ];
 
   // Validation functions
@@ -221,33 +161,20 @@ function AdminMarketplace() {
       newErrors.artifact_id = 'Please select an artifact';
     }
 
-    if (!formData.listing_type) {
-      newErrors.listing_type = 'Listing type is required';
+    if (!formData.title?.trim()) {
+      newErrors.title = 'Title is required';
     }
 
-    if (!formData.starting_price || formData.starting_price <= 0) {
-      newErrors.starting_price = 'Starting price must be greater than 0';
+    if (!formData.description?.trim()) {
+      newErrors.description = 'Description is required';
     }
 
-    if (formData.listing_type === 'reserve' && (!formData.reserve_price || formData.reserve_price <= 0)) {
-      newErrors.reserve_price = 'Reserve price is required for reserve auctions';
+    if (!formData.price || formData.price <= 0) {
+      newErrors.price = 'Price must be greater than 0';
     }
 
-    if (formData.listing_type !== 'fixed') {
-      if (!formData.auction_start_time) {
-        newErrors.auction_start_time = 'Auction start time is required';
-      }
-      if (!formData.auction_end_time) {
-        newErrors.auction_end_time = 'Auction end time is required';
-      }
-      if (formData.auction_start_time && formData.auction_end_time && 
-          new Date(formData.auction_start_time) >= new Date(formData.auction_end_time)) {
-        newErrors.auction_end_time = 'End time must be after start time';
-      }
-    }
-
-    if (formData.shipping_cost && formData.shipping_cost < 0) {
-      newErrors.shipping_cost = 'Shipping cost cannot be negative';
+    if (!formData.image?.trim()) {
+      newErrors.image = 'Image URL is required';
     }
 
     setErrors(newErrors);
@@ -261,28 +188,20 @@ function AdminMarketplace() {
       error = 'Please select an artifact';
     }
 
-    if (name === 'listing_type' && !value) {
-      error = 'Listing type is required';
+    if (name === 'title' && !value?.trim()) {
+      error = 'Title is required';
     }
 
-    if (name === 'starting_price' && (!value || value <= 0)) {
-      error = 'Starting price must be greater than 0';
+    if (name === 'description' && !value?.trim()) {
+      error = 'Description is required';
     }
 
-    if (name === 'reserve_price' && formData.listing_type === 'reserve' && (!value || value <= 0)) {
-      error = 'Reserve price is required for reserve auctions';
+    if (name === 'price' && (!value || value <= 0)) {
+      error = 'Price must be greater than 0';
     }
 
-    if (name === 'auction_start_time' && formData.listing_type !== 'fixed' && !value) {
-      error = 'Auction start time is required';
-    }
-
-    if (name === 'auction_end_time' && formData.listing_type !== 'fixed' && !value) {
-      error = 'Auction end time is required';
-    }
-
-    if (name === 'shipping_cost' && value && value < 0) {
-      error = 'Shipping cost cannot be negative';
+    if (name === 'image' && !value?.trim()) {
+      error = 'Image URL is required';
     }
 
     setErrors((prev) => ({ ...prev, [name]: error }));
@@ -291,32 +210,27 @@ function AdminMarketplace() {
   // Handle form submission
   const handleFormSubmit = async (formData, isEditMode, selectedItem) => {
     try {
-      // Set default values
-      const listingData = {
-        ...formData,
-        currency: formData.currency || 'USD',
-        current_price: formData.starting_price,
-        status: formData.status || 'active'
-      };
-
       if (isEditMode) {
-        await updateListing(selectedItem._id, listingData, user.token);
+        // Update existing listing (no blockchain operation, just DB)
+        await updateListing(selectedItem._id, formData, user.token);
       } else {
-        await createListing(listingData, user.token);
+        // Create new listing (will mint NFT on blockchain)
+        await createListing(formData, user.token);
       }
       
       // Refresh data
       const [updatedListings, updatedStats] = await Promise.all([
-        getAllListings(user.token),
-        getMarketplaceStats(user.token)
+        getListings(),
+        getListingStats(user.token)
       ]);
       
       setListings(updatedListings || []);
       setStats(updatedStats || {
-          activeListings: statsData?.activeListings || 0,
-          soldListings: statsData?.soldListings || 0,
-          cancelledListings: statsData?.cancelledListings || 0,
-          totalRevenue: statsData?.totalRevenue || 0
+        activeListings: 0,
+        soldListings: 0,
+        cancelledListings: 0,
+        totalRevenue: 0,
+        totalListings: 0
       });
     } catch (error) {
       console.error('Error saving listing:', error);
@@ -332,16 +246,17 @@ function AdminMarketplace() {
         
         // Refresh data
         const [updatedListings, updatedStats] = await Promise.all([
-          getAllListings(user.token),
-          getMarketplaceStats(user.token)
+          getListings(),
+          getListingStats(user.token)
         ]);
         
         setListings(updatedListings || []);
         setStats(updatedStats || {
-          activeListings: statsData?.activeListings || 0,
-          soldListings: statsData?.soldListings || 0,
-          cancelledListings: statsData?.cancelledListings || 0,
-          totalRevenue: statsData?.totalRevenue || 0
+          activeListings: 0,
+          soldListings: 0,
+          cancelledListings: 0,
+          totalRevenue: 0,
+          totalListings: 0
         });
       } catch (error) {
         console.error('Error deleting listing:', error);
@@ -356,7 +271,7 @@ function AdminMarketplace() {
     };
 
     const formatCurrency = (amount) => {
-      return amount ? `$${amount.toFixed(2)}` : 'N/A';
+      return amount ? `${amount.toLocaleString()} PKR` : 'N/A';
     };
 
     return (
@@ -372,29 +287,28 @@ function AdminMarketplace() {
           </Box>
         </TableCell>
         <TableCell>
-          <Chip
-            label={listing.listing_type}
-            color={listingTypeColors[listing.listing_type] || 'default'}
-            sx={{ textTransform: 'capitalize' }}
-          />
+          <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+            #{listing.tokenId}
+          </Typography>
         </TableCell>
         <TableCell>
           <Chip
             label={listing.status}
             color={statusColors[listing.status] || 'default'}
+            size="small"
             sx={{ textTransform: 'capitalize' }}
           />
         </TableCell>
-        <TableCell>{formatCurrency(listing.current_price)}</TableCell>
-        <TableCell>{formatDate(listing.auction_end_time)}</TableCell>
-        <TableCell align="center">{listing.view_count || 0}</TableCell>
-        <TableCell align="center">
-          {listing.is_featured ? (
-            <Star size={18} color="#4CAF50" fill="#4CAF50" />
-          ) : (
-            <Star size={18} color="#B0BEC5" />
-          )}
+        <TableCell>{formatCurrency(listing.price)}</TableCell>
+        <TableCell>
+          <Typography variant="body2">
+            {listing.seller?.username || 'Unknown'}
+          </Typography>
+          <Typography variant="caption" color="textSecondary">
+            {listing.seller?.email || 'N/A'}
+          </Typography>
         </TableCell>
+        <TableCell>{formatDate(listing.createdAt)}</TableCell>
       </>
     );
   };
@@ -406,7 +320,7 @@ function AdminMarketplace() {
     };
 
     const formatCurrency = (amount) => {
-      return amount ? `$${amount.toFixed(2)}` : 'N/A';
+      return amount ? `${amount.toLocaleString()} PKR` : 'N/A';
     };
 
     return (
@@ -417,8 +331,8 @@ function AdminMarketplace() {
               {listing.title}
             </Typography>
             <Chip
-              label={listing.listing_type}
-              color={listingTypeColors[listing.listing_type] || 'default'}
+              label={listing.status}
+              color={statusColors[listing.status] || 'default'}
               sx={{ textTransform: 'capitalize' }}
             />
           </Box>
@@ -426,43 +340,45 @@ function AdminMarketplace() {
         <DialogContent>
           <Grid container spacing={3} sx={{ mt: 2 }}>
             <Grid size={{ xs: 12, md: 6 }}>
-              <Box>
-                {[
-                  { label: 'Description', value: listing.description || '-' },
-                  { label: 'Listing Type', value: listing.listing_type },
-                  { label: 'Status', value: listing.status },
-                  { label: 'Starting Price', value: formatCurrency(listing.starting_price) },
-                  { label: 'Current Price', value: formatCurrency(listing.current_price) },
-                  { label: 'Reserve Price', value: formatCurrency(listing.reserve_price) },
-                  { label: 'Buy Now Price', value: formatCurrency(listing.buy_now_price) },
-                  { label: 'Currency', value: listing.currency || 'USD' }
-                ].map((field, index) => (
-                  <Box key={index} sx={{ mb: 2 }}>
-                    <Typography variant="subtitle2" color="textSecondary">
-                      {field.label}
-                    </Typography>
-                    <Typography variant="body1">{field.value}</Typography>
-                  </Box>
-                ))}
-              </Box>
+              {listing.image && (
+                <Box
+                  component="img"
+                  src={listing.image}
+                  alt={listing.title}
+                  sx={{
+                    width: '100%',
+                    borderRadius: 2,
+                    mb: 2
+                  }}
+                />
+              )}
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
               <Box>
                 {[
-                  { label: 'Auction Start', value: formatDate(listing.auction_start_time) },
-                  { label: 'Auction End', value: formatDate(listing.auction_end_time) },
-                  { label: 'Auto Extend', value: `${listing.auto_extend_minutes || 0} minutes` },
-                  { label: 'Shipping Cost', value: formatCurrency(listing.shipping_cost) },
-                  { label: 'Featured', value: listing.is_featured ? 'Yes' : 'No' },
-                  { label: 'Views', value: listing.view_count?.toLocaleString() || '0' },
-                  { label: 'Created At', value: formatDate(listing.created_at) },
+                  { label: 'Description', value: listing.description || '-' },
+                  { label: 'Price', value: formatCurrency(listing.price) },
+                  { label: 'Status', value: listing.status },
+                  { label: 'Token ID', value: listing.tokenId },
+                  { label: 'Contract Address', value: listing.contractAddress },
+                  { label: 'Seller', value: listing.seller?.username || 'Unknown' },
+                  { label: 'Seller Email', value: listing.seller?.email || 'N/A' },
+                  { label: 'Created At', value: formatDate(listing.createdAt) },
+                  { label: 'Updated At', value: formatDate(listing.updatedAt) },
                   { label: 'Artifact ID', value: listing.artifact_id?._id || listing.artifact_id || '-' }
                 ].map((field, index) => (
                   <Box key={index} sx={{ mb: 2 }}>
                     <Typography variant="subtitle2" color="textSecondary">
                       {field.label}
                     </Typography>
-                    <Typography variant="body1">{field.value}</Typography>
+                    <Typography 
+                      variant="body2"
+                      sx={{
+                        wordBreak: field.label === 'Contract Address' ? 'break-all' : 'normal'
+                      }}
+                    >
+                      {field.value}
+                    </Typography>
                   </Box>
                 ))}
               </Box>
@@ -483,9 +399,9 @@ function AdminMarketplace() {
 
   return (
     <AdminTable
-      title="Marketplace Management"
-      subtitle="Monitor and manage marketplace listings"
-      createButtonText="Create Listing"
+      title="NFT Marketplace Management"
+      subtitle="Manage blockchain-based NFT listings"
+      createButtonText="Create NFT Listing"
       createButtonIcon={<Gavel size={20} />}
       chartData={revenueData}
       chartType="area"
@@ -495,17 +411,12 @@ function AdminMarketplace() {
       statsData={statsData}
       tableColumns={tableColumns}
       tableData={listings}
-      searchFields={['title', 'description']}
+      searchFields={['title', 'description', 'tokenId']}
       filterOptions={[
-        {
-          label: 'Listing Type',
-          field: 'listing_type',
-          options: ['All', 'auction', 'fixed', 'reserve']
-        },
         {
           label: 'Status',
           field: 'status',
-          options: ['All', 'active', 'sold', 'cancelled', 'expired']
+          options: ['All', 'active', 'sold', 'cancelled']
         }
       ]}
       onFormSubmit={handleFormSubmit}
@@ -516,6 +427,8 @@ function AdminMarketplace() {
       validateForm={validateForm}
       validateField={validateField}
       statusColors={statusColors}
+      errors={errors}
+      setErrors={setErrors}
     />
   );
 }

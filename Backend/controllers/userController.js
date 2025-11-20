@@ -1,3 +1,4 @@
+// controllers/userController.js
 import User from "../models/User.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../config/cloudinary.js";
 
@@ -7,7 +8,7 @@ export const addUser = async (req, res) => {
     const {
       username,
       email,
-      password,            // plain text from request
+      password,
       first_name,
       last_name,
       phone_number,
@@ -29,11 +30,11 @@ export const addUser = async (req, res) => {
       return res.status(400).json({ message: "User already exists with this username" });
     } 
 
-    // Create new user (use password_hash here so pre-save hook runs)
+    // Create new user
     const newUser = new User({
       username,
       email,
-      password_hash: password,  // 👈 aligns with schema + will get hashed
+      password_hash: password,
       first_name,
       last_name,
       phone_number,
@@ -64,25 +65,43 @@ export const addUser = async (req, res) => {
 
 // Get profile
 export const getUserProfile = async (req, res) => {
-  const user = await User.findById(req.user._id).select("-password_hash");;
-  if (user) {
-    res.json(user);
-  } else {
-    res.status(404).json({ message: "User not found" });
+  try {
+    const user = await User.findById(req.user._id).select("-password_hash");
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    console.error("Error in getUserProfile:", error);
+    res.status(500).json({ message: "Error fetching profile" });
   }
 };
 
 // Admin: Get all users
 export const getAllUsers = async (req, res) => {
-  const users = await User.find().select("-password_hash");
-  res.json(users);
+  try {
+    const users = await User.find().select("-password_hash");
+    res.json(users);
+  } catch (error) {
+    console.error("Error in getAllUsers:", error);
+    res.status(500).json({ message: "Error fetching users" });
+  }
 };
 
 // Admin: Get user by ID
 export const getUserById = async (req, res) => {
-  const user = await User.findById(req.params.id).select("-password_hash");
-  if (user) res.json(user);
-  else res.status(404).json({ message: "User not found" });
+  try {
+    const user = await User.findById(req.params.id).select("-password_hash");
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    console.error("Error in getUserById:", error);
+    res.status(500).json({ message: "Error fetching user" });
+  }
 };
 
 // Update user
@@ -90,7 +109,6 @@ export const updateUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: "User not found" });
-
 
     user.username = req.body.username || user.username;
     user.email = req.body.email || user.email;
@@ -102,29 +120,30 @@ export const updateUser = async (req, res) => {
     user.email_verified = req.body.email_verified ?? user.email_verified;
 
     if (req.file) {
-    // If user already has an image, delete old one first
-    if (user.profileImage?.publicId) {
-      await deleteFromCloudinary(user.profileImage.publicId);
-    }
+      // If user already has an image, delete old one first
+      if (user.profileImage?.publicId) {
+        await deleteFromCloudinary(user.profileImage.publicId);
+      }
 
-    // Upload new image to Cloudinary under "miraas/users"
-    const uploadResult = await uploadToCloudinary(req.file.buffer, "miraas/users");
-
-    user.profileImage = {
+      // Upload new image to Cloudinary
+      const uploadResult = await uploadToCloudinary(req.file.buffer, "miraas/users");
+      user.profileImage = {
         url: uploadResult.secure_url,
         publicId: uploadResult.public_id,
       };
     }
 
     const updatedUser = await user.save();
-    res.json(updatedUser);
+    
+    // Return without password
+    const { password_hash, ...userWithoutPassword } = updatedUser.toObject();
+    res.json(userWithoutPassword);
 
   } catch (error) {
-    console.log("Error in updateUser:", error);
+    console.error("Error in updateUser:", error);
     res.status(500).json({ message: error.message });
   }
 };
-
 
 // Admin: Delete user
 export const deleteUser = async (req, res) => {
@@ -132,23 +151,50 @@ export const deleteUser = async (req, res) => {
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    //delete related image from cloud too
+    // Delete related image from cloud too
     if (user.profileImage?.publicId) {
       await deleteFromCloudinary(user.profileImage.publicId);
     }
 
     res.json({ message: "User deleted successfully" });
   } catch (error) {
-    console.log("❌ Error in deleteUser:", error);
+    console.error("❌ Error in deleteUser:", error);
     res.status(500).json({ message: "Error deleting user" });
   }
 };
 
-// Admin: Get user statistics (example: count active/inactive)
+// Admin: Get user statistics
 export const getUserStats = async (req, res) => {
-  const totalUsers = await User.countDocuments();
-  const activeUsers = await User.countDocuments({ is_active: true });
-  const inactiveUsers = totalUsers - activeUsers;
+  try {
+    const totalUsers = await User.countDocuments();
+    const activeUsers = await User.countDocuments({ is_active: true });
+    const inactiveUsers = totalUsers - activeUsers;
 
-  res.json({ totalUsers, activeUsers, inactiveUsers });
+    res.json({ totalUsers, activeUsers, inactiveUsers });
+  } catch (error) {
+    console.error("Error in getUserStats:", error);
+    res.status(500).json({ message: "Error fetching stats" });
+  }
+};
+
+// ============ MARKETPLACE ADDITIONS ============
+
+// Check Stripe account status
+export const checkStripeStatus = async (req, res) => {
+  try {
+    const userId = req.user._id; // from authMiddleware
+    const user = await User.findById(userId).select('stripeAccountId');
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      hasStripeAccount: !!user.stripeAccountId,
+      stripeAccountId: user.stripeAccountId || null,
+    });
+  } catch (err) {
+    console.error("Error checking Stripe status:", err);
+    res.status(500).json({ message: "Error checking Stripe status", error: err.message });
+  }
 };

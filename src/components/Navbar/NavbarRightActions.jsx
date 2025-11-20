@@ -1,6 +1,7 @@
+// navbar/NavbarRightActions.jsx
 import { Menu as MenuIcon, Close as CloseIcon, Login, Logout } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import {
   Box,
   IconButton,
@@ -12,24 +13,31 @@ import {
   Tooltip,
   Menu,
   MenuItem,
+  Badge,
+  Divider,
 } from "@mui/material";
+import { ShoppingCart, Plus, Package, Store, Settings, LayoutDashboard, LogOut  } from "lucide-react";
 
 // Custom components
 import ThemeToggle from "../ui/ThemeToggle";
 import Button from "../ui/Button";
 
+// Contexts
+import { CartContext } from "../../contexts/CartContext";
+
 //api service
-import { getProfile, updateUser } from "../../services/userService";
+import { getProfile } from "../../services/userService";
 
 function RightActions({ user, setUser, isMobile, handleMobileMenuToggle, mobileMenuOpen }) {
   const [userData, setUserData] = useState(null);
   const theme = useTheme();
   const navigate = useNavigate();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
-  const isMediumScreen = useMediaQuery(theme.breakpoints.between("sm", "md"));
+  const { getCartCount } = useContext(CartContext);
 
   // State for profile menu
   const [anchorEl, setAnchorEl] = useState(null);
+  const [sellerMenuAnchor, setSellerMenuAnchor] = useState(null);
   const open = Boolean(anchorEl);
 
   const handleProfileClick = (event) => {
@@ -40,8 +48,21 @@ function RightActions({ user, setUser, isMobile, handleMobileMenuToggle, mobileM
     setAnchorEl(null);
   };
 
+  const handleSellerMenuOpen = (event) => {
+    setSellerMenuAnchor(event.currentTarget);
+  };
+
+  const handleSellerMenuClose = () => {
+    setSellerMenuAnchor(null);
+  };
+
   const handleViewProfile = () => {
     navigate("/profile");
+    handleMenuClose();
+  };
+
+  const handleMyOrders = () => {
+    navigate("/marketplace/my-orders");
     handleMenuClose();
   };
 
@@ -55,27 +76,32 @@ function RightActions({ user, setUser, isMobile, handleMobileMenuToggle, mobileM
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token"); // remove JWT
-    setUser(null); // update state in parent
-    navigate("/login"); // redirect to login
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    navigate("/login");
     handleMenuClose();
   };
 
   useEffect(() => {
-    // Check if user exists and has a token before making the API call
     if (!user || !user.token) return;
 
     const fetchProfile = async () => {
       try {
         const profileData = await getProfile(user.token);
         setUserData(profileData);
+        
+        // Update user context with latest data including stripeAccountId
+        if (profileData.stripeAccountId && !user.stripeAccountId) {
+          setUser((prev) => ({ ...prev, stripeAccountId: profileData.stripeAccountId }));
+        }
       } catch (err) {
         console.error("Failed to load profile", err);
       }
     };
 
     fetchProfile();
-  }, [user?.token]); // Use optional chaining in dependency array too
+  }, [user?.token]);
 
   return (
     <Stack
@@ -91,9 +117,39 @@ function RightActions({ user, setUser, isMobile, handleMobileMenuToggle, mobileM
     >
       <ThemeToggle />
 
+      {/* ============ MARKETPLACE: Cart Icon ============ */}
+      {!isMobile && (
+        <Tooltip title="Shopping Cart">
+          <IconButton
+            onClick={() => navigate("/cart")}
+            aria-label="Shopping cart"
+            sx={{
+              transition: 'transform 0.2s ease-in-out',
+              '&:hover': {
+                transform: 'scale(1.1)',
+              },
+            }}
+          >
+            <Badge badgeContent={getCartCount()} color="error">
+              <ShoppingCart size={20} />
+            </Badge>
+          </IconButton>
+        </Tooltip>
+      )}
+
       {user ? (
-        // Logged-in state (both regular user and guest user)
+        // Logged-in state
         <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 0.5, sm: 1 } }}>
+          <Button
+          variant="contained"
+          size="small"
+          startIcon={<Store size={16} />}
+          onClick={() => navigate("/marketplace")}
+          sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
+        >
+          Buy
+        </Button>
+          {/* User Profile Avatar */}
           <Tooltip title="Profile">
             <IconButton
               onClick={handleProfileClick}
@@ -103,8 +159,8 @@ function RightActions({ user, setUser, isMobile, handleMobileMenuToggle, mobileM
               aria-haspopup="true"
               aria-expanded={open ? "true" : undefined}
             >
-              <Avatar src={userData?.profileImage.url || user.avatar}>
-                {userData?.profileImage.url ? "" : user.username?.charAt(0).toUpperCase()}
+              <Avatar src={userData?.profileImage?.url || user.avatar}>
+                {userData?.profileImage?.url ? "" : user.username?.charAt(0).toUpperCase()}
               </Avatar>
             </IconButton>
           </Tooltip>
@@ -126,12 +182,27 @@ function RightActions({ user, setUser, isMobile, handleMobileMenuToggle, mobileM
             }}
           >
             <MenuItem onClick={handleViewProfile}>
+              <Settings size={18} style={{ marginRight: 8 }} />
               <Typography variant="body2">Settings</Typography>
             </MenuItem>
+            <Divider />
             <MenuItem onClick={handleViewDashboard}>
+              <LayoutDashboard size={18} style={{ marginRight: 8 }} />
               <Typography variant="body2">View Dashboard</Typography>
             </MenuItem>
+            <Divider />
+            <MenuItem onClick={handleMyOrders}>
+              <Package size={18} style={{ marginRight: 8 }} />
+              <Typography variant="body2">My Orders</Typography>
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={() => { navigate('/seller/onboarding'); handleMenuClose(); }}>
+              <Store size={18} style={{ marginRight: 8 }} />
+              <Typography variant="body2">Become a Seller</Typography>
+            </MenuItem>
+            <Divider />
             <MenuItem onClick={handleLogout}>
+              <LogOut size={18} style={{ marginRight: 8 }} />
               <Typography variant="body2" color="error.main">
                 Logout
               </Typography>

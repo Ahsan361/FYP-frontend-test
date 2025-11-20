@@ -1,3 +1,4 @@
+// context/userContext.js
 import React, { createContext, useState, useEffect } from "react";
 
 // Create the context
@@ -31,8 +32,49 @@ export const UserProvider = ({ children }) => {
     }
   }, [user]);
 
+  // ============ MARKETPLACE ADDITIONS ============
+  
+  // Update user data (for refreshing Stripe status, etc.)
+  const updateUser = (updatedData) => {
+    setUser((prev) => {
+      const newUser = { ...prev, ...updatedData };
+      localStorage.setItem("user", JSON.stringify(newUser));
+      return newUser;
+    });
+  };
+
+  // Update Stripe account status specifically
+  const updateStripeStatus = (stripeAccountId) => {
+    setUser((prev) => {
+      const newUser = { ...prev, stripeAccountId };
+      localStorage.setItem("user", JSON.stringify(newUser));
+      return newUser;
+    });
+  };
+
+  // Login helper
+  const login = (userData) => {
+    setUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData));
+  };
+
+  // Logout helper
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+  };
+
   return (
-    <UserContext.Provider value={{ user, setUser, loading }}>
+    <UserContext.Provider value={{ 
+      user, 
+      setUser, 
+      loading,
+      updateUser,
+      updateStripeStatus,
+      login,
+      logout
+    }}>
       {children}
     </UserContext.Provider>
   );

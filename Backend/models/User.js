@@ -22,6 +22,14 @@ const userSchema = new mongoose.Schema(
     otp_expires_at: { type: Date },
     otp_attempts: { type: Number, default: 0 },
     created_at_unverified: { type: Date },
+
+     // Stripe (Fiat Payments)
+    stripeAccountId: { type: String }, 
+    isStripeVerified: { type: Boolean, default: false },
+
+    // Blockchain Wallet
+    walletAddress: { type: String }, // e.g., MetaMask / external wallet
+    isWalletLinked: { type: Boolean, default: false }, // quick flag
   },
   { timestamps: true }
 );

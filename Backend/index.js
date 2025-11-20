@@ -25,6 +25,11 @@ import userRoutes from "./routes/userRoutes.js";
 import EventRegistration from "./routes/eventRegistrationRoutes.js"
 import ExhibitionRegistration from "./routes/exhibitionRegistrationRoutes.js"
 import imageRoutes from "./routes/imageRoutes.js";
+import stripeWebhookRoutes from "./routes/stripeWebhook.js";
+import listingRoutes from "./routes/listingRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
+import stripeRoutes from "./routes/stripeRoute.js";
+import walletSetupRoutes from "./routes/walletSetupRoute.js";
 
 // Connect to database
 connectDB();
@@ -39,6 +44,7 @@ app.use(cors({
 
 
 // Mount your routers
+app.use("/api/stripe", stripeWebhookRoutes);
 app.use("/api/artifacts", artifactRoutes);
 app.use("/api/artifact-media", artifactMediaRoutes);
 app.use("/api/blockchain", blockchainRoutes);
@@ -54,6 +60,11 @@ app.use("/api/users", userRoutes);
 app.use("/api/event-registrations", EventRegistration)
 app.use("/api/exhibition-registrations", ExhibitionRegistration)
 app.use("/api/image-route", imageRoutes);
+//blockchain routes
+app.use("/api/listings", listingRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/payments", stripeRoutes);
+app.use("/api/wallet-setup", walletSetupRoutes);
 
 const PORT = process.env.PORT || 5000;
 

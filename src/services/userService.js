@@ -1,3 +1,4 @@
+// service/userService.js
 import axios from "axios";
 
 const API_URL = `${import.meta.env.VITE_API_BASE_URL}/users`; 
@@ -90,10 +91,23 @@ export const resetPassword = async (email) => {
   return res.data;
 };
 
-//get me 
+//get me (profile)
 export const getProfile = async (token) => {
   const res = await axios.get(`${API_URL}/profile`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
-}
+};
+
+// ============ MARKETPLACE ADDITIONS ============
+
+// Check Stripe account status
+export const checkStripeStatus = async (token) => {
+  const res = await axios.get(`${API_URL}/stripe-status`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};
+
+// Get user profile with Stripe info (alias for compatibility)
+export const getUserProfile = getProfile;

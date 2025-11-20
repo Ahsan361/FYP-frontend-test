@@ -27,7 +27,19 @@ import AdminPanel from "../pages/AdminPanel/AdminPanel";
 import UserPanel from "../pages/UserPanel/UserPanel";
 import UserProfile from "../pages/UserProfile/UserProfile"
 import EmailVerification from "../pages/Authentication/EmailVerification"
+
+//marketplace pages
 import MarketPlacePage from "../pages/MarkepPlace/MarketPlacePage";
+import ListingDetailPage from "../pages/MarkepPlace/ListingDetailPage";
+import CreateListingPage from "../pages/MarkepPlace/CreateListingPage";
+import CartPage from "../pages/MarkepPlace/CartPage";
+import MyOrdersPage from "../pages/MarkepPlace/MyOrdersPage";
+import PaymentSuccessPage from "../pages/Payment/PaymentSuccessPage";
+import PaymentCancelPage from "../pages/Payment/PaymentCancelPage";
+import SellerOnboardingPage from "../pages/MarkepPlace/SellerOnboardingPage";
+import OnboardingCompletePage from "../pages/MarkepPlace/OnboardingCompletePage";
+import OnboardingRefreshPage from "../pages/MarkepPlace/OnboardingRefreshPage";
+import WalletSetupPage from "../pages/MarkepPlace/LinkWallet/walletSetupPage";
 
 // map paths to components
 const routesConfig = [
@@ -65,8 +77,21 @@ const routesConfig = [
   { path: routes.support.existingPatron, element: <ExistingPatronPage /> },
   { path: routes.support.volunteer, element: <VolunteerPage /> },
 
-  //exibition and event  page 
-  { path: routes.explore, element: <EventsAndExibitionsPage /> },//to be replaced with our original page here 
+  //exibition and event page 
+  { path: routes.explore, element: <EventsAndExibitionsPage /> },
+
+  //marketPlace pages
+  { path: routes.marketplace.base, element: <MarketPlacePage /> },
+  { path: routes.marketplace.listing, element: <ListingDetailPage /> },
+  { path: routes.marketplace.create, element: <CreateListingPage /> },
+  { path: routes.marketplace.cart, element: <CartPage /> },
+  { path: routes.marketplace.orders, element: <MyOrdersPage /> },
+  { path: routes.marketplace.paymentSuccess, element: <PaymentSuccessPage /> },
+  { path: routes.marketplace.paymentCancel, element: <PaymentCancelPage /> },
+  { path: routes.marketplace.sellerOnboarding, element: <SellerOnboardingPage /> },
+  { path: routes.marketplace.onboardingComplete, element: <OnboardingCompletePage /> },
+  { path: routes.marketplace.onboardingRefresh, element: <OnboardingRefreshPage /> },
+  { path: routes.marketplace.walletSetup, element: <WalletSetupPage /> },
 ];
 
 export default routesConfig;
